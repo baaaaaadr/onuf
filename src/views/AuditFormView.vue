@@ -45,23 +45,18 @@
               style="height: 120px; border-radius: 8px; overflow: hidden;"
             ></div>
             
-            <!-- Bouton debug -->
-            <div class="d-flex justify-center mt-2">
-              <v-btn 
-                size="x-small" 
-                variant="text" 
-                color="grey" 
-                @click="showDebugDialog = true"
-              >
-                <v-icon size="small" class="mr-1">mdi-bug</v-icon>
-                Debug GPS
-              </v-btn>
-            </div>
+            <!-- Note: Bouton debug supprimé - cliquer sur précision -->
           </div>
           
-          <!-- Indicateur de précision -->
+          <!-- Indicateur de précision cliquable -->
           <div v-if="locationAccuracy" class="d-flex justify-space-between align-center">
-            <v-chip size="x-small" :color="getAccuracyColor()" variant="tonal">
+            <v-chip 
+              size="x-small" 
+              :color="getAccuracyColor()" 
+              variant="tonal"
+              @click="showDebugDialog = true"
+              class="cursor-pointer"
+            >
               <v-icon start size="x-small">mdi-crosshairs-gps</v-icon>
               Précision: {{ locationAccuracy }}m
             </v-chip>
@@ -279,6 +274,35 @@
                 <div v-if="geoDetails.heading"><strong>Cap:</strong> {{ geoDetails.heading }}°</div>
                 <div v-if="geoDetails.speed"><strong>Vitesse:</strong> {{ geoDetails.speed }}m/s</div>
                 <div v-if="geoDetails.timestamp"><strong>Timestamp:</strong> {{ new Date(geoDetails.timestamp).toLocaleString() }}</div>
+                
+                <!-- Bouton Google Maps -->
+                <div v-if="coordinates.lat && coordinates.lng" class="mt-3">
+                  <v-btn 
+                    size="small" 
+                    color="primary" 
+                    :href="getGoogleMapsUrl()" 
+                    target="_blank"
+                    prepend-icon="mdi-map"
+                  >
+                    Voir sur Google Maps
+                  </v-btn>
+                </div>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          
+          <!-- Historique positions -->
+          <v-expansion-panel>
+            <v-expansion-panel-title>
+              🗺️ Historique GPS ({{ geoHistory.length }})
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
+                <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
+                  <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
+                  <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
+                </div>
+                <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -302,7 +326,7 @@
           <!-- Actions utilisateur -->
           <v-expansion-panel>
             <v-expansion-panel-title>
-              🎯 Actions Audit ({{ userActions.length }})
+              👤 Réponses Utilisateur ({{ userActions.length }})
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
@@ -311,6 +335,23 @@
                   <span class="ml-2">{{ action.message }}</span>
                 </div>
                 <div v-if="userActions.length === 0" class="text-grey text-caption">Aucune action enregistrée</div>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          
+          <!-- Infos de sauvegarde -->
+          <v-expansion-panel>
+            <v-expansion-panel-title>
+              📋 Infos Sauvegarde
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="debug-info">
+                <div><strong>Dernière sauvegarde:</strong> {{ lastSaved || 'Jamais' }}</div>
+                <div><strong>Progrès complet:</strong> {{ progressPercentage }}%</div>
+                <div><strong>Questions répondues:</strong> {{ getAnsweredQuestions() }}/6</div>
+                <div><strong>Photos ajoutées:</strong> {{ formData.photos.length }}</div>
+                <div v-if="formData.photos.length > 0"><strong>Taille totale photos:</strong> {{ getTotalPhotoSize() }}</div>
+                <div><strong>Formulaire valide:</strong> {{ isFormValid ? '✅ Oui' : '❌ Non' }}</div>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -331,18 +372,19 @@
             </v-expansion-panel-text>
           </v-expansion-panel>
           
-          <!-- Historique positions -->
+          <!-- Tous les logs mélangés -->  
           <v-expansion-panel>
             <v-expansion-panel-title>
-              🗺️ Historique GPS ({{ geoHistory.length }})
+              📋 Tous les logs ({{ allLogsCount }})
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
-                <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
-                  <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
-                  <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
+              <div class="debug-info" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                <div v-for="(log, index) in allLogsCombined.slice().reverse()" :key="index" class="log-entry" :class="log.category || log.type">
+                  <span class="text-caption">{{ formatTime(log.timestamp) }}</span>
+                  <span class="ml-1" :class="`log-category-${log.category || log.type}`">[{{ log.category?.toUpperCase() || log.type?.toUpperCase() }}]</span>
+                  <span class="ml-2">{{ log.message }}</span>
                 </div>
-                <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
+                <div v-if="allLogsCount === 0" class="text-grey text-caption">Aucun log disponible</div>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -354,6 +396,55 @@
         <v-btn @click="clearDebugLogs" color="orange" variant="text">Effacer logs</v-btn>
         <v-spacer></v-spacer>
         <v-btn @click="showDebugDialog = false" color="primary">Fermer</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Dialog photo en plein écran -->
+  <v-dialog v-model="showPhotoDialog" max-width="95vw" max-height="95vh">
+    <v-card v-if="selectedPhoto" class="photo-dialog">
+      <v-card-title class="d-flex justify-space-between align-center pa-2">
+        <span class="text-subtitle-1">📸 {{ selectedPhoto.name || `Photo ${selectedPhotoIndex + 1}` }}</span>
+        <v-btn icon="mdi-close" @click="showPhotoDialog = false" variant="text" size="small"></v-btn>
+      </v-card-title>
+      
+      <v-card-text class="pa-2">
+        <div class="photo-container">
+          <v-img
+            :src="selectedPhoto.data"
+            class="photo-full"
+            contain
+            max-height="75vh"
+            @click="showPhotoDialog = false"
+            style="cursor: pointer;"
+          >
+            <!-- Overlay avec bouton fermer accessible -->
+            <div class="photo-overlay-close">
+              <v-btn 
+                icon="mdi-close" 
+                @click.stop="showPhotoDialog = false" 
+                variant="elevated" 
+                color="white"
+                size="small"
+                class="close-btn-overlay"
+              ></v-btn>
+            </div>
+          </v-img>
+        </div>
+      </v-card-text>
+      
+      <v-card-text v-if="selectedPhoto.originalSize || selectedPhoto.compressedSize" class="pa-2">
+        <div class="d-flex justify-space-between text-caption text-grey">
+          <span v-if="selectedPhoto.originalSize">Original: {{ (selectedPhoto.originalSize / 1024).toFixed(1)}}KB</span>
+          <span v-if="selectedPhoto.compressedSize">Compressé: {{ (selectedPhoto.compressedSize / 1024).toFixed(1)}}KB</span>
+          <span v-if="selectedPhoto.timestamp">{{ formatTime(new Date(selectedPhoto.timestamp).getTime()) }}</span>
+        </div>
+      </v-card-text>
+      
+      <!-- Bouton fermer en bas pour accessibilité -->
+      <v-card-actions class="pa-2">
+        <v-spacer></v-spacer>
+        <v-btn @click="showPhotoDialog = false" color="primary">Fermer</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -402,6 +493,10 @@ const userActions = ref([]);
 const geoHistory = ref([]);
 const geoDetails = ref({});
 const permissionState = ref('');
+const geoLogs = ref([]);
+const showPhotoDialog = ref(false);
+const selectedPhoto = ref(null);
+const selectedPhotoIndex = ref(0);
 
 const formData = ref({
   lighting: null,
@@ -422,7 +517,8 @@ const addDebugLog = (message, type = 'info') => {
   debugLogs.value.push({
     timestamp: Date.now(),
     message,
-    type
+    type,
+    category: 'debug'
   });
   // Garder seulement les 100 derniers logs
   if (debugLogs.value.length > 100) {
@@ -431,10 +527,25 @@ const addDebugLog = (message, type = 'info') => {
   console.log(`[${type.toUpperCase()}]`, message);
 };
 
+const addGeoLog = (message, type = 'info') => {
+  geoLogs.value.push({
+    timestamp: Date.now(),
+    message,
+    type,
+    category: 'geo'
+  });
+  // Garder seulement les 50 derniers logs geo
+  if (geoLogs.value.length > 50) {
+    geoLogs.value = geoLogs.value.slice(-50);
+  }
+  console.log(`[GEO-${type.toUpperCase()}]`, message);
+};
+
 const addUserAction = (action) => {
   const actionLog = {
     timestamp: Date.now(),
-    message: action
+    message: action,
+    category: 'user'
   };
   userActions.value.push(actionLog);
   addDebugLog(`👤 ${action}`, 'action');
@@ -465,8 +576,23 @@ const clearDebugLogs = () => {
   debugLogs.value = [];
   userActions.value = [];
   geoHistory.value = [];
+  geoLogs.value = [];
   addDebugLog('🗑️ Logs effacés', 'info');
 };
+
+// Computed pour combiner tous les logs
+const allLogsCombined = computed(() => {
+  const allLogs = [
+    ...debugLogs.value,
+    ...userActions.value,
+    ...geoLogs.value
+  ];
+  return allLogs.sort((a, b) => a.timestamp - b.timestamp);
+});
+
+const allLogsCount = computed(() => {
+  return debugLogs.value.length + userActions.value.length + geoLogs.value.length;
+});
 
 const refreshGeoInfo = async () => {
   addUserAction('🔄 Actualisation infos GPS');
@@ -476,10 +602,12 @@ const refreshGeoInfo = async () => {
     try {
       const result = await navigator.permissions.query({ name: 'geolocation' });
       permissionState.value = result.state;
-      addDebugLog(`🔐 Permission: ${result.state}`, 'info');
+      addGeoLog(`🔐 Permission géolocalisation: ${result.state}`, 'info');
     } catch (error) {
-      addDebugLog(`⚠️ Erreur permissions: ${error.message}`, 'warn');
+      addGeoLog(`⚠️ Erreur vérification permissions: ${error.message}`, 'warn');
     }
+  } else {
+    addGeoLog('❌ API Permissions non supportée par ce navigateur', 'warn');
   }
   
   // Relancer la géolocalisation
@@ -512,6 +640,30 @@ const copyDebugInfo = async () => {
   } catch (error) {
     addDebugLog(`⚠️ Erreur copie: ${error.message}`, 'warn');
   }
+};
+
+// Fonctions pour les infos de sauvegarde
+const getAnsweredQuestions = () => {
+  return [
+    formData.value.lighting,
+    formData.value.walkpath,
+    formData.value.openness,
+    formData.value.feeling,
+    formData.value.peoplePresence,
+    formData.value.cleanliness
+  ].filter(answer => answer !== null).length;
+};
+
+const getTotalPhotoSize = () => {
+  const totalBytes = formData.value.photos.reduce((sum, photo) => {
+    return sum + (photo.compressedSize || photo.size || 0);
+  }, 0);
+  return `${(totalBytes / 1024).toFixed(1)}KB`;
+};
+
+const getGoogleMapsUrl = () => {
+  if (!coordinates.value.lat || !coordinates.value.lng) return '#';
+  return `https://maps.google.com/maps?q=${coordinates.value.lat},${coordinates.value.lng}&z=16`;
 };
 const lightingOptions = [
   { value: 1, text: 'Aucun', emoji: '🌑', icon: 'mdi-lightbulb-off-outline', color: 'grey-lighten-1' },
@@ -621,8 +773,8 @@ const takePhoto = () => {
           addUserAction(`✅ Photo ajoutée: ${file.name} (${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB)`);
           addDebugLog(`🗂️ Compression: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`, 'success');
           
-          // Sauvegarde automatique
-          saveLocally();
+          // Sauvegarde automatique du progrès
+          saveProgress();
         } catch (error) {
           addDebugLog(`❌ Erreur traitement photo: ${error.message}`, 'error');
           addUserAction(`❌ Échec ajout photo: ${file.name}`);
@@ -700,7 +852,17 @@ const removePhoto = (index) => {
   const photo = formData.value.photos[index];
   formData.value.photos.splice(index, 1);
   addUserAction(`🗜️ Photo supprimée: ${photo.name || 'Photo ' + (index + 1)}`);
-  saveLocally(); // Sauvegarde automatique
+  saveProgress(); // Sauvegarde du progrès
+};
+
+// Fonction pour ouvrir le dialog photo
+const openPhotoDialog = (photo, index) => {
+  if (photo.data) {
+    selectedPhoto.value = photo;
+    selectedPhotoIndex.value = index;
+    showPhotoDialog.value = true;
+    addUserAction(`🔍 Ouverture photo en grand: ${photo.name || 'Photo ' + (index + 1)}`);
+  }
 };
 
 // Fonctions de géolocalisation
@@ -708,9 +870,11 @@ const getCurrentLocation = () => {
   if (!navigator.geolocation) {
     locationText.value = '⚠️ Géolocalisation non supportée';
     locationIcon.value = 'mdi-map-marker-off';
+    addGeoLog('❌ Géolocalisation non supportée par le navigateur', 'error');
     return;
   }
 
+  addGeoLog('🔄 Démarrage de la géolocalisation...', 'info');
   locationLoading.value = true;
   locationIcon.value = 'mdi-loading';
   locationText.value = 'Obtention de la position...';
@@ -720,14 +884,37 @@ const getCurrentLocation = () => {
     timeout: 10000,
     maximumAge: 60000 // Cache pendant 1 minute
   };
+  
+  addGeoLog(`⚙️ Options GPS: précision=${options.enableHighAccuracy}, timeout=${options.timeout}ms, cache=${options.maximumAge}ms`, 'info');
 
   navigator.geolocation.getCurrentPosition(
     async (position) => {
-      const { latitude, longitude, accuracy } = position.coords;
+      const { latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, speed } = position.coords;
+      
+      addGeoLog(`📍 Position obtenue: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${Math.round(accuracy)}m)`, 'success');
+      
       coordinates.value = { lat: latitude, lng: longitude };
       locationAccuracy.value = Math.round(accuracy);
       
+      // Stocker les détails GPS complets
+      geoDetails.value = {
+        latitude: latitude.toFixed(6),
+        longitude: longitude.toFixed(6),
+        accuracy: Math.round(accuracy),
+        altitude: altitude ? Math.round(altitude) : null,
+        altitudeAccuracy: altitudeAccuracy ? Math.round(altitudeAccuracy) : null,
+        heading: heading ? Math.round(heading) : null,
+        speed: speed ? speed.toFixed(2) : null,
+        timestamp: position.timestamp
+      };
+      
+      addGeoLog(`📊 Détails GPS complets stockés`, 'info');
+      
+      // Ajouter à l'historique
+      addGeoHistory(latitude, longitude, Math.round(accuracy));
+      
       // Géocodage inverse pour obtenir l'adresse
+      addGeoLog('🌍 Démarrage géocodage inverse...', 'info');
       await reverseGeocode(latitude, longitude);
       
       locationLoading.value = false;
@@ -737,27 +924,38 @@ const getCurrentLocation = () => {
       formData.value.coordinates = { lat: latitude, lng: longitude };
       formData.value.location = locationText.value;
       
+      addGeoLog('💾 Coordonnées sauvegardées dans le formulaire', 'info');
+      
       // Créer/mettre à jour la carte
+      addGeoLog('🗺️ Mise à jour de la carte...', 'info');
       updateMap(latitude, longitude);
     },
     (error) => {
       locationLoading.value = false;
       locationIcon.value = 'mdi-map-marker-off';
       
+      let errorMsg = '';
       switch(error.code) {
         case error.PERMISSION_DENIED:
-          locationText.value = '⚠️ Accès refusé - Activez la géolocalisation';
+          errorMsg = '⚠️ Accès refusé - Activez la géolocalisation';
+          addGeoLog('🚫 Permission de géolocalisation refusée par l\'utilisateur', 'error');
           break;
         case error.POSITION_UNAVAILABLE:
-          locationText.value = '⚠️ Position indisponible';
+          errorMsg = '⚠️ Position indisponible';
+          addGeoLog('📍 Position GPS indisponible (pas de signal)', 'error');
           break;
         case error.TIMEOUT:
-          locationText.value = '⚠️ Timeout - Réessayez';
+          errorMsg = '⚠️ Timeout - Réessayez';
+          addGeoLog(`⏱️ Timeout GPS après ${options.timeout}ms`, 'error');
           break;
         default:
-          locationText.value = '⚠️ Erreur de géolocalisation';
+          errorMsg = '⚠️ Erreur de géolocalisation';
+          addGeoLog(`❌ Erreur GPS inconnue: ${error.message}`, 'error');
           break;
       }
+      
+      locationText.value = errorMsg;
+      addGeoLog(`🔴 Échec géolocalisation: ${errorMsg}`, 'error');
     },
     options
   );
@@ -766,19 +964,23 @@ const getCurrentLocation = () => {
 // Géocodage inverse avec OpenStreetMap API
 const reverseGeocode = async (lat, lng) => {
   try {
+    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=fr`;
+    addGeoLog(`🌐 Appel API géocodage: Nominatim`, 'info');
+    
     // Utiliser l'API Nominatim d'OpenStreetMap (gratuite)
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=fr`
-    );
+    const response = await fetch(apiUrl);
     
     if (response.ok) {
       const data = await response.json();
+      addGeoLog(`✅ Réponse API géocodage reçue: ${JSON.stringify(data.address).slice(0, 100)}...`, 'success');
       
       // Extraire les informations pertinentes
       const address = data.address || {};
       const city = address.city || address.town || address.village || '';
       const state = address.state || address.region || '';
       const country = address.country || '';
+      
+      addGeoLog(`🏙️ Adresse extraite: ville=${city}, région=${state}, pays=${country}`, 'info');
       
       // Formater l'adresse
       let locationString = '';
@@ -791,12 +993,14 @@ const reverseGeocode = async (lat, lng) => {
       }
       
       locationText.value = locationString || `📍 Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      addGeoLog(`🏷️ Adresse finale: ${locationText.value}`, 'success');
     } else {
+      addGeoLog(`⚠️ Échec API géocodage (${response.status}), passage au fallback`, 'warn');
       // Fallback en cas d'échec de l'API
       fallbackGeocode(lat, lng);
     }
   } catch (error) {
-    console.log('Erreur géocodage:', error);
+    addGeoLog(`❌ Erreur géocodage: ${error.message}`, 'error');
     // Fallback en cas d'erreur
     fallbackGeocode(lat, lng);
   }
@@ -804,38 +1008,39 @@ const reverseGeocode = async (lat, lng) => {
 
 // Fallback géocodage simplifié avec logs
 const fallbackGeocode = (lat, lng) => {
-  addDebugLog(`🔄 Utilisation du fallback pour: ${lat.toFixed(6)}, ${lng.toFixed(6)}`, 'warn');
+  addGeoLog(`🔄 Utilisation du fallback pour: ${lat.toFixed(6)}, ${lng.toFixed(6)}`, 'warn');
   
   if (lat >= 30.3 && lat <= 30.5 && lng >= -9.7 && lng <= -9.5) {
-    addDebugLog('🇲🇦 Détection zone Agadir', 'success');
+    addGeoLog('🇲🇦 Détection zone Agadir', 'success');
     locationText.value = `🇲🇦 Agadir, Maroc (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
   } else if (lat >= 31 && lat <= 36 && lng >= -10 && lng <= -1) {
-    addDebugLog('🇲🇦 Détection zone Maroc', 'info');
+    addGeoLog('🇲🇦 Détection zone Maroc', 'info');
     locationText.value = `🇲🇦 Maroc (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
   } else {
-    addDebugLog('🌍 Zone non reconnue, coordonnées génériques', 'warn');
+    addGeoLog('🌍 Zone non reconnue, coordonnées génériques', 'warn');
     locationText.value = `📍 Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   }
   
-  addDebugLog(`🏷️ Fallback résultat: ${locationText.value}`, 'info');
+  addGeoLog(`🏷️ Fallback résultat: ${locationText.value}`, 'info');
 };
 
 // Fonction pour créer/mettre à jour la carte
 const updateMap = async (lat, lng) => {
-  console.log('🗺️ [MAP] Mise à jour carte:', lat, lng);
+  addGeoLog('🗺️ [MAP] Mise à jour carte:', 'info');
+  addGeoLog(`📍 [MAP] Coordonnées: ${lat}, ${lng}`, 'info');
   
   // Attendre que l'élément soit disponible
   await nextTick();
   
   if (!mapContainer.value) {
-    console.warn('⚠️ [MAP] Container non disponible');
+    addGeoLog('⚠️ [MAP] Container non disponible', 'warn');
     return;
   }
   
   try {
     // Charger Leaflet dynamiquement
     if (!window.L) {
-      console.log('📦 [MAP] Chargement Leaflet...');
+      addGeoLog('📦 [MAP] Chargement Leaflet...', 'info');
       
       // Charger CSS
       const link = document.createElement('link');
@@ -851,12 +1056,12 @@ const updateMap = async (lat, lng) => {
         document.head.appendChild(script);
       });
       
-      console.log('✅ [MAP] Leaflet chargé');
+      addGeoLog('✅ [MAP] Leaflet chargé avec succès', 'success');
     }
     
     // Créer la carte si elle n'existe pas
     if (!map.value) {
-      console.log('🌍 [MAP] Création nouvelle carte');
+      addGeoLog('🌍 [MAP] Création nouvelle carte', 'info');
       map.value = window.L.map(mapContainer.value, {
         zoomControl: false,
         attributionControl: false,
@@ -872,6 +1077,7 @@ const updateMap = async (lat, lng) => {
       
       // Ajouter le marqueur
       marker.value = window.L.marker([lat, lng]).addTo(map.value);
+      addGeoLog('📍 [MAP] Marqueur ajouté', 'info');
       
       // Ajouter cercle de précision si disponible
       if (locationAccuracy.value) {
@@ -882,9 +1088,10 @@ const updateMap = async (lat, lng) => {
           fillOpacity: 0.1,
           weight: 2
         }).addTo(map.value);
+        addGeoLog(`🎯 [MAP] Cercle de précision ajouté (${locationAccuracy.value}m)`, 'info');
       }
     } else {
-      console.log('🔄 [MAP] Mise à jour position');
+      addGeoLog('🔄 [MAP] Mise à jour position existante', 'info');
       // Mettre à jour position
       map.value.setView([lat, lng], 15);
       if (marker.value) {
@@ -892,9 +1099,9 @@ const updateMap = async (lat, lng) => {
       }
     }
     
-    console.log('✅ [MAP] Carte mise à jour avec succès');
+    addGeoLog('✅ [MAP] Carte mise à jour avec succès', 'success');
   } catch (error) {
-    console.error('❌ [MAP] Erreur:', error);
+    addGeoLog(`❌ [MAP] Erreur: ${error.message}`, 'error');
   }
 };
 
@@ -916,7 +1123,7 @@ const saveLocally = () => {
     timestamp: new Date().toISOString()
   };
   
-  console.log('📋 [SAVE] Sauvegarde audit avec ID:', auditId);
+  addDebugLog(`📋 Sauvegarde audit avec ID: ${auditId}`, 'info');
   
   const existingAudits = JSON.parse(localStorage.getItem('safety_audits') || '[]');
   
@@ -933,7 +1140,7 @@ const saveLocally = () => {
   });
   
   if (isDuplicate) {
-    console.warn('⚠️ [SAVE] Doublon détecté, écrasement du dernier audit');
+    addDebugLog('⚠️ Doublon détecté, écrasement du dernier audit', 'warn');
     // Supprimer le dernier audit similaire
     const filteredAudits = existingAudits.filter(audit => {
       if (!audit.coordinates || !auditData.coordinates) return true;
@@ -950,7 +1157,21 @@ const saveLocally = () => {
   }
   
   lastSaved.value = new Date().toLocaleTimeString();
-  console.log('✅ [SAVE] Audit sauvegardé avec succès');
+  addDebugLog('✅ Audit sauvegardé avec succès', 'success');
+};
+
+// Sauvegarde intermédiaire (sans créer d'audit final)
+const saveProgress = () => {
+  const progressData = {
+    ...formData.value,
+    isProgress: true, // Marqueur pour indiquer que c'est juste un progrès
+    lastUpdate: new Date().toISOString()
+  };
+  
+  // Sauvegarder le progrès dans une clé séparée
+  localStorage.setItem('audit_progress', JSON.stringify(progressData));
+  lastSaved.value = new Date().toLocaleTimeString();
+  addDebugLog('🔄 Progrès sauvegardé (temporaire)', 'info');
 };
 
 const submitAudit = () => {
@@ -1006,25 +1227,24 @@ const goToIntro = () => {
 
 // Auto-démarrage de la géolocalisation et sauvegarde auto
 onMounted(() => {
-  addDebugLog('🚀 Initialisation application', 'info');
+  addDebugLog('🚀 Initialisation application AuditFormView', 'info');
   
-  // Exposer la fonction addUserAction globalement pour les composants enfants
+  // Exposer les fonctions globalement pour les composants enfants
   window.addUserAction = addUserAction;
+  window.saveProgress = saveProgress;
+  
+  addDebugLog('🌐 Exposition des fonctions globales pour les composants enfants', 'info');
   
   // Demander automatiquement la géolocalisation au chargement
+  addDebugLog('📍 Démarrage automatique de la géolocalisation...', 'info');
   getCurrentLocation();
   
   // Vérifier les permissions
+  addDebugLog('🔐 Vérification des permissions...', 'info');
   refreshGeoInfo();
 });
 
-// Auto-sauvegarde toutes les 60 secondes ET à chaque action
-setInterval(() => {
-  if (progressPercentage.value > 0) {
-    addDebugLog('📋 Sauvegarde automatique périodique', 'info');
-    saveLocally();
-  }
-}, 60000); // 1 minute
+// Plus de sauvegarde périodique - seulement à chaque action
 </script>
 
 <style scoped>
@@ -1117,5 +1337,57 @@ setInterval(() => {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   background: #fafafa;
+}
+
+/* Styles pour dialog photo amélioré */
+.photo-overlay-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.close-btn-overlay {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Catégories de logs */
+.log-category-debug {
+  color: #1976d2 !important;
+  font-weight: bold;
+}
+
+.log-category-user {
+  color: #7b1fa2 !important;
+  font-weight: bold;
+}
+
+.log-category-geo {
+  color: #388e3c !important;
+  font-weight: bold;
+}
+
+.log-category-info {
+  color: #1976d2 !important;
+}
+
+.log-category-success {
+  color: #388e3c !important;
+}
+
+.log-category-warn {
+  color: #f57c00 !important;
+}
+
+.log-category-error {
+  color: #d32f2f !important;
+}
+
+.log-category-action {
+  color: #7b1fa2 !important;
 }
 </style>

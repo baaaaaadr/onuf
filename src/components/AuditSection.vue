@@ -90,6 +90,11 @@ const selectOption = (value) => {
   if (window.addUserAction) {
     window.addUserAction(`🎯 Sélection "${props.title}": ${optionText}`);
   }
+  
+  // Sauvegarder le progrès si la fonction est disponible
+  if (window.saveProgress) {
+    window.saveProgress();
+  }
 };
 
 const getSelectedOption = () => {
