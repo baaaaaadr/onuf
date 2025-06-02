@@ -23,6 +23,9 @@
               <div>
                 <div class="font-weight-bold">📍 Localisation</div>
                 <span class="text-body-2 text-grey-darken-1">{{ locationText }}</span>
+                <div v-if="geoDetails.nearbyInfo" class="text-caption text-grey mt-1">
+                  {{ geoDetails.nearbyInfo }}
+                </div>
               </div>
             </div>
             <v-btn 
@@ -256,74 +259,68 @@
       </v-card-title>
       
       <v-card-text style="max-height: 60vh; overflow-y: auto;">
-        <!-- Infos GPS détaillées -->
+        <!-- Console Debug Réorganisée -->
         <v-expansion-panels multiple variant="accordion">
           
-          <!-- Position actuelle -->
+          <!-- Infos de localisation -->
           <v-expansion-panel>
             <v-expansion-panel-title>
-              📍 Position GPS ({{ locationAccuracy ? locationAccuracy + 'm' : 'N/A' }})
+              🗺️ Infos de localisation
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <div class="debug-info">
-                <div v-if="geoDetails.latitude"><strong>Latitude:</strong> {{ geoDetails.latitude }}</div>
-                <div v-if="geoDetails.longitude"><strong>Longitude:</strong> {{ geoDetails.longitude }}</div>
-                <div v-if="geoDetails.accuracy"><strong>Précision:</strong> {{ geoDetails.accuracy }}m</div>
-                <div v-if="geoDetails.altitude"><strong>Altitude:</strong> {{ geoDetails.altitude }}m</div>
-                <div v-if="geoDetails.altitudeAccuracy"><strong>Précision altitude:</strong> {{ geoDetails.altitudeAccuracy }}m</div>
-                <div v-if="geoDetails.heading"><strong>Cap:</strong> {{ geoDetails.heading }}°</div>
-                <div v-if="geoDetails.speed"><strong>Vitesse:</strong> {{ geoDetails.speed }}m/s</div>
-                <div v-if="geoDetails.timestamp"><strong>Timestamp:</strong> {{ new Date(geoDetails.timestamp).toLocaleString() }}</div>
+                <!-- Position actuelle -->
+                <div class="mb-3">
+                  <strong>📍 Position GPS ({{ locationAccuracy ? locationAccuracy + 'm' : 'N/A' }})</strong>
+                  <div v-if="geoDetails.latitude">Latitude: {{ geoDetails.latitude }}</div>
+                  <div v-if="geoDetails.longitude">Longitude: {{ geoDetails.longitude }}</div>
+                  <div v-if="geoDetails.accuracy">Précision: {{ geoDetails.accuracy }}m</div>
+                  <div v-if="geoDetails.altitude">Altitude: {{ geoDetails.altitude }}m</div>
+                  <div v-if="geoDetails.altitudeAccuracy">Précision altitude: {{ geoDetails.altitudeAccuracy }}m</div>
+                  <div v-if="geoDetails.heading">Cap: {{ geoDetails.heading }}°</div>
+                  <div v-if="geoDetails.speed">Vitesse: {{ geoDetails.speed }}m/s</div>
+                  <div v-if="geoDetails.timestamp">Timestamp: {{ new Date(geoDetails.timestamp).toLocaleString() }}</div>
+                  <div v-if="geoDetails.nearbyInfo">Proximité: {{ geoDetails.nearbyInfo }}</div>
+                  
+                  <!-- Boutons Maps -->
+                  <div v-if="coordinates.lat && coordinates.lng" class="mt-3 d-flex gap-2">
+                    <v-btn 
+                      size="small" 
+                      color="primary" 
+                      :href="getGoogleMapsUrl()" 
+                      target="_blank"
+                      prepend-icon="mdi-map"
+                    >
+                      Google Maps
+                    </v-btn>
+                    <v-btn 
+                      size="small" 
+                      color="secondary" 
+                      :href="getOpenStreetMapUrl()" 
+                      target="_blank"
+                      prepend-icon="mdi-map-outline"
+                    >
+                      OpenStreetMap
+                    </v-btn>
+                  </div>
+                </div>
                 
-                <!-- Bouton Google Maps -->
-                <div v-if="coordinates.lat && coordinates.lng" class="mt-3">
-                  <v-btn 
-                    size="small" 
-                    color="primary" 
-                    :href="getGoogleMapsUrl()" 
-                    target="_blank"
-                    prepend-icon="mdi-map"
-                  >
-                    Voir sur Google Maps
-                  </v-btn>
+                <!-- Historique positions -->
+                <div class="mb-3">
+                  <strong>🗺️ Historique GPS ({{ geoHistory.length }})</strong>
+                  <div style="max-height: 150px; overflow-y: auto;">
+                    <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
+                      <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
+                      <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
+                    </div>
+                    <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
+                  </div>
                 </div>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
           
-          <!-- Historique positions -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              🗺️ Historique GPS ({{ geoHistory.length }})
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
-                <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
-                  <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
-                  <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
-                </div>
-                <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Support navigateur -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              📱 Capacités Navigateur
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info">
-                <div><strong>Géolocalisation:</strong> {{ navigator.geolocation ? '✅ Supporté' : '❌ Non supporté' }}</div>
-                <div><strong>HTTPS:</strong> {{ location.protocol === 'https:' ? '✅ Sécurisé' : '⚠️ Non sécurisé' }}</div>
-                <div><strong>User Agent:</strong> {{ navigator.userAgent.slice(0, 50) }}...</div>
-                <div><strong>Permissions API:</strong> {{ navigator.permissions ? '✅ Disponible' : '❌ Non disponible' }}</div>
-                <div v-if="permissionState"><strong>État permission:</strong> {{ permissionState }}</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Actions utilisateur -->
+          <!-- Réponses utilisateur -->
           <v-expansion-panel>
             <v-expansion-panel-title>
               👤 Réponses Utilisateur ({{ userActions.length }})
@@ -342,7 +339,7 @@
           <!-- Infos de sauvegarde -->
           <v-expansion-panel>
             <v-expansion-panel-title>
-              📋 Infos Sauvegarde
+              💾 Infos Sauvegarde
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <div class="debug-info">
@@ -351,7 +348,33 @@
                 <div><strong>Questions répondues:</strong> {{ getAnsweredQuestions() }}/6</div>
                 <div><strong>Photos ajoutées:</strong> {{ formData.photos.length }}</div>
                 <div v-if="formData.photos.length > 0"><strong>Taille totale photos:</strong> {{ getTotalPhotoSize() }}</div>
+                <div v-if="formData.photos.length > 0"><strong>Détail photos:</strong></div>
+                <div v-for="(photo, index) in formData.photos" :key="index" class="ml-3 text-caption" v-if="formData.photos.length > 0">
+                  • {{ photo.name }}: {{ photo.originalSize ? (photo.originalSize / 1024).toFixed(1) : '?' }}KB → {{ photo.compressedSize ? (photo.compressedSize / 1024).toFixed(1) : '?' }}KB
+                </div>
                 <div><strong>Formulaire valide:</strong> {{ isFormValid ? '✅ Oui' : '❌ Non' }}</div>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          
+          <!-- Capacités navigateur -->
+          <v-expansion-panel>
+            <v-expansion-panel-title>
+              📱 Capacités Navigateur
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="debug-info">
+                <div><strong>Géolocalisation:</strong> {{ navigator.geolocation ? '✅ Supporté' : '❌ Non supporté' }}</div>
+                <div><strong>HTTPS:</strong> {{ location.protocol === 'https:' ? '✅ Sécurisé' : '⚠️ Non sécurisé' }}</div>
+                <div><strong>User Agent:</strong> {{ navigator.userAgent.slice(0, 80) }}...</div>
+                <div><strong>Permissions API:</strong> {{ navigator.permissions ? '✅ Disponible' : '❌ Non disponible' }}</div>
+                <div v-if="permissionState"><strong>État permission:</strong> {{ permissionState }}</div>
+                <div><strong>Plateforme:</strong> {{ navigator.platform || 'Inconnue' }}</div>
+                <div><strong>Langue:</strong> {{ navigator.language || 'Inconnue' }}</div>
+                <div><strong>Cookies activés:</strong> {{ navigator.cookieEnabled ? '✅ Oui' : '❌ Non' }}</div>
+                <div><strong>En ligne:</strong> {{ navigator.onLine ? '✅ Connecté' : '❌ Hors ligne' }}</div>
+                <div><strong>Mémoire disponible:</strong> {{ navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'Inconnue' }}</div>
+                <div><strong>Connexion:</strong> {{ getConnectionInfo() }}</div>
               </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -664,6 +687,19 @@ const getTotalPhotoSize = () => {
 const getGoogleMapsUrl = () => {
   if (!coordinates.value.lat || !coordinates.value.lng) return '#';
   return `https://maps.google.com/maps?q=${coordinates.value.lat},${coordinates.value.lng}&z=16`;
+};
+
+const getOpenStreetMapUrl = () => {
+  if (!coordinates.value.lat || !coordinates.value.lng) return '#';
+  return `https://www.openstreetmap.org/?mlat=${coordinates.value.lat}&mlon=${coordinates.value.lng}&zoom=16`;
+};
+
+const getConnectionInfo = () => {
+  if (navigator.connection || navigator.mozConnection || navigator.webkitConnection) {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    return `${connection.effectiveType || 'Inconnue'} (${connection.downlink || '?'}Mbps)`;
+  }
+  return 'Information non disponible';
 };
 const lightingOptions = [
   { value: 1, text: 'Aucun', emoji: '🌑', icon: 'mdi-lightbulb-off-outline', color: 'grey-lighten-1' },
@@ -979,10 +1015,15 @@ const reverseGeocode = async (lat, lng) => {
       const city = address.city || address.town || address.village || '';
       const state = address.state || address.region || '';
       const country = address.country || '';
+      const road = address.road || '';
+      const amenity = address.amenity || '';
+      const shop = address.shop || '';
+      const leisure = address.leisure || '';
       
       addGeoLog(`🏙️ Adresse extraite: ville=${city}, région=${state}, pays=${country}`, 'info');
+      addGeoLog(`🗺️ Proximité: route=${road}, amenity=${amenity}, shop=${shop}, leisure=${leisure}`, 'info');
       
-      // Formater l'adresse
+      // Formater l'adresse principale
       let locationString = '';
       if (city) locationString += `${city}`;
       if (state && city) locationString += `, ${state}`;
@@ -991,6 +1032,20 @@ const reverseGeocode = async (lat, lng) => {
         const flag = country.toLowerCase() === 'maroc' || country.toLowerCase() === 'morocco' ? '🇲🇦' : '🌍';
         locationString += ` ${flag} ${country}`;
       }
+      
+      // Stocker les détails pour affichage
+      const nearbyInfo = [];
+      if (road) nearbyInfo.push(`🚣 ${road}`);
+      if (amenity) nearbyInfo.push(`🏢 ${amenity}`);
+      if (shop) nearbyInfo.push(`🏬 ${shop}`);
+      if (leisure) nearbyInfo.push(`🏞️ ${leisure}`);
+      
+      // Stocker les infos de proximité dans les détails géo
+      geoDetails.value = {
+        ...geoDetails.value,
+        nearbyInfo: nearbyInfo.join(' • ') || 'Aucune info de proximité',
+        fullAddress: data
+      };
       
       locationText.value = locationString || `📍 Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       addGeoLog(`🏷️ Adresse finale: ${locationText.value}`, 'success');
@@ -1172,6 +1227,7 @@ const saveProgress = () => {
   localStorage.setItem('audit_progress', JSON.stringify(progressData));
   lastSaved.value = new Date().toLocaleTimeString();
   addDebugLog('🔄 Progrès sauvegardé (temporaire)', 'info');
+  addUserAction('💾 Sauvegarde automatique du progrès');
 };
 
 const submitAudit = () => {

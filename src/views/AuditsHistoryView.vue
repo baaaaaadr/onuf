@@ -78,6 +78,9 @@
                   <span class="text-caption text-grey">
                     {{ formatDate(audit.timestamp) }}
                   </span>
+                  <v-chip v-if="audit.id" size="x-small" class="ml-2" color="info" variant="text">
+                    ID: {{ audit.id.slice(-6) }}
+                  </v-chip>
                 </div>
 
                 <!-- Score global -->
@@ -217,27 +220,51 @@
   </v-dialog>
 
   <!-- Dialog photo en plein écran -->
-  <v-dialog v-model="showPhotoDialog" max-width="90vw">
+  <v-dialog v-model="showPhotoDialog" max-width="90vw" max-height="90vh">
     <v-card v-if="selectedPhoto">
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span>📸 {{ selectedPhoto.name || `Photo ${selectedPhotoIndex + 1}` }}</span>
-        <v-btn icon="mdi-close" @click="showPhotoDialog = false" variant="text"></v-btn>
+      <v-card-title class="d-flex justify-space-between align-center pa-2">
+        <span class="text-subtitle-1">📸 {{ selectedPhoto.name || `Photo ${selectedPhotoIndex + 1}` }}</span>
+        <v-btn icon="mdi-close" @click="showPhotoDialog = false" variant="text" size="small"></v-btn>
       </v-card-title>
       
-      <v-card-text class="pa-0">
-        <v-img
-          :src="selectedPhoto.data"
-          max-height="70vh"
-          contain
-        ></v-img>
+      <v-card-text class="pa-2">
+        <div class="photo-container">
+          <v-img
+            :src="selectedPhoto.data"
+            class="photo-full"
+            contain
+            max-height="70vh"
+            @click="showPhotoDialog = false"
+            style="cursor: pointer;"
+          >
+            <!-- Overlay avec bouton fermer accessible -->
+            <div class="photo-overlay-close">
+              <v-btn 
+                icon="mdi-close" 
+                @click.stop="showPhotoDialog = false" 
+                variant="elevated" 
+                color="white"
+                size="small"
+                class="close-btn-overlay"
+              ></v-btn>
+            </div>
+          </v-img>
+        </div>
       </v-card-text>
       
-      <v-card-text v-if="selectedPhoto.size">
+      <v-card-text v-if="selectedPhoto.originalSize || selectedPhoto.compressedSize" class="pa-2">
         <div class="d-flex justify-space-between text-caption text-grey">
-          <span>Taille: {{ formatFileSize(selectedPhoto.size) }}</span>
+          <span v-if="selectedPhoto.originalSize">Original: {{ (selectedPhoto.originalSize / 1024).toFixed(1)}}KB</span>
+          <span v-if="selectedPhoto.compressedSize">Compressé: {{ (selectedPhoto.compressedSize / 1024).toFixed(1)}}KB</span>
           <span v-if="selectedPhoto.timestamp">{{ formatDate(selectedPhoto.timestamp) }}</span>
         </div>
       </v-card-text>
+      
+      <!-- Bouton fermer en bas pour accessibilité -->
+      <v-card-actions class="pa-2">
+        <v-spacer></v-spacer>
+        <v-btn @click="showPhotoDialog = false" color="primary">Fermer</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 
@@ -276,9 +303,18 @@ const loadAudits = () => {
   try {
     const saved = localStorage.getItem('safety_audits');
     if (saved) {
-      audits.value = JSON.parse(saved).sort((a, b) => 
+      // Filtrer les sauvegardes de progrès qui ne devraient pas être dans les audits finaux
+      const allSaved = JSON.parse(saved);
+      const finalAudits = allSaved.filter(audit => !audit.isProgress);
+      audits.value = finalAudits.sort((a, b) => 
         new Date(b.timestamp) - new Date(a.timestamp)
       );
+      
+      // Si on trouve des sauvegardes de progrès dans les audits, les nettoyer
+      if (allSaved.length !== finalAudits.length) {
+        console.log('🧹 Nettoyage des sauvegardes de progrès dans les audits');
+        localStorage.setItem('safety_audits', JSON.stringify(finalAudits));
+      }
     }
   } catch (error) {
     console.error('Erreur chargement audits:', error);
@@ -442,5 +478,17 @@ onMounted(() => {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* Styles pour dialog photo amélioré */
+.photo-overlay-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.close-btn-overlay {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 </style>
