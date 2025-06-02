@@ -80,7 +80,16 @@ const isSelected = (value) => {
 };
 
 const selectOption = (value) => {
+  const option = props.options.find(opt => opt.value === value);
+  const optionText = option ? `${option.emoji} ${option.text}` : value;
+  
+  // Émettre l'événement vers le parent
   emit('update:modelValue', value);
+  
+  // Ajouter au log global si disponible
+  if (window.addUserAction) {
+    window.addUserAction(`🎯 Sélection "${props.title}": ${optionText}`);
+  }
 };
 
 const getSelectedOption = () => {

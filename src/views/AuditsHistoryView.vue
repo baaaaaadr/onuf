@@ -89,6 +89,8 @@
                     size="small"
                     density="compact"
                     readonly
+                    :length="4"
+                    half-increments
                   ></v-rating>
                   <span class="text-caption ml-2">({{ calculateScore(audit).toFixed(1) }}/4)</span>
                 </div>
@@ -138,27 +140,27 @@
           <div class="audit-scores">
             <div class="score-item">
               <span>💡 Éclairage:</span>
-              <v-rating :model-value="selectedAudit.lighting" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.lighting" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
             <div class="score-item">
               <span>🚶 Cheminement:</span>
-              <v-rating :model-value="selectedAudit.walkpath" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.walkpath" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
             <div class="score-item">
               <span>👁️ Ouverture:</span>
-              <v-rating :model-value="selectedAudit.openness" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.openness" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
             <div class="score-item">
               <span>😊 Ressenti:</span>
-              <v-rating :model-value="selectedAudit.feeling" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.feeling" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
             <div class="score-item">
               <span>👥 Présence:</span>
-              <v-rating :model-value="selectedAudit.peoplePresence" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.peoplePresence" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
             <div class="score-item">
               <span>🧹 Propreté:</span>
-              <v-rating :model-value="selectedAudit.cleanliness" color="warning" size="small" readonly density="compact"></v-rating>
+              <v-rating :model-value="selectedAudit.cleanliness" color="warning" size="small" readonly density="compact" :length="4"></v-rating>
             </div>
           </div>
         </div>
