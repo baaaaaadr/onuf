@@ -1,19 +1,28 @@
 # 🔄 Guide de Continuation de Conversation
 
+> **INSTRUCTION CLAUDE** : Maintiens ce fichier à jour avec les éléments essentiels après chaque prompt. Garde SEULEMENT les infos cruciales pour continuer le développement efficacement.
+Ne crée pas trop de fichiers MD dans le projet, sauf si c'est utile pour Claude et que tu vas les lire automatiquement via une reférence depuis ce fichier contexte ci.
+
 ## 📱 **Projet ONUF PWA - Contexte**
 Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase.
 
-## 🎯 **État Actuel**
+## 🎯 **État Actuel (Juin 2025)**
 - ✅ Interface complète Vue.js + Vuetify 
 - ✅ Géolocalisation + carte Leaflet
 - ✅ 6 sections d'audit (éclairage, cheminement, etc.)
 - ✅ Système photos avec compression
 - ✅ Console debug avancée
 - ✅ Schéma Supabase configuré (auth simple username/password)
-- ✅ Intégration Supabase complétée
-- ✅ Système d'authentification fonctionnel
-- ✅ Synchronisation des audits en temps réel
-- 🔄 **EN COURS** : Optimisation des performances et tests finaux
+- ✅ Synchronisation offline/online corrigée
+- ✅ Protection double clic + gestion doublons améliorée
+- ✅ Transmission précision GPS à la DB
+- ✅ Navigation popup optimisée (3 boutons)
+- ✅ Stratégie sauvegarde optimisée (progressions = local uniquement)
+- ✅ **NOUVEAU** : Bouton "+" dans header pour nouvel audit
+- ✅ **CORRIGÉ** : Erreur "null latitude" en synchronisation
+- ✅ **CORRIGÉ** : Calcul statistiques sync ("4 Sync")
+- ✅ **FINALISÉ** : Audits offline fonctionnels (test15 OK)
+- ✅ **RÉVOLUTION** : Stratégie Local-First implémentée
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA
@@ -22,43 +31,65 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - **Storage** : IndexedDB local + Synchronisation automatique avec Supabase
 - **Gestion d'état** : Composition API + Pinia
 
-## 📋 **Structure de la Base de Données**
-- `profiles` : Gestion des utilisateurs et rôles
-- `audits` : Stockage des audits principaux
-- `audit_photos` : Gestion des médias avec optimisation
-- `audit_sessions` : Suivi des sessions et progression
-- `sync_queue` : File d'attente pour la synchronisation hors-ligne
-
 ## 🔐 **Accès**
 - **Admin** : `admin` / `admin123!`
 - **Agents** : `agent01`, `agent02`, `agent03` / `field123!`
-- **URL de test** : [Lien vers l'application de préproduction]
 
-## 🛠️ **Dernières Mises à Jour**
-- **Système d'authentification** : Implémentation complète avec gestion des sessions
-- **Synchronisation** : Mécanisme de file d'attente pour les opérations hors-ligne
-- **Sécurité** : Vérification des rôles et permissions
-- **Performance** : Optimisation des requêtes et du chargement des médias
+## 🛠️ **Dernières Corrections (Session Actuelle)**
+- **✅ STRATÉGIE LOCAL-FIRST** : Réécriture complète de la gestion offline/online
+- **✅ TOUT EN LOCAL TOUJOURS** : Audits restent en localStorage même après sync
+- **✅ SYNC = MARQUAGE SEULEMENT** : Plus de suppression automatique
+- **✅ DÉDUPLICATION SIMPLE** : Par ID uniquement, plus de clés composites
+- **✅ OFFLINE = TOUT DISPONIBLE** : Accès complet aux audits hors ligne
+- **✅ SYNC CRITICAL FIX** : Correction "null latitude" - coordonnées GPS garanties
+- **✅ BOUTON "+"** : Ajouté dans StatusBar.vue pour créer nouvel audit
+- **✅ STATS SYNC** : Calcul basé sur vrais audits synchronisés localStorage
+- **✅ GPS FALLBACK** : Position par défaut Agadir si GPS indisponible
+- **✅ 3 BUGS MAJEURS CORRIGÉS** : Géolocalisation, comptage sync, duplication
+- **✅ BOUTON HOME** : Navigation rapide vers accueil depuis toute page
+- **✅ CARTE GPS PLEIN ÉCRAN** : Carte Leaflet interactive avec position + précision
+- **✅ CARTE TEMPS RÉEL** : Mise à jour automatique quand utilisateur se déplace
+- **✅ CERCLE PRÉCISION FIX** : Rayon limité à 5km pour éviter cercles géants
+- **✅ SPINNER FIX** : Correction chargement infini de la carte
 
 ## 📁 **Fichiers Importants**
-- `src/composables/useSupabase.js` : Client et méthodes d'authentification
-- `src/composables/useAudits.js` : Gestion des opérations CRUD des audits
-- `src/composables/useSyncQueue.js` : Gestion de la file de synchronisation
-- `src/views/AuditFormView.vue` : Formulaire principal d'audit
-- `src/views/AuditsHistoryView.vue` : Historique et gestion des audits
-- `.env` : Configuration des variables d'environnement
-- `supabase-setup-simplified.sql` : Schéma complet de la base de données
+- `src/composables/useAudits.js` : Gestion CRUD + stratégie Local-First
+- `src/composables/useSyncQueue.js` : Synchronisation simplifiée
+- `src/views/AuditFormView.vue` : Formulaire principal (corrections récentes)
+- `src/views/AuditsHistoryView.vue` : Historique + auto-refresh
+- `src/components/StatusBar.vue` : Header avec bouton "+" et indicateurs
+- `src/utils/debug.js` : Outils debug (window.__debugONUF)
+- `STRATEGIE_LOCAL_FIRST.md` : Documentation nouvelle approche
+
+## 🧪 **Debug Tools**
+```javascript
+__debugONUF.getStats()           // Statistiques complètes
+__debugONUF.getLocalAudits()     // Audits locaux
+__debugONUF.getSyncQueue()       // Queue synchronisation
+__debugONUF.reloadAudits()       // Forcer reload interface
+```
+
+## 📱 **Fonctionnalités Carte GPS**
+- **🗺️ Carte plein écran** : Dialog fullscreen avec Leaflet + OpenStreetMap
+- **📍 Position temps réel** : Marqueur et cercle se déplacent automatiquement
+- **🎯 Cercle de précision** : Rayon limité à 5km (si GPS > 5km) pour visibilité
+- **🎨 Couleurs adaptives** : Vert (précis), Orange (moyen), Rouge (imprécis)
+- **💬 Popup informatif** : Coordonnées + précision réelle vs affichée
+- **🔄 Actualisation** : Bouton refresh + watcher automatique
+- **📱 Zoom adaptatif** : 16 (précis), 14 (moyen), 12 (imprécis)
+
+## 🚨 **Problèmes Connus**
+- **Test14 offline manquant** : Audit créé offline mais n'apparaît pas en liste
+- **Doublons timestamp** : Plusieurs audits avec même heure (corrections en cours)
 
 ## 🚀 **Prochaines Étapes**
-1. Finaliser les tests de synchronisation hors-ligne
-2. Optimiser les performances de l'application
-3. Implémenter des rapports et tableaux de bord
-4. Préparer le déploiement en production
+1. Finaliser correction audits offline (test14)
+2. Optimiser performance interface
+3. Tableaux de bord et rapports
+4. Déploiement production
 
 ## 📎 **Ressources**
 - **Dépôt** : `C:\Users\MiniMonster\Documents\my apps\ONUF\ONUF-pwa`
-- **Documentation** : `INTEGRATION_GUIDE.md`
-- **Migration** : `MIGRATION_RAPIDE.md`
-- **Correctifs** : `CORRECTIONS_RAPPORT.md`
+- **Corrections récentes** : `CORRECTIONS_FINALES.md`
 
-Ce document fournit tout le contexte nécessaire pour reprendre le développement. Consultez les fichiers de documentation pour plus de détails techniques. 🚀
+> **Note** : Toujours commencer par lire ce fichier pour le contexte complet.

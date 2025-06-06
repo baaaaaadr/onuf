@@ -31,7 +31,13 @@ export const SYNC_STATUS = {
 window.addEventListener('online', () => {
   isOnline.value = true
   console.log('🌐 Connexion rétablie - Reprise sync...')
-  startAutoSync()
+  
+  // ✅ NOUVEAU: Attendre stabilisation puis forcer sync
+  setTimeout(() => {
+    console.log('🔄 Démarrage sync forcée après reconnexion')
+    startAutoSync()
+    processQueue() // Force immédiatement
+  }, 2000)
 })
 
 window.addEventListener('offline', () => {
@@ -44,7 +50,27 @@ const updateSyncStats = () => {
   syncStats.pending = syncQueue.value.filter(i => i.status === SYNC_STATUS.PENDING).length
   syncStats.syncing = syncQueue.value.filter(i => i.status === SYNC_STATUS.SYNCING).length
   syncStats.failed = syncQueue.value.filter(i => i.status === SYNC_STATUS.FAILED).length
-  syncStats.success = syncQueue.value.filter(i => i.status === SYNC_STATUS.SYNCED).length
+  
+  // ✅ CORRIGÉ: Calculer le vrai nombre d'audits synchronisés
+  syncStats.success = calculateTotalSyncedAudits()
+}
+
+// ✅ CORRIGÉ: Calculer le nombre d'audits synchronisés (Local-First STRICT)
+const calculateTotalSyncedAudits = () => {
+  try {
+    const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+    
+    // ✅ STRICT: Compter seulement les audits avec synced=true ET cloudId
+    const syncedCount = localAudits.filter(audit => 
+      audit.synced === true && audit.cloudId
+    ).length
+    
+    console.log(`📊 Local-First STRICT: ${syncedCount} audits réellement synchronisés sur ${localAudits.length} total`)
+    return syncedCount
+  } catch (error) {
+    console.error('❌ Erreur calcul audits synchronisés:', error)
+    return 0
+  }
 }
 
 // Sauvegarder la queue dans localStorage
@@ -271,6 +297,7 @@ export const useSyncQueue = () => {
     startAutoSync,
     cleanupSyncedItems,
     setSaveToCloudFunction,
+    updateSyncStats, // ✅ NOUVEAU: Permettre mise à jour manuelle des stats
     
     // Computed
     totalItems,

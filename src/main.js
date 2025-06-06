@@ -9,6 +9,8 @@ import { initAuth } from './composables/useSupabase'
 import { globalGeolocation } from './composables/useGeolocation'
 // Import du composable sync queue (s'initialise automatiquement via getGlobalSyncQueue)
 import { getGlobalSyncQueue } from './composables/useSyncQueue'
+// ✅ NOUVEAU: Import des outils de debug
+import './utils/debug.js'
 
 console.log('🚀 Initialisation ONUF PWA...')
 

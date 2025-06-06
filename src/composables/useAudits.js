@@ -12,6 +12,22 @@ export const useAudits = () => {
   const loading = ref(false)
   const error = ref(null)
 
+  // ✅ NOUVEAU: Fonction globale pour créer clé unique audit
+  const createAuditKey = (audit) => {
+    // Utiliser timestamp + coordonnées + commentaire pour identifier les doublons
+    const timestamp = audit.created_at || audit.createdAt || audit.timestamp
+    const lat = audit.latitude || audit.coordinates?.lat || 0
+    const lng = audit.longitude || audit.coordinates?.lng || 0
+    const comment = audit.comment || ''
+    
+    // Clé plus précise avec secondes pour éviter doublons
+    const timeKey = Math.floor(new Date(timestamp).getTime() / 1000) // Précision à la seconde
+    const coordKey = `${lat.toFixed(6)}_${lng.toFixed(6)}` // Plus de précision GPS
+    const commentKey = comment.trim().toLowerCase().replace(/\s+/g, '_') // Normaliser commentaire
+    
+    return `${timeKey}_${coordKey}_${commentKey}`
+  }
+
   // Fonction pour obtenir URL des photos Supabase Storage
   const getPhotoUrl = (storagePath) => {
     if (!storagePath) return null
@@ -23,7 +39,7 @@ export const useAudits = () => {
     return data?.publicUrl || null
   }
 
-  // Marquer un audit local comme synchronisé
+  // ✅ NOUVEAU: Marquer un audit local comme synchronisé (stratégie Local-First)
   const markLocalAuditAsSynced = async (localId, cloudId) => {
     try {
       const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
@@ -33,7 +49,7 @@ export const useAudits = () => {
       )
       
       if (auditIndex >= 0) {
-        // Mettre à jour l'audit local avec les infos de sync
+        // ✅ SIMPLE: Juste marquer comme synchronisé, GARDER en local
         localAudits[auditIndex] = {
           ...localAudits[auditIndex],
           synced: true,
@@ -43,7 +59,7 @@ export const useAudits = () => {
         }
         
         localStorage.setItem('onuf_audits_local', JSON.stringify(localAudits))
-        console.log(`✅ Audit local ${localId} marqué comme synchronisé (cloud ID: ${cloudId})`)
+        console.log(`✅ Audit ${localId} marqué synchronisé (garde en local + cloudId: ${cloudId})`)
       }
     } catch (error) {
       console.error('❌ Erreur marquage sync:', error)
@@ -53,13 +69,30 @@ export const useAudits = () => {
   // Sauvegarder vers le cloud (Supabase)
   const saveAuditToCloud = async (auditData) => {
     try {
+      // ✅ CORRIGÉ: Extraire coordonnées de façon sûre
+      let latitude = null
+      let longitude = null
+      
+      if (auditData.coordinates && auditData.coordinates.lat && auditData.coordinates.lng) {
+        latitude = parseFloat(auditData.coordinates.lat)
+        longitude = parseFloat(auditData.coordinates.lng)
+      } else if (auditData.latitude && auditData.longitude) {
+        latitude = parseFloat(auditData.latitude)
+        longitude = parseFloat(auditData.longitude)
+      } else {
+        // Fallback vers position par défaut si aucune coordonnée
+        console.warn('⚠️ Aucune coordonnée GPS valide - Utilisation position par défaut')
+        latitude = 30.356278  // Position par défaut Agadir
+        longitude = -9.545752
+      }
+      
       // Préparer données pour la base
       const dbAudit = {
         user_id: currentUser.value.user_id,
-        latitude: auditData.coordinates?.lat,
-        longitude: auditData.coordinates?.lng,
-        location_text: auditData.location,
-        location_accuracy: auditData.locationAccuracy,
+        latitude: latitude,
+        longitude: longitude,
+        location_text: auditData.location || 'Position non disponible',
+        location_accuracy: auditData.locationAccuracy || auditData.accuracy || 999999, // ✅ CORRIGÉ: Valeur par défaut valide
         nearby_info: auditData.nearbyInfo,
         lighting: auditData.lighting,
         walkpath: auditData.walkpath,
@@ -73,10 +106,15 @@ export const useAudits = () => {
         device_info: {
           userAgent: navigator.userAgent,
           platform: navigator.platform,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          // ✅ CORRIGÉ: Infos GPS détaillées avec fallback
+          gps_accuracy: auditData.locationAccuracy || auditData.accuracy || 999999,
+          gps_timestamp: auditData.gpsTimestamp || new Date().toISOString()
         },
         is_completed: true
       }
+      
+      console.log('📤 Envoi DB avec coordonnées:', { latitude, longitude, accuracy: dbAudit.location_accuracy })
 
       // Insérer audit
       const { data: audit, error: auditError } = await supabase
@@ -156,7 +194,7 @@ export const useAudits = () => {
     }
   }
 
-  // Sauvegarder localement (localStorage/IndexedDB)
+  // ✅ NOUVEAU: Sauvegarder localement avec stratégie Local-First SIMPLE
   const saveAuditLocally = async (auditData) => {
     try {
       // Générer ID unique si pas présent
@@ -164,11 +202,20 @@ export const useAudits = () => {
         auditData.id = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       }
 
+      // ✅ SIMPLE: Garantir données minimales
+      const safeAuditData = {
+        ...auditData,
+        coordinates: auditData.coordinates || { lat: 0, lng: 0 },
+        location: auditData.location || 'Position non disponible',
+        locationAccuracy: auditData.locationAccuracy || auditData.accuracy || 999999,
+        timestamp: auditData.timestamp || Date.now()
+      }
+
       // Préparer données locales
       const localAudit = {
-        ...auditData,
+        ...safeAuditData,
         userId: currentUser.value.user_id,
-        localId: auditData.id,
+        localId: safeAuditData.id,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         synced: false,
@@ -178,18 +225,29 @@ export const useAudits = () => {
       // Récupérer audits existants
       const existingAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
       
-      // Ajouter ou mettre à jour
-      const existingIndex = existingAudits.findIndex(a => a.id === auditData.id)
-      if (existingIndex >= 0) {
-        existingAudits[existingIndex] = localAudit
-      } else {
-        existingAudits.push(localAudit)
-      }
-
-      // Sauvegarder
-      localStorage.setItem('onuf_audits_local', JSON.stringify(existingAudits))
+      // ✅ NOUVEAU: Déduplication simple par ID uniquement
+      const existingIndex = existingAudits.findIndex(existing => 
+        existing.id === localAudit.id || existing.localId === localAudit.id
+      )
       
-      console.log('✅ Audit sauvegardé localement:', auditData.id)
+      if (existingIndex !== -1) {
+        // Remplacer l'audit existant (mise à jour)
+        existingAudits[existingIndex] = {
+          ...existingAudits[existingIndex], // Garder cloudId et statut sync
+          ...localAudit,
+          // Préserver ces champs importants
+          synced: existingAudits[existingIndex].synced || false,
+          cloudId: existingAudits[existingIndex].cloudId || null
+        }
+        console.log(`🔄 Audit mis à jour: ${localAudit.id}`)
+      } else {
+        // Ajouter nouvel audit
+        existingAudits.push(localAudit)
+        console.log(`➕ Nouvel audit créé: ${localAudit.id}`)
+      }
+      
+      localStorage.setItem('onuf_audits_local', JSON.stringify(existingAudits))
+      console.log(`✅ Audit sauvegardé localement: ${safeAuditData.id}`)
       return localAudit
     } catch (error) {
       console.error('❌ Erreur sauvegarde locale:', error)
@@ -245,32 +303,47 @@ export const useAudits = () => {
     return Promise.all(uploadPromises)
   }
 
-  // Récupérer tous les audits (local + cloud)
+  // ✅ NOUVEAU: Récupérer tous les audits avec stratégie Local-First SIMPLE
   const getAllAudits = async () => {
     loading.value = true
     error.value = null
     
     try {
-      // Récupérer audits locaux
+      // 1. TOUJOURS charger les audits locaux (disponibles offline)
       const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      console.log(`📋 Local-First: ${localAudits.length} audits locaux chargés`)
       
-      // Récupérer audits cloud si connecté
+      // 2. Si ONLINE: charger aussi le cloud pour détecter nouveaux audits
       let cloudAudits = []
       if (isOnline.value && currentUser.value) {
+        console.log('🌐 Mode online: chargement cloud...')
         const cloudResult = await getUserAudits()
         if (cloudResult.success) {
           cloudAudits = cloudResult.audits
+          console.log(`☁️ Cloud: ${cloudAudits.length} audits récupérés`)
+        } else {
+          console.warn('⚠️ Erreur cloud (non bloquante):', cloudResult.error)
         }
+      } else {
+        console.log('📴 Mode offline: utilisation local uniquement')
       }
 
-      // Fusionner et dédupliquer
+      // 3. Fusionner avec priorité LOCAL
       const allAudits = mergeAudits(localAudits, cloudAudits)
       
       return { success: true, audits: allAudits }
     } catch (err) {
       error.value = err.message
-      console.error('Get all audits error:', err)
-      return { success: false, error: err.message }
+      console.error('❌ Get all audits error:', err)
+      
+      // ✅ FALLBACK: En cas d'erreur, au moins retourner le local
+      try {
+        const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+        console.log('🚑 Fallback: utilisation local uniquement')
+        return { success: true, audits: localAudits }
+      } catch (fallbackErr) {
+        return { success: false, error: err.message, audits: [] }
+      }
     } finally {
       loading.value = false
     }
@@ -319,98 +392,65 @@ export const useAudits = () => {
     }
   }
 
-  // Nettoyer les audits locaux synchronisés (garder 24h)
-  const cleanupSyncedLocalAudits = () => {
-    try {
-      const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
-      
-      // Garder les audits synchronisés pendant 24h au lieu de les supprimer immédiatement
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-      
-      const auditesToKeep = localAudits.filter(audit => {
-        // Garder les audits non synchronisés
-        if (!audit.synced) return true
-        
-        // Garder les audits synchronisés récemment (moins de 24h)
-        const syncedAt = new Date(audit.syncedAt || audit.createdAt || 0)
-        return syncedAt > oneDayAgo
-      })
-      
-      localStorage.setItem('onuf_audits_local', JSON.stringify(auditesToKeep))
-      
-      const removed = localAudits.length - auditesToKeep.length
-      if (removed > 0) {
-        console.log(`🧹 ${removed} audit(s) local(aux) ancien(s) nettoyé(s) (>24h)`)
-      }
-    } catch (error) {
-      console.error('❌ Erreur nettoyage audits locaux:', error)
-    }
-  }
+  // ✅ SUPPRIMÉ: Plus de nettoyage automatique dans la stratégie Local-First
+  // Les audits restent en local pour être disponibles offline
+  // Nettoyage = MANUEL UNIQUEMENT via bouton interface
 
-  // Fusionner audits locaux et cloud avec déduplication intelligente
+  // ✅ CORRIGÉ: Fusionner audits avec stratégie Local-First ANTI-DUPLICATION
   const mergeAudits = (localAudits, cloudAudits) => {
     const merged = []
-    const processedKeys = new Set() // Utilise des clés composites pour éviter doublons
-
-    // Fonction pour créer une clé unique basée sur le contenu
-    const createAuditKey = (audit) => {
-      // Utiliser timestamp + coordonnées + commentaire pour identifier les doublons
-      const timestamp = audit.created_at || audit.createdAt || audit.timestamp
-      const lat = audit.latitude || audit.coordinates?.lat || 0
-      const lng = audit.longitude || audit.coordinates?.lng || 0
-      const comment = audit.comment || ''
-      
-      // Clé composite pour identifier le même audit même avec IDs différents
-      return `${Math.floor(new Date(timestamp).getTime() / 1000)}_${lat.toFixed(4)}_${lng.toFixed(4)}_${comment}`
-    }
-
-    // Ajouter audits cloud d'abord (priorité)
-    cloudAudits.forEach(audit => {
-      const auditKey = createAuditKey(audit)
-      
+    const processedCloudIds = new Set()
+    
+    console.log(`🔄 Fusion Local-First: ${localAudits.length} locaux + ${cloudAudits.length} cloud`)
+    
+    // 1. AJOUTER TOUS LES AUDITS LOCAUX D'ABORD (priorité absolue)
+    localAudits.forEach(audit => {
       const enrichedAudit = {
         ...audit,
-        synced: true,
-        localOnly: false,
-        source: 'cloud'
+        source: 'local',
+        localOnly: !audit.synced,
+        synced: audit.synced || false
       }
       
       merged.push(enrichedAudit)
-      processedKeys.add(auditKey)
       
-      // Marquer aussi les IDs pour éviter doublons par ID
-      processedKeys.add(audit.id)
-    })
-
-    // Ajouter audits locaux NON DUPLIQUÉS
-    localAudits.forEach(audit => {
-      const auditKey = createAuditKey(audit)
-      const auditId = audit.id || audit.localId
-      
-      // Vérifier si déjà ajouté (par clé composite OU par ID)
-      if (!processedKeys.has(auditKey) && !processedKeys.has(auditId) && !audit.synced) {
-        merged.push({
-          ...audit,
-          synced: false,
-          localOnly: true,
-          source: 'local'
-        })
-        processedKeys.add(auditKey)
-        processedKeys.add(auditId)
-      } else {
-        console.log(`🗑️ Doublon éliminé: ${audit.comment || auditId} (clé: ${auditKey})`)
+      // ✅ CORRIGÉ: Enregistrer les cloudId pour éviter doublons
+      if (audit.cloudId) {
+        processedCloudIds.add(audit.cloudId)
+        console.log(`🔗 Local audit ${audit.id} lié au cloudId: ${audit.cloudId}`)
       }
     })
-
-    // Nettoyer les audits locaux synchronisés
-    cleanupSyncedLocalAudits()
-
-    // Trier par date de création (plus récent en premier)
-    return merged.sort((a, b) => {
+    
+    // 2. AJOUTER AUDITS CLOUD SEULEMENT S'ILS N'EXISTENT PAS DÉJÀ EN LOCAL
+    cloudAudits.forEach(cloudAudit => {
+      // ✅ CORRIGÉ: Vérifier si ce cloudAudit.id existe déjà comme cloudId local
+      const isAlreadyLocal = processedCloudIds.has(cloudAudit.id)
+      
+      if (!isAlreadyLocal) {
+        const enrichedAudit = {
+          ...cloudAudit,
+          source: 'cloud',
+          localOnly: false,
+          synced: true,
+          cloudId: cloudAudit.id
+        }
+        
+        merged.push(enrichedAudit)
+        console.log(`📥 Audit cloud ajouté: ${cloudAudit.id}`)
+      } else {
+        console.log(`🚫 Audit cloud ignoré (déjà synchronisé en local): ${cloudAudit.id}`)
+      }
+    })
+    
+    // 3. TRIER PAR DATE (plus récent en premier)
+    const sorted = merged.sort((a, b) => {
       const dateA = new Date(a.created_at || a.createdAt || a.timestamp || 0)
       const dateB = new Date(b.created_at || b.createdAt || b.timestamp || 0)
       return dateB - dateA
     })
+    
+    console.log(`✅ Fusion terminée: ${sorted.length} audits total (${localAudits.length} locaux + ${cloudAudits.length} cloud)`)
+    return sorted
   }
 
   // Supprimer audit

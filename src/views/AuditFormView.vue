@@ -1,17 +1,4 @@
 <template>
-  <v-app-bar color="primary" density="compact" elevation="2">
-    <template v-slot:prepend>
-      <v-btn icon="mdi-arrow-left" @click="$router.push('/')"></v-btn>
-    </template>
-    <v-app-bar-title class="font-weight-bold">🛡️ Agadir Safety Audit</v-app-bar-title>
-    <template v-slot:append>
-      <v-chip color="success" size="small" v-if="auditCompleted">
-        <v-icon start size="small">mdi-check</v-icon>
-        Terminé
-      </v-chip>
-    </template>
-  </v-app-bar>
-
   <v-container class="pa-4">
     <v-form ref="auditForm">
       <!-- Widget de géolocalisation avec carte -->
@@ -225,7 +212,8 @@
         size="x-large" 
         @click="submitAudit" 
         class="mt-8 mb-4"
-        :disabled="!isFormValid"
+        :disabled="!isFormValid || isSubmitting"
+        :loading="isSubmitting"
         rounded="lg"
         elevation="2"
       >
@@ -480,12 +468,39 @@
       <v-card-text class="text-body-1">
         Merci pour votre contribution à la sécurité urbaine.
         <br>
-        Vos données ont été sauvegardées localement.
+        Vos données ont été sauvegardées{{ isOnline ? ' et synchronisées' : ' localement' }}.
       </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="goToIntro">
-          Nouveau audit
+      <v-card-actions class="justify-center flex-column gap-2">
+        <!-- ✅ NOUVEAU: Boutons améliorés -->
+        <v-btn 
+          color="primary" 
+          @click="startNewAudit"
+          size="large"
+          variant="elevated"
+        >
+          <v-icon start>mdi-plus</v-icon>
+          Nouvel audit
         </v-btn>
+        
+        <div class="d-flex gap-2">
+          <v-btn 
+            color="secondary" 
+            @click="goToHistory"
+            variant="outlined"
+          >
+            <v-icon start>mdi-history</v-icon>
+            Mes audits
+          </v-btn>
+          
+          <v-btn 
+            color="grey" 
+            @click="goToHome"
+            variant="outlined"
+          >
+            <v-icon start>mdi-home</v-icon>
+            Accueil
+          </v-btn>
+        </div>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -496,6 +511,8 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import AuditSection from '@/components/AuditSection.vue';
 import { useAuth } from '@/composables/useSupabase';
 import { useAudits } from '@/composables/useAudits';
+import { useRouter } from 'vue-router';
+import { getGlobalSyncQueue } from '@/composables/useSyncQueue'; // ✅ NOUVEAU: Pour isOnline
 
 const showSuccessDialog = ref(false);
 const auditCompleted = ref(false);
@@ -1169,20 +1186,31 @@ const getAccuracyColor = () => {
   return 'red';
 };
 
-const saveLocally = () => {
+const saveLocally = (auditDataToSave = null) => {
+  // ✅ NOUVEAU: Utiliser param ou formData par défaut
+  const dataToSave = auditDataToSave || formData.value;
+  
   // Générer un ID unique pour éviter les doublons
-  const auditId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  const auditId = dataToSave.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   // Sauvegarder dans localStorage pour l'instant
   const auditData = {
     id: auditId,
-    ...formData.value,
-    timestamp: new Date().toISOString()
+    ...dataToSave,
+    timestamp: new Date().toISOString(),
+    // ✅ NOUVEAU: Ajouter infos pour compatibilité avec useAudits
+    userId: currentUser?.value?.user_id,
+    localId: auditId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    synced: false,
+    localOnly: true
   };
   
   addDebugLog(`📋 Sauvegarde audit avec ID: ${auditId}`, 'info');
   
-  const existingAudits = JSON.parse(localStorage.getItem('safety_audits') || '[]');
+  // ✅ NOUVEAU: Utiliser la même clé que useAudits.js
+  const existingAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]');
   
   // Vérifier s'il n'y a pas déjà un audit très similaire (mêmes coordonnées et timestamp proche)
   const isDuplicate = existingAudits.some(audit => {
@@ -1207,17 +1235,20 @@ const saveLocally = () => {
       return !(latDiff < 0.001 && lngDiff < 0.001 && timeDiff < 30000);
     });
     filteredAudits.push(auditData);
-    localStorage.setItem('safety_audits', JSON.stringify(filteredAudits));
+    localStorage.setItem('onuf_audits_local', JSON.stringify(filteredAudits)); // ✅ NOUVEAU: Même clé
   } else {
     existingAudits.push(auditData);
-    localStorage.setItem('safety_audits', JSON.stringify(existingAudits));
+    localStorage.setItem('onuf_audits_local', JSON.stringify(existingAudits)); // ✅ NOUVEAU: Même clé
   }
   
   lastSaved.value = new Date().toLocaleTimeString();
   addDebugLog('✅ Audit sauvegardé avec succès', 'success');
+  
+  return auditData; // ✅ NOUVEAU: Retourner les données sauvegardées
 };
 
 // Sauvegarde intermédiaire (sans créer d'audit final)
+// ✅ NOUVEAU: Seulement local, pas de cloud pour éviter pollution DB
 const saveProgress = () => {
   // Sauvegarde locale existante
   const progressData = {
@@ -1228,20 +1259,29 @@ const saveProgress = () => {
   
   localStorage.setItem('audit_progress', JSON.stringify(progressData));
   lastSaved.value = new Date().toLocaleTimeString();
-  addDebugLog('🔄 Progrès sauvegardé (temporaire)', 'info');
+  addDebugLog('🔄 Progrès sauvegardé (temporaire local uniquement)', 'info');
   addUserAction('💾 Sauvegarde automatique du progrès');
   
-  // Sauvegarde cloud si connecté
-  if (isAuthenticated.value && navigator.onLine) {
-    saveProgressCloud(formData.value);
-  }
+  // ✅ SUPPRIMÉ: Plus de sauvegarde cloud des progressions
+  // pour éviter la pollution de la DB avec des audits incomplets
 };
 
 const { currentUser, isAuthenticated } = useAuth();
 const { saveAudit, saveProgress: saveProgressCloud } = useAudits();
+const router = useRouter(); // ✅ NOUVEAU: Pour navigation
+const { isOnline, addToSyncQueue } = getGlobalSyncQueue(); // ✅ NOUVEAU: Pour statut connexion + queue
+
+// ✅ NOUVEAU: Protection contre double soumission
+const isSubmitting = ref(false);
 
 const submitAudit = async () => {
   addUserAction('🚀 Tentative soumission audit');
+  
+  // ✅ NOUVEAU: Protection contre double clic
+  if (isSubmitting.value) {
+    addUserAction('⚠️ Double clic détecté - Ignoré');
+    return;
+  }
   
   if (!isFormValid.value) {
     addUserAction('⚠️ Échec: questions incomplètes');
@@ -1249,25 +1289,51 @@ const submitAudit = async () => {
     return;
   }
 
-  // Sauvegarder localement d'abord
-  saveLocally();
+  isSubmitting.value = true; // Verrouiller la soumission
   
-  // Puis essayer de sauvegarder en cloud si connecté
-  if (isAuthenticated.value && navigator.onLine) {
-    addUserAction('☁️ Sauvegarde cloud en cours...');
-    const result = await saveAudit(formData.value);
-    if (result.success) {
-      addUserAction('✅ Audit sauvegardé en cloud');
-    } else {
-      addUserAction('⚠️ Échec sauvegarde cloud (restera local)');
+  try {
+    // ✅ NOUVEAU: Enrichir les données avec infos GPS détaillées
+    const enrichedFormData = {
+      ...formData.value,
+      locationAccuracy: locationAccuracy.value,
+      accuracy: locationAccuracy.value, // Alias pour compatibilité
+      gpsTimestamp: geoDetails.value.timestamp,
+      nearbyInfo: geoDetails.value.nearbyInfo,
+      timestamp: Date.now(),
+      // Générer un ID unique pour éviter les doublons
+      id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
+
+    // Sauvegarder localement d'abord
+    const localResult = saveLocally(enrichedFormData); // ✅ NOUVEAU: Passer les données enrichies
+    
+    // Puis essayer de sauvegarder en cloud si connecté
+    if (isAuthenticated.value && isOnline.value) { // ✅ NOUVEAU: Vérifier aussi isOnline
+      addUserAction('☁️ Sauvegarde cloud en cours...');
+      const result = await saveAudit(enrichedFormData);
+      if (result.success) {
+        addUserAction('✅ Audit sauvegardé en cloud');
+      } else {
+        addUserAction('⚠️ Échec sauvegarde cloud (restera local)');
+      }
+    } else if (!isOnline.value) {
+      // ✅ NOUVEAU: Mode offline explicite - ajouter à la queue
+      addUserAction('📴 Mode offline - Ajout à la queue de synchronisation');
+      addToSyncQueue(enrichedFormData);
     }
+    
+    auditCompleted.value = true;
+    showSuccessDialog.value = true;
+  } catch (error) {
+    addUserAction(`❌ Erreur: ${error.message}`);
+    alert('❌ Erreur lors de la sauvegarde: ' + error.message);
+  } finally {
+    isSubmitting.value = false; // Déverrouiller
   }
-  
-  auditCompleted.value = true;
-  showSuccessDialog.value = true;
 };
 
-const goToIntro = () => {
+// ✅ NOUVEAU: Fonctions de navigation améliorées
+const startNewAudit = () => {
   showSuccessDialog.value = false;
   // Réinitialiser le formulaire
   formData.value = {
@@ -1290,11 +1356,22 @@ const goToIntro = () => {
   coordinates.value = { lat: null, lng: null };
   
   auditCompleted.value = false;
-  // Retourner à l'accueil
-  setTimeout(() => {
-    window.location.href = '/';
-  }, 300);
+  addUserAction('🆕 Nouveau formulaire d\'audit initialisé');
+  // Pas de refresh - reste sur la page
 };
+
+const goToHistory = () => {
+  showSuccessDialog.value = false;
+  router.push('/history');
+};
+
+const goToHome = () => {
+  showSuccessDialog.value = false;
+  router.push('/');
+};
+
+// Garder pour compatibilité
+const goToIntro = startNewAudit;
 
 // Auto-démarrage de la géolocalisation et sauvegarde auto
 onMounted(() => {

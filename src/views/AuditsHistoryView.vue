@@ -635,7 +635,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
@@ -785,16 +785,20 @@ const getRealSyncStatusText = (audit) => {
 // =====================================================
 
 const hasCoordinates = (audit) => {
-  return (audit.latitude && audit.longitude) || 
-         (audit.coordinates && audit.coordinates.lat && audit.coordinates.lng)
+  // ✅ CORRIGÉ: Vérifier toutes les sources de coordonnées possibles
+  const lat = audit.latitude || audit.coordinates?.lat
+  const lng = audit.longitude || audit.coordinates?.lng
+  
+  return lat && lng && lat !== 0 && lng !== 0
 }
 
 const formatCoordinates = (audit) => {
-  if (audit.coordinates && audit.coordinates.lat && audit.coordinates.lng) {
-    return `${audit.coordinates.lat.toFixed(4)}, ${audit.coordinates.lng.toFixed(4)}`
-  }
-  if (audit.latitude && audit.longitude) {
-    return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
+  // ✅ CORRIGÉ: Utiliser la même logique que hasCoordinates
+  const lat = audit.latitude || audit.coordinates?.lat
+  const lng = audit.longitude || audit.coordinates?.lng
+  
+  if (lat && lng && lat !== 0 && lng !== 0) {
+    return `${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}`
   }
   return 'Non disponible'
 }
@@ -1111,9 +1115,53 @@ const confirmDelete = async () => {
   }
 }
 
+// ✅ NOUVEAU: Setup auto-refresh à la reconnexion
+const setupAutoRefresh = () => {
+  // Watcher sur l'état de connexion
+  watch(isOnline, async (newOnlineStatus, oldOnlineStatus) => {
+    // Quand on passe de offline à online
+    if (newOnlineStatus && !oldOnlineStatus) {
+      console.log('🌐 Reconnexion détectée - Refresh automatique des audits')
+      
+      // Attendre un peu pour que la connexion se stabilise
+      setTimeout(async () => {
+        await loadAudits()
+        // Déclencher aussi la sync queue
+        await processQueue()
+      }, 1000)
+    }
+  })
+  
+  // Refresh périodique si des audits en attente
+  const autoRefreshInterval = setInterval(async () => {
+    if (isOnline.value && (syncStats.pending > 0 || syncStats.syncing > 0)) {
+      console.log('🔄 Refresh automatique - Sync en cours')
+      await loadAudits()
+    }
+  }, 10000) // Toutes les 10 secondes
+  
+  return autoRefreshInterval
+}
+
 // Lifecycle
+let autoRefreshInterval = null
+
 onMounted(() => {
   loadAudits()
+  
+  // ✅ NOUVEAU: Configurer auto-refresh
+  autoRefreshInterval = setupAutoRefresh()
+  
+  // Écouter événements de force reload
+  window.addEventListener('onuf-force-reload', loadAudits)
+})
+
+onUnmounted(() => {
+  // Nettoyer les intervals et listeners
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval)
+  }
+  window.removeEventListener('onuf-force-reload', loadAudits)
 })
 
 // Watchers
