@@ -494,6 +494,8 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import AuditSection from '@/components/AuditSection.vue';
+import { useAuth } from '@/composables/useSupabase';
+import { useAudits } from '@/composables/useAudits';
 
 const showSuccessDialog = ref(false);
 const auditCompleted = ref(false);
@@ -1217,37 +1219,50 @@ const saveLocally = () => {
 
 // Sauvegarde intermédiaire (sans créer d'audit final)
 const saveProgress = () => {
+  // Sauvegarde locale existante
   const progressData = {
     ...formData.value,
-    isProgress: true, // Marqueur pour indiquer que c'est juste un progrès
+    isProgress: true,
     lastUpdate: new Date().toISOString()
   };
   
-  // Sauvegarder le progrès dans une clé séparée
   localStorage.setItem('audit_progress', JSON.stringify(progressData));
   lastSaved.value = new Date().toLocaleTimeString();
   addDebugLog('🔄 Progrès sauvegardé (temporaire)', 'info');
   addUserAction('💾 Sauvegarde automatique du progrès');
+  
+  // Sauvegarde cloud si connecté
+  if (isAuthenticated.value && navigator.onLine) {
+    saveProgressCloud(formData.value);
+  }
 };
 
-const submitAudit = () => {
+const { currentUser, isAuthenticated } = useAuth();
+const { saveAudit, saveProgress: saveProgressCloud } = useAudits();
+
+const submitAudit = async () => {
   addUserAction('🚀 Tentative soumission audit');
   
   if (!isFormValid.value) {
     addUserAction('⚠️ Échec: questions incomplètes');
-    addDebugLog('⚠️ Formulaire incomplet lors de la soumission', 'warn');
     alert('⚠️ Veuillez répondre à toutes les questions obligatoires.');
     return;
   }
 
-  // Sauvegarder les données
-  addDebugLog('📋 Démarrage sauvegarde finale', 'info');
+  // Sauvegarder localement d'abord
   saveLocally();
   
-  addUserAction('✅ Audit soumis avec succès');
-  addDebugLog('✅ Audit finalisé et sauvegardé', 'success');
+  // Puis essayer de sauvegarder en cloud si connecté
+  if (isAuthenticated.value && navigator.onLine) {
+    addUserAction('☁️ Sauvegarde cloud en cours...');
+    const result = await saveAudit(formData.value);
+    if (result.success) {
+      addUserAction('✅ Audit sauvegardé en cloud');
+    } else {
+      addUserAction('⚠️ Échec sauvegarde cloud (restera local)');
+    }
+  }
   
-  console.log('Audit Data:', formData.value);
   auditCompleted.value = true;
   showSuccessDialog.value = true;
 };

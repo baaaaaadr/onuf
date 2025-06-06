@@ -1,6 +1,8 @@
-<!-- AuditsHistoryView.vue - Version avec vrais composables + formatage corrigé -->
+<!-- src/views/AuditsHistoryView-enhanced.vue - Version avec indicateurs de sync -->
 <template>
   <div class="audits-history-view">
+    <!-- Le header est maintenant géré par StatusBar dans App.vue -->
+    
     <v-container class="pa-4">
       <!-- État de chargement -->
       <div v-if="loading" class="text-center py-8">
@@ -27,7 +29,7 @@
 
       <!-- Audits existants -->
       <div v-else>
-        <!-- Statistiques rapides avec vrais statuts -->
+        <!-- Statistiques rapides avec indicateurs de sync -->
         <v-row class="mb-4">
           <v-col cols="3">
             <v-card class="text-center" color="blue-lighten-5">
@@ -77,7 +79,7 @@
           </v-col>
         </v-row>
 
-        <!-- Barre d'actions avec vrais statuts -->
+        <!-- Barre d'actions -->
         <v-row class="mb-4">
           <v-col>
             <div class="d-flex justify-space-between align-center">
@@ -160,137 +162,18 @@
           {{ syncStats.pending + syncStats.failed }} audit(s) seront synchronisés à la reconnexion
         </v-alert>
 
-        <!-- Liste des audits avec vrais statuts de sync -->
+        <!-- Liste des audits avec nouveaux composants -->
         <div class="audit-list">
-          <v-card
+          <AuditListItem
             v-for="audit in filteredAudits"
-            :key="audit.id || audit.localId || audit.timestamp"
-            class="mb-3 audit-card"
-            hover
-          >
-            <v-card-text class="pa-4">
-              <div class="d-flex justify-space-between align-start mb-3">
-                <div class="flex-grow-1">
-                  <!-- TITRE AVEC INDICATEUR SYNC CORRIGÉ -->
-                  <div class="d-flex align-center mb-2">
-                    <h3 class="text-h6 mr-2">
-                      {{ audit.comment || getAuditTitle(audit) }}
-                    </h3>
-                    <v-chip 
-                      :color="getRealSyncStatusColor(audit)" 
-                      size="small" 
-                      variant="tonal"
-                    >
-                      <v-icon left size="small">{{ getRealSyncStatusIcon(audit) }}</v-icon>
-                      {{ getRealSyncStatusText(audit) }}
-                    </v-chip>
-                  </div>
-                  
-                  <!-- LOCALISATION ET DATE CORRIGÉES -->
-                  <div class="text-caption text-grey mb-2">
-                    {{ formatLocationLine(audit) }}
-                  </div>
-                  
-                  <!-- SCORES VISUELS -->
-                  <div class="d-flex align-center gap-3 mb-2">
-                    <div class="score-badge">
-                      <span class="score-icon">💡</span>
-                      <v-rating 
-                        :model-value="audit.lighting || 0" 
-                        :color="getScoreColor(audit.lighting)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
-                    </div>
-                    <div class="score-badge">
-                      <span class="score-icon">🚶</span>
-                      <v-rating 
-                        :model-value="audit.walkpath || 0" 
-                        :color="getScoreColor(audit.walkpath)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
-                    </div>
-                    <div class="score-badge">
-                      <span class="score-icon">😊</span>
-                      <v-rating 
-                        :model-value="audit.feeling || 0" 
-                        :color="getScoreColor(audit.feeling)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
-                    </div>
-                  </div>
-                  
-                  <!-- PHOTOS INFO -->
-                  <div v-if="getPhotosCount(audit) > 0" class="text-caption text-blue">
-                    📸 {{ getPhotosCount(audit) }} photo(s)
-                  </div>
-                </div>
-                
-                <!-- SCORE GLOBAL -->
-                <div class="text-center ml-3">
-                  <div class="text-h4 font-weight-bold" :style="{ color: getScoreColor(calculateGlobalScore(audit)) + ' !important' }">
-                    {{ calculateGlobalScore(audit).toFixed(1) }}
-                  </div>
-                  <div class="text-caption">Score</div>
-                </div>
-              </div>
-              
-              <!-- ACTIONS AVEC RETRY -->
-              <div class="d-flex justify-space-between align-center">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  @click="viewAuditDetails(audit)"
-                >
-                  <v-icon left size="small">mdi-eye</v-icon>
-                  Voir détails
-                </v-btn>
-                
-                <div class="d-flex gap-2">
-                  <!-- Bouton retry si échec -->
-                  <v-btn
-                    v-if="getRealSyncStatusText(audit) === 'Échec'"
-                    variant="text"
-                    size="small"
-                    icon="mdi-refresh"
-                    color="orange"
-                    @click="retryAuditSync(audit)"
-                    :disabled="!isOnline"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-pencil"
-                    @click="editAudit(audit)"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-share"
-                    @click="shareAudit(audit)"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-delete"
-                    color="error"
-                    @click="deleteAudit(audit)"
-                  ></v-btn>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
+            :key="audit.id || audit.localId"
+            :audit="audit"
+            :can-edit="true"
+            @view-details="viewAuditDetails"
+            @edit="editAudit"
+            @delete="deleteAudit"
+            @share="shareAudit"
+          />
         </div>
 
         <!-- Pagination si beaucoup d'audits -->
@@ -305,42 +188,46 @@
       </div>
     </v-container>
 
-    <!-- Dialog détail d'audit avec vrais statuts -->
+    <!-- Dialog détail d'audit (amélioré) -->
     <v-dialog v-model="showAuditDialog" max-width="600" scrollable>
       <v-card v-if="selectedAudit">
-        <v-card-title class="d-flex align-center">
+        <v-card-title class="d-flex align-center sticky-header">
           <v-icon class="mr-2">mdi-clipboard-text</v-icon>
           Détail de l'audit
           <v-spacer />
+          
+          <!-- Indicateur de sync dans le header -->
           <v-chip 
-            :color="getRealSyncStatusColor(selectedAudit)"
+            :color="getSyncStatusColor(selectedAudit)"
             size="small"
             variant="tonal"
           >
-            <v-icon left size="small">{{ getRealSyncStatusIcon(selectedAudit) }}</v-icon>
-            {{ getRealSyncStatusText(selectedAudit) }}
+            <v-icon left size="small">{{ getSyncStatusIcon(selectedAudit) }}</v-icon>
+            {{ getSyncStatusText(selectedAudit) }}
           </v-chip>
         </v-card-title>
         
         <v-divider />
         
         <v-card-text class="pa-4">
-          <!-- Localisation avec formatage corrigé -->
+          <!-- Localisation avec précision GPS -->
           <div class="mb-4">
             <h4 class="text-subtitle-1 mb-2 d-flex align-center">
-              <v-icon class="mr-2" color="primary">mdi-map-marker</v-icon>
+              <v-icon class="mr-2" :color="getLocationAccuracyColor(selectedAudit)">
+                {{ getLocationAccuracyIcon(selectedAudit) }}
+              </v-icon>
               Localisation
             </h4>
-            <p class="text-body-2">{{ formatAddress(selectedAudit) }}</p>
-            <div v-if="hasCoordinates(selectedAudit)" class="text-caption text-grey">
+            <p class="text-body-2">{{ selectedAudit.location || selectedAudit.location_text || 'Non disponible' }}</p>
+            <div v-if="selectedAudit.coordinates || (selectedAudit.latitude && selectedAudit.longitude)" class="text-caption text-grey">
               Coordonnées: {{ formatCoordinates(selectedAudit) }}
-            </div>
-            <div class="text-caption text-grey">
-              Date: {{ formatDate(getAuditDate(selectedAudit)) }}
+              <span v-if="selectedAudit.location_accuracy" class="ml-2">
+                (Précision: ±{{ selectedAudit.location_accuracy }}m)
+              </span>
             </div>
           </div>
 
-          <!-- Scores détaillés -->
+          <!-- Scores détaillés avec couleurs -->
           <div class="mb-4">
             <h4 class="text-subtitle-1 mb-2">📊 Évaluations</h4>
             <div class="audit-scores">
@@ -381,7 +268,15 @@
             </div>
           </div>
 
-          <!-- Photos améliorées avec support Supabase -->
+          <!-- Commentaire -->
+          <div v-if="selectedAudit.comment" class="mb-4">
+            <h4 class="text-subtitle-1 mb-2">💬 Commentaire</h4>
+            <v-card variant="tonal" color="blue-grey" class="pa-3">
+              <p class="text-body-2 mb-0">{{ selectedAudit.comment }}</p>
+            </v-card>
+          </div>
+
+          <!-- Photos améliorées -->
           <div v-if="hasPhotos(selectedAudit)" class="mb-4">
             <h4 class="text-subtitle-1 mb-2">
               📸 Photos ({{ getPhotosCount(selectedAudit) }})
@@ -404,7 +299,6 @@
                     aspect-ratio="1"
                     cover
                     class="cursor-pointer"
-                    @error="handleImageError(photo, index)"
                   >
                     <div class="photo-overlay">
                       <v-icon color="white">mdi-magnify</v-icon>
@@ -412,36 +306,13 @@
                   </v-img>
                   <v-card-text v-else class="text-center pa-2">
                     <v-icon>mdi-image-broken</v-icon>
-                    <div class="text-caption mt-1">Photo indisponible</div>
                   </v-card-text>
                 </v-card>
               </v-col>
             </v-row>
-            
-            <!-- Debug info pour les photos -->
-            <v-expansion-panels v-if="selectedAudit.photos || selectedAudit.audit_photos" variant="accordion" class="mt-3">
-              <v-expansion-panel>
-                <v-expansion-panel-title>
-                  <v-icon class="mr-2">mdi-bug</v-icon>
-                  Debug photos ({{ getPhotosCount(selectedAudit) }})
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <div class="technical-info">
-                    <div v-for="(photo, index) in getPhotos(selectedAudit)" :key="index" class="info-row">
-                      <span class="info-label">Photo {{ index + 1 }}:</span>
-                      <span class="info-value">{{ photo.name || 'Sans nom' }}</span>
-                    </div>
-                    <div v-if="selectedAudit.total_photos" class="info-row">
-                      <span class="info-label">Total photos DB:</span>
-                      <span class="info-value">{{ selectedAudit.total_photos }}</span>
-                    </div>
-                  </div>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
           </div>
 
-          <!-- Métadonnées techniques avec vrais statuts -->
+          <!-- Métadonnées techniques -->
           <v-expansion-panels variant="accordion" class="mb-4">
             <v-expansion-panel>
               <v-expansion-panel-title>
@@ -452,23 +323,23 @@
                 <div class="technical-info">
                   <div class="info-row">
                     <span class="info-label">ID:</span>
-                    <span class="info-value">{{ selectedAudit.id || selectedAudit.localId || 'N/A' }}</span>
+                    <span class="info-value">{{ selectedAudit.id || selectedAudit.localId }}</span>
                   </div>
                   <div class="info-row">
                     <span class="info-label">Créé:</span>
-                    <span class="info-value">{{ formatDate(getAuditDate(selectedAudit)) }}</span>
+                    <span class="info-value">{{ formatDate(selectedAudit.created_at || selectedAudit.timestamp) }}</span>
+                  </div>
+                  <div class="info-row" v-if="selectedAudit.updated_at">
+                    <span class="info-label">Modifié:</span>
+                    <span class="info-value">{{ formatDate(selectedAudit.updated_at) }}</span>
                   </div>
                   <div class="info-row">
                     <span class="info-label">Source:</span>
-                    <span class="info-value">{{ getAuditSource(selectedAudit) }}</span>
+                    <span class="info-value">{{ selectedAudit.source || (selectedAudit.synced ? 'Cloud' : 'Local') }}</span>
                   </div>
-                  <div class="info-row">
-                    <span class="info-label">Statut sync:</span>
-                    <span class="info-value">{{ getRealSyncStatusText(selectedAudit) }}</span>
-                  </div>
-                  <div class="info-row" v-if="getSyncDetails(selectedAudit)">
-                    <span class="info-label">Tentatives:</span>
-                    <span class="info-value">{{ getSyncDetails(selectedAudit).attempts || 0 }}/{{ getSyncDetails(selectedAudit).maxAttempts || 3 }}</span>
+                  <div class="info-row" v-if="selectedAudit.device_info">
+                    <span class="info-label">Appareil:</span>
+                    <span class="info-value">{{ getDeviceInfo(selectedAudit) }}</span>
                   </div>
                 </div>
               </v-expansion-panel-text>
@@ -478,9 +349,9 @@
 
         <v-card-actions class="pa-4">
           <v-btn
-            v-if="getRealSyncStatusText(selectedAudit) === 'Échec'"
+            v-if="!selectedAudit.synced && getSyncStatus(selectedAudit.id) === 'failed'"
             color="warning"
-            @click="retryAuditSync(selectedAudit)"
+            @click="retryAuditSync"
             :disabled="!isOnline"
           >
             <v-icon left>mdi-refresh</v-icon>
@@ -501,7 +372,8 @@
       </v-card>
     </v-dialog>
 
-    <!-- Dialog photo en plein écran -->
+    <!-- Autres dialogs existants -->
+    <!-- Dialog photo en plein écran (inchangé) -->
     <v-dialog v-model="showPhotoDialog" max-width="90vw" max-height="90vh">
       <v-card v-if="selectedPhoto">
         <v-card-title class="d-flex justify-space-between align-center pa-2">
@@ -551,16 +423,6 @@
               <div class="text-caption">Échoués</div>
             </v-col>
           </v-row>
-          <v-row>
-            <v-col cols="6" class="text-center">
-              <div class="text-h4 warning--text">{{ syncStats.pending }}</div>
-              <div class="text-caption">En attente</div>
-            </v-col>
-            <v-col cols="6" class="text-center">
-              <div class="text-h4 info--text">{{ syncStats.syncing }}</div>
-              <div class="text-caption">En cours</div>
-            </v-col>
-          </v-row>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -569,7 +431,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Dialog de confirmation de suppression -->
+    <!-- Dialog de confirmation de suppression (amélioré) -->
     <v-dialog v-model="showDeleteDialog" max-width="400">
       <v-card>
         <v-card-title class="text-h6 d-flex align-center">
@@ -639,11 +501,12 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
+import AuditListItem from '@/components/AuditListItem.vue'
 
 // Router
 const router = useRouter()
 
-// Composables avec vrais statuts de sync
+// Composables
 const { getAllAudits, deleteAudit: deleteAuditData, syncAllLocalAudits } = useAudits()
 const { 
   syncStats, 
@@ -662,8 +525,8 @@ const error = ref(null)
 // Dialogs
 const showAuditDialog = ref(false)
 const showPhotoDialog = ref(false)
-const showSyncDetails = ref(false)
 const showDeleteDialog = ref(false)
+const showSyncDetails = ref(false)
 
 // Sélections
 const selectedAudit = ref(null)
@@ -676,158 +539,16 @@ const currentPage = ref(1)
 const auditsPerPage = 20
 const deleteMode = ref('local-only')
 
-// =====================================================
-// FONCTIONS DE FORMATAGE CORRIGÉES (GARDÉES)
-// =====================================================
-
-const formatDate = (dateInput) => {
-  if (!dateInput) return 'Date inconnue'
-  
-  try {
-    let date
-    if (dateInput instanceof Date) date = dateInput
-    else if (typeof dateInput === 'number') date = new Date(dateInput)
-    else if (typeof dateInput === 'string') date = new Date(dateInput)
-    else return 'Format invalide'
-    
-    if (isNaN(date.getTime())) return 'Date invalide'
-    
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit', month: '2-digit', year: '2-digit'
-    }) + ' ' + date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit', minute: '2-digit'
-    })
-  } catch (error) {
-    console.error('Erreur formatage date:', error, 'Input:', dateInput)
-    return 'Erreur date'
-  }
-}
-
-const formatAddress = (audit) => {
-  if (audit.address && audit.address !== '') return audit.address
-  if (audit.location_text && audit.location_text !== '') return audit.location_text
-  if (audit.location && audit.location !== '') return audit.location
-  if (audit.latitude && audit.longitude) return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
-  return 'Position inconnue'
-}
-
-const getAuditDate = (audit) => {
-  return audit.created_at || audit.createdAt || audit.timestamp || audit.lastUpdate || audit.date || Date.now()
-}
-
-const formatLocationLine = (audit) => {
-  const address = formatAddress(audit)
-  const coordinates = hasCoordinates(audit) 
-    ? `${audit.latitude?.toFixed(4) || '0.0000'}, ${audit.longitude?.toFixed(4) || '0.0000'}`
-    : null
-  const formattedDate = formatDate(getAuditDate(audit))
-  
-  return coordinates ? 
-    `${address} • ${coordinates} • ${formattedDate}` : 
-    `${address} • ${formattedDate}`
-}
-
-// =====================================================
-// FONCTIONS DE STATUT SYNC AVEC VRAIS COMPOSABLES
-// =====================================================
-
-const getRealSyncStatusColor = (audit) => {
-  const auditId = audit.id || audit.localId
-  const queueStatus = getSyncStatus(auditId)
-  
-  // Priorité aux vrais statuts de la queue
-  switch (queueStatus) {
-    case 'synced': return 'success'
-    case 'syncing': return 'info'
-    case 'pending': return 'warning'
-    case 'failed': return 'error'
-    default:
-      // Fallback sur les propriétés de l'audit
-      if (audit.synced || audit.source === 'cloud') return 'success'
-      if (audit.source === 'local' || audit.localOnly) return 'orange'
-      return 'grey'
-  }
-}
-
-const getRealSyncStatusIcon = (audit) => {
-  const auditId = audit.id || audit.localId
-  const queueStatus = getSyncStatus(auditId)
-  
-  switch (queueStatus) {
-    case 'synced': return 'mdi-cloud-check'
-    case 'syncing': return 'mdi-cloud-sync'
-    case 'pending': return 'mdi-cloud-clock'
-    case 'failed': return 'mdi-cloud-alert'
-    default:
-      if (audit.synced || audit.source === 'cloud') return 'mdi-cloud-check'
-      return 'mdi-harddisk'
-  }
-}
-
-const getRealSyncStatusText = (audit) => {
-  const auditId = audit.id || audit.localId
-  const queueStatus = getSyncStatus(auditId)
-  
-  switch (queueStatus) {
-    case 'synced': return 'Synchronisé'
-    case 'syncing': return 'En cours...'
-    case 'pending': return 'En attente'
-    case 'failed': return 'Échec'
-    default:
-      if (audit.synced || audit.source === 'cloud') return 'Synchronisé'
-      if (audit.source === 'local' || audit.localOnly) return 'En attente'
-      return 'Local'
-  }
-}
-
-// =====================================================
-// AUTRES FONCTIONS UTILITAIRES (GARDÉES)
-// =====================================================
-
-const hasCoordinates = (audit) => {
-  return (audit.latitude && audit.longitude) || 
-         (audit.coordinates && audit.coordinates.lat && audit.coordinates.lng)
-}
-
-const formatCoordinates = (audit) => {
-  if (audit.coordinates && audit.coordinates.lat && audit.coordinates.lng) {
-    return `${audit.coordinates.lat.toFixed(4)}, ${audit.coordinates.lng.toFixed(4)}`
-  }
-  if (audit.latitude && audit.longitude) {
-    return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
-  }
-  return 'Non disponible'
-}
-
-const getAuditTitle = (audit) => {
-  if (audit.comment) return audit.comment
-  if (audit.id) return `Audit ${audit.id.substring(0, 8)}`
-  if (audit.localId) return `Audit ${audit.localId.substring(0, 8)}`
-  return `Audit ${formatDate(getAuditDate(audit))}`
-}
-
-const getAuditSource = (audit) => {
-  if (audit.synced || audit.source === 'cloud') return 'Cloud Supabase'
-  if (audit.source === 'local') return 'Local (non synchronisé)'
-  return 'LocalStorage'
-}
-
-// Computed avec vrais composables
+// Computed
 const filteredAudits = computed(() => {
   let filtered = allAudits.value
 
   switch (filterMode.value) {
     case 'synced':
-      filtered = allAudits.value.filter(audit => 
-        audit.synced || audit.source === 'cloud' || 
-        getSyncStatus(audit.id || audit.localId) === 'synced'
-      )
+      filtered = allAudits.value.filter(audit => audit.synced || audit.source === 'cloud')
       break
     case 'local':
-      filtered = allAudits.value.filter(audit => 
-        !audit.synced || audit.source === 'local' || 
-        ['pending', 'failed', 'local_only'].includes(getSyncStatus(audit.id || audit.localId))
-      )
+      filtered = allAudits.value.filter(audit => !audit.synced || audit.source === 'local')
       break
     case 'failed':
       filtered = allAudits.value.filter(audit => {
@@ -850,10 +571,7 @@ const totalPages = computed(() => {
 })
 
 const localOnlyAudits = computed(() => {
-  return allAudits.value.filter(audit => 
-    !audit.synced && audit.source !== 'cloud' && 
-    getSyncStatus(audit.id || audit.localId) !== 'synced'
-  )
+  return allAudits.value.filter(audit => !audit.synced && audit.source !== 'cloud')
 })
 
 const averageScore = computed(() => {
@@ -872,7 +590,7 @@ const totalPhotos = computed(() => {
   }, 0)
 })
 
-// Methods avec vrais composables
+// Methods
 const loadAudits = async () => {
   loading.value = true
   error.value = null
@@ -881,7 +599,7 @@ const loadAudits = async () => {
     const result = await getAllAudits()
     if (result.success) {
       allAudits.value = result.audits
-      console.log(`📊 ${result.audits.length} audits chargés avec vrais statuts sync`)
+      console.log(`📊 ${result.audits.length} audits chargés`)
     } else {
       error.value = result.error
     }
@@ -909,10 +627,10 @@ const calculateGlobalScore = (audit) => {
 
 const getScoreColor = (score) => {
   if (!score || score <= 0) return 'grey'
-  if (score <= 1) return 'red'
-  if (score <= 2) return 'orange'
-  if (score <= 3) return 'blue'
-  return 'green'
+  if (score <= 1) return 'error'
+  if (score <= 2) return 'warning'
+  if (score <= 3) return 'primary'
+  return 'success'
 }
 
 const getScoreItems = (audit) => {
@@ -926,70 +644,107 @@ const getScoreItems = (audit) => {
   ]
 }
 
-// Fonction pour obtenir URL photo Supabase
-const getPhotoUrl = (storagePath) => {
-  if (!storagePath) return null
-  // URL publique Supabase Storage
-  return `https://xciqkmnnrmejvrtschrh.supabase.co/storage/v1/object/public/audit-photos/${storagePath}`
+const getSyncStatusColor = (audit) => {
+  const status = getSyncStatus(audit.id || audit.localId)
+  switch (status) {
+    case 'synced': return 'success'
+    case 'syncing': return 'info'
+    case 'pending': return 'warning'
+    case 'failed': return 'error'
+    default: return 'grey'
+  }
+}
+
+const getSyncStatusIcon = (audit) => {
+  const status = getSyncStatus(audit.id || audit.localId)
+  switch (status) {
+    case 'synced': return 'mdi-cloud-check'
+    case 'syncing': return 'mdi-cloud-sync'
+    case 'pending': return 'mdi-cloud-clock'
+    case 'failed': return 'mdi-cloud-alert'
+    default: return 'mdi-harddisk'
+  }
+}
+
+const getSyncStatusText = (audit) => {
+  const status = getSyncStatus(audit.id || audit.localId)
+  switch (status) {
+    case 'synced': return 'Synchronisé'
+    case 'syncing': return 'En cours...'
+    case 'pending': return 'En attente'
+    case 'failed': return 'Échec'
+    default: return 'Local'
+  }
+}
+
+const getLocationAccuracyColor = (audit) => {
+  const accuracy = audit.location_accuracy
+  if (!accuracy) return 'grey'
+  if (accuracy <= 10) return 'success'
+  if (accuracy <= 50) return 'primary'
+  if (accuracy <= 100) return 'warning'
+  return 'error'
+}
+
+const getLocationAccuracyIcon = (audit) => {
+  const accuracy = audit.location_accuracy
+  if (!accuracy) return 'mdi-map-marker-question'
+  if (accuracy <= 10) return 'mdi-crosshairs-gps'
+  if (accuracy <= 50) return 'mdi-map-marker-check'
+  return 'mdi-map-marker-alert'
+}
+
+const formatCoordinates = (audit) => {
+  if (audit.coordinates) {
+    return `${audit.coordinates.lat.toFixed(4)}, ${audit.coordinates.lng.toFixed(4)}`
+  }
+  if (audit.latitude && audit.longitude) {
+    return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
+  }
+  return 'Non disponible'
 }
 
 const hasPhotos = (audit) => {
-  // Vérifier photos locales ou cloud
   return (audit.photos && audit.photos.length > 0) || 
-         (audit.audit_photos && audit.audit_photos.length > 0) ||
          (audit.total_photos && audit.total_photos > 0)
 }
 
 const getPhotosCount = (audit) => {
-  // Priorité aux photos enrichies, puis total_photos
-  if (audit.photos && audit.photos.length > 0) return audit.photos.length
-  if (audit.audit_photos && audit.audit_photos.length > 0) return audit.audit_photos.length
+  if (audit.photos) return audit.photos.length
   if (audit.total_photos) return audit.total_photos
   return 0
 }
 
 const getPhotos = (audit) => {
-  // Retourner photos enrichies ou adapter audit_photos
-  if (audit.photos && audit.photos.length > 0) {
-    return audit.photos
-  }
+  return audit.photos || []
+}
+
+const getDeviceInfo = (audit) => {
+  if (!audit.device_info) return 'Non disponible'
+  return audit.device_info.platform || 'Navigateur web'
+}
+
+const formatDate = (timestamp) => {
+  if (!timestamp) return 'Date inconnue'
   
-  // Si audit_photos de Supabase, les adapter
-  if (audit.audit_photos && audit.audit_photos.length > 0) {
-    return audit.audit_photos.map(photo => ({
-      id: photo.id,
-      name: photo.filename,
-      data: getPhotoUrl(photo.storage_path),
-      originalSize: photo.original_size,
-      compressedSize: photo.compressed_size,
-      order: photo.upload_order
-    }))
-  }
-  
-  return []
+  const date = new Date(timestamp)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
-const openPhotoDialog = (photo, index) => {
-  if (photo.data) {
-    selectedPhoto.value = photo
-    selectedPhotoIndex.value = index
-    showPhotoDialog.value = true
-  } else {
-    console.warn('Photo sans données:', photo)
-  }
-}
-
-const handleImageError = (photo, index) => {
-  console.error(`Erreur chargement photo ${index + 1}:`, photo)
-}
-
-// Actions avec vrais composables
+// Actions
 const viewAuditDetails = (audit) => {
   selectedAudit.value = audit
   showAuditDialog.value = true
 }
 
 const editAudit = (audit) => {
+  // Naviguer vers le formulaire avec les données de l'audit
   router.push({
     name: 'audit',
     query: { edit: audit.id || audit.localId }
@@ -1000,29 +755,38 @@ const deleteAudit = async (audit) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cet audit ?')) {
     const result = await deleteAuditData(audit.id || audit.localId)
     if (result.success) {
-      await loadAudits()
+      await loadAudits() // Recharger la liste
     }
   }
 }
 
 const shareAudit = (audit) => {
-  const data = {
-    id: audit.id || audit.localId,
-    location: formatAddress(audit),
-    score: calculateGlobalScore(audit).toFixed(1),
-    date: formatDate(getAuditDate(audit))
-  }
-  
-  if (navigator.share) {
+  if (navigator.share && audit.synced) {
     navigator.share({
       title: 'Audit de sécurité ONUF',
-      text: `Audit du ${formatDate(getAuditDate(audit))} - Score: ${data.score}/4`,
-      url: window.location.href
+      text: `Audit du ${formatDate(audit.created_at || audit.timestamp)}`,
+      url: `${window.location.origin}/audit/${audit.id}`
     })
   } else {
+    // Fallback: copier dans le presse-papier
+    const data = {
+      id: audit.id,
+      location: audit.location || audit.location_text,
+      score: calculateGlobalScore(audit).toFixed(1),
+      date: formatDate(audit.created_at || audit.timestamp)
+    }
+    
     navigator.clipboard.writeText(JSON.stringify(data, null, 2))
       .then(() => alert('Données de l\'audit copiées dans le presse-papier'))
       .catch(() => alert('Impossible de partager cet audit'))
+  }
+}
+
+const openPhotoDialog = (photo, index) => {
+  if (photo.data) {
+    selectedPhoto.value = photo
+    selectedPhotoIndex.value = index
+    showPhotoDialog.value = true
   }
 }
 
@@ -1031,10 +795,9 @@ const syncAllAudits = async () => {
   await processQueue()
 }
 
-const retryAuditSync = async (audit) => {
-  const auditId = audit.id || audit.localId
-  await retrySync(auditId)
-  if (showAuditDialog.value) {
+const retryAuditSync = async () => {
+  if (selectedAudit.value) {
+    await retrySync(selectedAudit.value.id || selectedAudit.value.localId)
     showAuditDialog.value = false
   }
 }
@@ -1044,16 +807,14 @@ const exportSingleAudit = () => {
     const data = {
       ...selectedAudit.value,
       export_date: new Date().toISOString(),
-      formatted_date: formatDate(getAuditDate(selectedAudit.value)),
-      formatted_location: formatAddress(selectedAudit.value),
-      sync_status: getRealSyncStatusText(selectedAudit.value)
+      app_version: import.meta.env.VITE_APP_VERSION
     }
     
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `audit_${(selectedAudit.value.id || selectedAudit.value.localId || 'unknown').substring(0, 8)}_${new Date().toISOString().split('T')[0]}.json`
+    a.download = `audit_${(selectedAudit.value.id || selectedAudit.value.localId).substring(0, 8)}_${new Date().toISOString().split('T')[0]}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -1063,21 +824,11 @@ const exportSingleAudit = () => {
 
 const exportAllAudits = () => {
   const data = {
-    audits: filteredAudits.value.map(audit => ({
-      ...audit,
-      formatted_date: formatDate(getAuditDate(audit)),
-      formatted_location: formatAddress(audit),
-      sync_status: getRealSyncStatusText(audit)
-    })),
+    audits: filteredAudits.value,
     export_date: new Date().toISOString(),
+    app_version: import.meta.env.VITE_APP_VERSION,
     total_count: filteredAudits.value.length,
-    filter_applied: filterMode.value,
-    sync_summary: {
-      success: syncStats.success,
-      pending: syncStats.pending,
-      failed: syncStats.failed,
-      syncing: syncStats.syncing
-    }
+    filter_applied: filterMode.value
   }
   
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -1094,10 +845,12 @@ const exportAllAudits = () => {
 const confirmDelete = async () => {
   try {
     if (deleteMode.value === 'all') {
+      // Supprimer tous les audits
       for (const audit of allAudits.value) {
         await deleteAuditData(audit.id || audit.localId)
       }
     } else {
+      // Supprimer seulement les locaux
       for (const audit of localOnlyAudits.value) {
         await deleteAuditData(audit.id || audit.localId)
       }
@@ -1118,7 +871,7 @@ onMounted(() => {
 
 // Watchers
 watch(filterMode, () => {
-  currentPage.value = 1
+  currentPage.value = 1 // Reset pagination when filter changes
 })
 </script>
 
@@ -1131,23 +884,13 @@ watch(filterMode, () => {
   max-width: 800px;
 }
 
-.audit-card {
+.audit-list .v-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.audit-card:hover {
+.audit-list .v-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.score-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.score-icon {
-  font-size: 16px;
 }
 
 .score-item {
@@ -1176,10 +919,6 @@ watch(filterMode, () => {
 .score-text {
   font-weight: 600;
   min-width: 40px;
-}
-
-.cursor-pointer {
-  cursor: pointer;
 }
 
 .photo-preview {
@@ -1218,6 +957,17 @@ watch(filterMode, () => {
   z-index: 10;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+}
+
 .technical-info .info-row {
   display: flex;
   justify-content: space-between;
@@ -1248,11 +998,6 @@ watch(filterMode, () => {
     padding: 8px;
   }
   
-  .score-badge {
-    flex-direction: column;
-    gap: 2px;
-  }
-  
   .score-item {
     flex-direction: column;
     align-items: flex-start;
@@ -1270,14 +1015,6 @@ watch(filterMode, () => {
   
   .info-value {
     text-align: left;
-  }
-  
-  .photo-preview {
-    margin-bottom: 8px;
-  }
-  
-  .photo-preview:hover {
-    transform: none;
   }
 }
 </style>
