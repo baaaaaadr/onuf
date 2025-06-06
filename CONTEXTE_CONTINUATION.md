@@ -1,7 +1,5 @@
 # 🔄 Guide de Continuation de Conversation
 
-Si tu ouvres une nouvelle conversation avec moi, fournis ce contexte :
-
 ## 📱 **Projet ONUF PWA - Contexte**
 Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase.
 
@@ -12,39 +10,55 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ Système photos avec compression
 - ✅ Console debug avancée
 - ✅ Schéma Supabase configuré (auth simple username/password)
-- 🔄 **EN COURS** : Intégration Supabase avec l'app Vue
+- ✅ Intégration Supabase complétée
+- ✅ Système d'authentification fonctionnel
+- ✅ Synchronisation des audits en temps réel
+- 🔄 **EN COURS** : Optimisation des performances et tests finaux
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA
-- **Backend** : Supabase (PostgreSQL + Storage)
-- **Auth** : Custom (username/password, pas d'email pour éviter RGPD)
-- **Storage** : IndexedDB local + sync Supabase quand en ligne
+- **Backend** : Supabase (PostgreSQL + Storage + Auth)
+- **Auth** : Système personnalisé avec username/password
+- **Storage** : IndexedDB local + Synchronisation automatique avec Supabase
+- **Gestion d'état** : Composition API + Pinia
 
-## 📋 **Tables DB Créées**
-- `profiles` (users avec username/password)
-- `audits` (audits principaux)
-- `audit_photos` (photos liées aux audits)
-- `audit_sessions` (sauvegardes de progrès)
+## 📋 **Structure de la Base de Données**
+- `profiles` : Gestion des utilisateurs et rôles
+- `audits` : Stockage des audits principaux
+- `audit_photos` : Gestion des médias avec optimisation
+- `audit_sessions` : Suivi des sessions et progression
+- `sync_queue` : File d'attente pour la synchronisation hors-ligne
 
-## 🔐 **Users de Test**
-- Admin : `admin` / `admin123!`
-- Agents : `agent01`, `agent02`, `agent03` / `field123!`
+## 🔐 **Accès**
+- **Admin** : `admin` / `admin123!`
+- **Agents** : `agent01`, `agent02`, `agent03` / `field123!`
+- **URL de test** : [Lien vers l'application de préproduction]
 
-## 📁 **Fichiers Récents Créés**
-- `supabase-setup-simplified.sql` - Setup complet DB
-- `src/composables/useSupabase.js` - Auth et client Supabase
-- `src/composables/useAudits.js` - Gestion des audits
-- `.env.example` - Variables d'environnement
+## 🛠️ **Dernières Mises à Jour**
+- **Système d'authentification** : Implémentation complète avec gestion des sessions
+- **Synchronisation** : Mécanisme de file d'attente pour les opérations hors-ligne
+- **Sécurité** : Vérification des rôles et permissions
+- **Performance** : Optimisation des requêtes et du chargement des médias
 
-## 🎯 **Prochaine Étape**
-Intégrer les composables Supabase dans l'app Vue existante :
-1. Installer dépendance Supabase
-2. Créer vue de login
-3. Modifier AuditFormView pour sauvegarder en cloud
-4. Tester sync offline/online
+## 📁 **Fichiers Importants**
+- `src/composables/useSupabase.js` : Client et méthodes d'authentification
+- `src/composables/useAudits.js` : Gestion des opérations CRUD des audits
+- `src/composables/useSyncQueue.js` : Gestion de la file de synchronisation
+- `src/views/AuditFormView.vue` : Formulaire principal d'audit
+- `src/views/AuditsHistoryView.vue` : Historique et gestion des audits
+- `.env` : Configuration des variables d'environnement
+- `supabase-setup-simplified.sql` : Schéma complet de la base de données
 
-## 📎 **Liens Utiles**
-- Repo : `C:\Users\MiniMonster\Documents\my apps\ONUF\ONUF-pwa`
-- Doc technique : `CORRECTIONS_RAPPORT.md`
+## 🚀 **Prochaines Étapes**
+1. Finaliser les tests de synchronisation hors-ligne
+2. Optimiser les performances de l'application
+3. Implémenter des rapports et tableaux de bord
+4. Préparer le déploiement en production
 
-Avec ce contexte, tu peux reprendre exactement où on en était ! 🚀
+## 📎 **Ressources**
+- **Dépôt** : `C:\Users\MiniMonster\Documents\my apps\ONUF\ONUF-pwa`
+- **Documentation** : `INTEGRATION_GUIDE.md`
+- **Migration** : `MIGRATION_RAPIDE.md`
+- **Correctifs** : `CORRECTIONS_RAPPORT.md`
+
+Ce document fournit tout le contexte nécessaire pour reprendre le développement. Consultez les fichiers de documentation pour plus de détails techniques. 🚀
