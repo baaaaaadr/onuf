@@ -7,7 +7,7 @@ import { getGlobalSyncQueue } from './useSyncQueue.js'
 export const useAudits = () => {
   const { currentUser } = useAuth()
   const syncQueue = getGlobalSyncQueue()
-  const { addToSyncQueue, isOnline, setSaveToCloudFunction } = syncQueue
+  const { addToSyncQueue, isOnline, setSaveToCloudFunction, syncStats } = syncQueue
   
   const loading = ref(false)
   const error = ref(null)
@@ -602,6 +602,114 @@ export const useAudits = () => {
     }
   }
 
+  // ✅ NOUVEAU: Fonctions pour les statistiques et compteurs (UI)
+  const getPendingAuditsCount = async () => {
+    try {
+      // Compter audits en cours de progression
+      const progressData = localStorage.getItem('onuf_audit_progress')
+      const hasPendingProgress = progressData && JSON.parse(progressData)
+      
+      // Pour l'instant, retourner 1 si progression en cours, 0 sinon
+      return hasPendingProgress ? 1 : 0
+    } catch (error) {
+      console.error('Erreur comptage audits en attente:', error)
+      return 0
+    }
+  }
+
+  const getAuditsStats = async () => {
+    try {
+      const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      const userAudits = localAudits.filter(audit => 
+        audit.userId === currentUser.value?.user_id
+      )
+      
+      const totalAudits = userAudits.length
+      const syncedAudits = userAudits.filter(audit => audit.synced).length
+      const localOnlyAudits = totalAudits - syncedAudits
+      
+      // Calculer score moyen (approximatif basé sur les évaluations)
+      let totalScore = 0
+      let scoredAudits = 0
+      
+      userAudits.forEach(audit => {
+        // Calculer un score simple basé sur les réponses (0-100)
+        let score = 0
+        let factors = 0
+        
+        // Éclairage (0-4 devient 0-25 points)
+        if (audit.lighting !== undefined) {
+          score += (audit.lighting / 4) * 25
+          factors++
+        }
+        
+        // Cheminement (0-3 devient 0-25 points)
+        if (audit.walkpath !== undefined) {
+          score += (audit.walkpath / 3) * 25
+          factors++
+        }
+        
+        // Ouverture (0-3 devient 0-25 points)
+        if (audit.openness !== undefined) {
+          score += (audit.openness / 3) * 25
+          factors++
+        }
+        
+        // Ressenti (0-4 devient 0-25 points)
+        if (audit.feeling !== undefined) {
+          score += (audit.feeling / 4) * 25
+          factors++
+        }
+        
+        if (factors > 0) {
+          totalScore += score / factors // Score normalisé pour cet audit
+          scoredAudits++
+        }
+      })
+      
+      const averageScore = scoredAudits > 0 ? Math.round(totalScore / scoredAudits) : 0
+      
+      // Dernière date d'audit
+      const lastAudit = userAudits.sort((a, b) => {
+        const dateA = new Date(a.created_at || a.createdAt || a.timestamp || 0)
+        const dateB = new Date(b.created_at || b.createdAt || b.timestamp || 0)
+        return dateB - dateA
+      })[0]
+      
+      const lastAuditDate = lastAudit 
+        ? new Date(lastAudit.created_at || lastAudit.createdAt || lastAudit.timestamp).toLocaleDateString('fr-FR')
+        : 'Aucun'
+      
+      return {
+        success: true,
+        stats: {
+          totalAudits,
+          syncedAudits,
+          localOnlyAudits,
+          averageScore,
+          lastAuditDate,
+          pendingSync: syncStats.pending || 0,
+          failedSync: syncStats.failed || 0
+        }
+      }
+    } catch (error) {
+      console.error('Erreur calcul statistiques:', error)
+      return {
+        success: false,
+        error: error.message,
+        stats: {
+          totalAudits: 0,
+          syncedAudits: 0,
+          localOnlyAudits: 0,
+          averageScore: 0,
+          lastAuditDate: 'Erreur',
+          pendingSync: 0,
+          failedSync: 0
+        }
+      }
+    }
+  }
+
   return {
     loading: readonly(loading),
     error: readonly(error),
@@ -614,6 +722,9 @@ export const useAudits = () => {
     saveProgress,
     loadProgress,
     clearProgress,
-    syncAllLocalAudits
+    syncAllLocalAudits,
+    // ✅ NOUVEAU: Fonctions pour l'interface
+    getPendingAuditsCount,
+    getAuditsStats
   }
 }

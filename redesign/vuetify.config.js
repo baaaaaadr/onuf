@@ -1,21 +1,10 @@
-// Configuration Vuetify pour ONUF PWA - Thème Redesign v2.0
-// Mise à jour : Phase 1 du redesign - CORRECTION ERREURS AFFICHAGE
+// Fichier de configuration Vuetify pour ONUF PWA
+// À placer dans : src/plugins/vuetify.js
 
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { fr } from 'vuetify/locale' // ✅ NOUVEAU: Support français
 import '@mdi/font/css/materialdesignicons.css'
-
-// ✅ CORRECTION: Traductions françaises personnalisées pour éviter les erreurs
-const frenchTranslations = {
-  ...fr,
-  rating: {
-    ariaLabel: {
-      item: 'Note {0} sur {1}'
-    }
-  }
-}
 
 // Définition du thème ONUF
 const onufLightTheme = {
@@ -92,12 +81,17 @@ const defaults = {
     ripple: true,
   },
   
+  // App
+  VApp: {
+    style: 'background: var(--v-theme-background);'
+  },
+  
   // Boutons
   VBtn: {
     rounded: 'pill',
     elevation: 0,
     height: 48,
-    class: 'text-none font-weight-medium',
+    class: 'text-none font-weight-semibold',
     style: 'letter-spacing: 0.5px; transition: all 0.2s ease;'
   },
   
@@ -115,6 +109,14 @@ const defaults = {
   
   VCardText: {
     class: 'text-body-2'
+  },
+  
+  // Chips
+  VChip: {
+    rounded: 'pill',
+    size: 'small',
+    elevation: 0,
+    class: 'font-weight-medium'
   },
   
   // Form inputs
@@ -138,30 +140,14 @@ const defaults = {
     hideDetails: 'auto'
   },
   
-  // ✅ NOUVEAU: Configuration Rating pour éviter les erreurs
-  VRating: {
-    density: 'compact',
-    size: 'small',
+  VCheckbox: {
     color: 'primary',
-    emptyIcon: 'mdi-star-outline',
-    fullIcon: 'mdi-star',
-    halfIcon: 'mdi-star-half-full',
-    readonly: true,
-    length: 4
+    hideDetails: 'auto'
   },
   
-  // ✅ NOUVEAU: Configuration Chip
-  VChip: {
-    size: 'small',
-    rounded: 'pill',
-    variant: 'tonal'
-  },
-  
-  // ✅ NOUVEAU: Configuration Alert
-  VAlert: {
-    rounded: 'lg',
-    variant: 'tonal',
-    density: 'comfortable'
+  VRadio: {
+    color: 'primary',
+    hideDetails: 'auto'
   },
   
   // Lists
@@ -176,6 +162,26 @@ const defaults = {
     rounded: 'lg',
     minHeight: 56,
     class: 'px-4'
+  },
+  
+  VListItemTitle: {
+    class: 'text-body-1'
+  },
+  
+  VListItemSubtitle: {
+    class: 'text-body-2'
+  },
+  
+  // Progress
+  VProgressLinear: {
+    rounded: true,
+    height: 8,
+    color: 'primary'
+  },
+  
+  VProgressCircular: {
+    width: 4,
+    color: 'primary'
   },
   
   // Navigation
@@ -193,19 +199,64 @@ const defaults = {
   },
   
   VAppBarTitle: {
-    class: 'text-h6 font-weight-medium text-center'
+    class: 'text-h6 font-weight-semibold text-center'
   },
   
-  // Progress
-  VProgressLinear: {
-    rounded: true,
-    height: 8,
-    color: 'primary'
+  // Dialogs
+  VDialog: {
+    maxWidth: 500,
+    width: 'calc(100% - 32px)',
+    scrim: 'black',
+    opacity: 0.5
+  },
+  
+  // Alerts
+  VAlert: {
+    rounded: 'lg',
+    variant: 'tonal',
+    density: 'comfortable'
+  },
+  
+  // Snackbars
+  VSnackbar: {
+    location: 'top',
+    rounded: 'pill',
+    variant: 'elevated',
+    elevation: 3,
+    minWidth: 200,
+    maxWidth: 400
+  },
+  
+  // Dividers
+  VDivider: {
+    class: 'border-opacity-50'
   },
   
   // Icons
   VIcon: {
     size: 24
+  },
+  
+  // Rating
+  VRating: {
+    activeColor: 'warning',
+    color: 'grey-lighten-1',
+    emptyIcon: 'mdi-star-outline',
+    fullIcon: 'mdi-star',
+    halfIcon: 'mdi-star-half-full',
+    density: 'comfortable'
+  },
+  
+  // Expansion panels
+  VExpansionPanels: {
+    rounded: 'lg',
+    elevation: 0
+  },
+  
+  VExpansionPanel: {
+    elevation: 0,
+    rounded: 'lg',
+    color: 'surface'
   },
   
   // FAB
@@ -214,7 +265,47 @@ const defaults = {
     icon: true,
     elevation: 3,
     color: 'primary'
+  },
+  
+  // Menu
+  VMenu: {
+    rounded: 'lg',
+    elevation: 3,
+    offset: 8
+  },
+  
+  // Skeleton
+  VSkeletonLoader: {
+    elevation: 0,
+    boilerplate: false
   }
+}
+
+// Breakpoints personnalisés
+const breakpoints = {
+  mobileBreakpoint: 'md',
+  thresholds: {
+    xs: 0,
+    sm: 375,
+    md: 428,
+    lg: 768,
+    xl: 1024,
+  },
+}
+
+// Options d'affichage
+const display = {
+  mobileBreakpoint: 'md',
+}
+
+// Configuration des icônes
+const icons = {
+  defaultSet: 'mdi',
+  sets: {
+    mdi: {
+      component: null,
+    },
+  },
 }
 
 // Export de la configuration complète
@@ -233,14 +324,10 @@ export default createVuetify({
     },
   },
   defaults,
-  icons: {
-    defaultSet: 'mdi',
-  },
+  breakpoints,
+  display,
+  icons,
   locale: {
     locale: 'fr',
-    fallback: 'en',
-    messages: {
-      fr: frenchTranslations
-    }
   },
 })

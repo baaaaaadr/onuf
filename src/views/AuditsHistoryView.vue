@@ -59,18 +59,18 @@
           <v-col cols="3">
             <v-card 
               class="text-center cursor-pointer" 
-              :color="syncStats.failed > 0 ? 'red-lighten-5' : 'purple-lighten-5'"
+              :color="safeSyncStats.failed > 0 ? 'red-lighten-5' : 'purple-lighten-5'"
               @click="showSyncDetails = true"
             >
               <v-card-text class="pa-3">
                 <v-icon 
                   size="30" 
-                  :color="syncStats.failed > 0 ? 'error' : 'purple'" 
+                  :color="safeSyncStats.failed > 0 ? 'error' : 'purple'" 
                   class="mb-2"
                 >
-                  {{ syncStats.failed > 0 ? 'mdi-cloud-alert' : 'mdi-cloud-check' }}
+                  {{ safeSyncStats.failed > 0 ? 'mdi-cloud-alert' : 'mdi-cloud-check' }}
                 </v-icon>
-                <div class="text-h6">{{ syncStats.success }}</div>
+                <div class="text-h6">{{ safeSyncStats.success }}</div>
                 <div class="text-caption">Sync</div>
               </v-card-text>
             </v-card>
@@ -101,7 +101,7 @@
                     <v-icon left size="small">mdi-harddisk</v-icon>
                     Local
                   </v-btn>
-                  <v-btn value="failed" size="small" v-if="syncStats.failed > 0">
+                  <v-btn value="failed" size="small" v-if="safeSyncStats.failed > 0">
                     <v-icon left size="small">mdi-cloud-alert</v-icon>
                     Échecs
                   </v-btn>
@@ -111,15 +111,15 @@
               <div class="d-flex gap-2">
                 <!-- Actions de sync -->
                 <v-btn
-                  v-if="syncStats.pending > 0 || syncStats.failed > 0"
+                  v-if="safeSyncStats.pending > 0 || safeSyncStats.failed > 0"
                   color="primary"
                   size="small"
                   @click="syncAllAudits"
-                  :loading="syncStats.syncing > 0"
+                  :loading="safeSyncStats.syncing > 0"
                   :disabled="!isOnline"
                 >
                   <v-icon left size="small">mdi-cloud-sync</v-icon>
-                  Synchroniser ({{ syncStats.pending + syncStats.failed }})
+                  Synchroniser ({{ safeSyncStats.pending + safeSyncStats.failed }})
                 </v-btn>
 
                 <!-- Export -->
@@ -150,14 +150,14 @@
 
         <!-- Indicateur de statut réseau -->
         <v-alert
-          v-if="!isOnline && (syncStats.pending > 0 || syncStats.failed > 0)"
+          v-if="!isOnline && (safeSyncStats.pending > 0 || safeSyncStats.failed > 0)"
           type="warning"
           variant="tonal"
           density="compact"
           class="mb-4"
         >
           <v-icon class="mr-2">mdi-wifi-off</v-icon>
-          {{ syncStats.pending + syncStats.failed }} audit(s) seront synchronisés à la reconnexion
+          {{ safeSyncStats.pending + safeSyncStats.failed }} audit(s) seront synchronisés à la reconnexion
         </v-alert>
 
         <!-- Liste des audits avec vrais statuts de sync -->
@@ -195,36 +195,33 @@
                   <div class="d-flex align-center gap-3 mb-2">
                     <div class="score-badge">
                       <span class="score-icon">💡</span>
-                      <v-rating 
-                        :model-value="audit.lighting || 0" 
-                        :color="getScoreColor(audit.lighting)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
+                      <div class="score-circles">
+                        <div 
+                          v-for="n in 4" 
+                          :key="n"
+                          :class="['score-circle', { 'score-circle--filled': n <= (audit.lighting || 0) }]"
+                        ></div>
+                      </div>
                     </div>
                     <div class="score-badge">
                       <span class="score-icon">🚶</span>
-                      <v-rating 
-                        :model-value="audit.walkpath || 0" 
-                        :color="getScoreColor(audit.walkpath)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
+                      <div class="score-circles">
+                        <div 
+                          v-for="n in 4" 
+                          :key="n"
+                          :class="['score-circle', { 'score-circle--filled': n <= (audit.walkpath || 0) }]"
+                        ></div>
+                      </div>
                     </div>
                     <div class="score-badge">
                       <span class="score-icon">😊</span>
-                      <v-rating 
-                        :model-value="audit.feeling || 0" 
-                        :color="getScoreColor(audit.feeling)"
-                        size="small" 
-                        readonly 
-                        density="compact" 
-                        :length="4"
-                      ></v-rating>
+                      <div class="score-circles">
+                        <div 
+                          v-for="n in 4" 
+                          :key="n"
+                          :class="['score-circle', { 'score-circle--filled': n <= (audit.feeling || 0) }]"
+                        ></div>
+                      </div>
                     </div>
                   </div>
                   
@@ -347,14 +344,14 @@
               <div class="score-item" v-for="scoreItem in getScoreItems(selectedAudit)" :key="scoreItem.key">
                 <span class="score-label">{{ scoreItem.icon }} {{ scoreItem.label }}:</span>
                 <div class="score-display">
-                  <v-rating 
-                    :model-value="scoreItem.value" 
-                    :color="scoreItem.color"
-                    size="small" 
-                    readonly 
-                    density="compact" 
-                    :length="4"
-                  ></v-rating>
+                  <div class="score-circles">
+                    <div 
+                      v-for="n in 4" 
+                      :key="n"
+                      :class="['score-circle', { 'score-circle--filled': n <= scoreItem.value }]"
+                      :style="{ backgroundColor: n <= scoreItem.value ? scoreItem.color : '#e0e0e0' }"
+                    ></div>
+                  </div>
                   <span class="score-text ml-2">({{ scoreItem.value }}/4)</span>
                 </div>
               </div>
@@ -365,15 +362,14 @@
             <div class="d-flex justify-space-between align-center">
               <span class="text-subtitle-2">Score global:</span>
               <div class="d-flex align-center">
-                <v-rating 
-                  :model-value="calculateGlobalScore(selectedAudit)" 
-                  color="primary"
-                  size="small" 
-                  readonly 
-                  density="compact" 
-                  :length="4"
-                  half-increments
-                ></v-rating>
+                <div class="score-circles">
+                  <div 
+                    v-for="n in 4" 
+                    :key="n"
+                    :class="['score-circle', { 'score-circle--filled': n <= calculateGlobalScore(selectedAudit) }]"
+                    :style="{ backgroundColor: n <= calculateGlobalScore(selectedAudit) ? '#F3C348' : '#e0e0e0' }"
+                  ></div>
+                </div>
                 <span class="text-h6 ml-2 font-weight-bold">
                   {{ calculateGlobalScore(selectedAudit).toFixed(1) }}/4
                 </span>
@@ -543,21 +539,21 @@
         <v-card-text>
           <v-row>
             <v-col cols="6" class="text-center">
-              <div class="text-h4 success--text">{{ syncStats.success }}</div>
+              <div class="text-h4 success--text">{{ safeSyncStats.success }}</div>
               <div class="text-caption">Synchronisés</div>
             </v-col>
             <v-col cols="6" class="text-center">
-              <div class="text-h4 error--text">{{ syncStats.failed }}</div>
+              <div class="text-h4 error--text">{{ safeSyncStats.failed }}</div>
               <div class="text-caption">Échoués</div>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="6" class="text-center">
-              <div class="text-h4 warning--text">{{ syncStats.pending }}</div>
+              <div class="text-h4 warning--text">{{ safeSyncStats.pending }}</div>
               <div class="text-caption">En attente</div>
             </v-col>
             <v-col cols="6" class="text-center">
-              <div class="text-h4 info--text">{{ syncStats.syncing }}</div>
+              <div class="text-h4 info--text">{{ safeSyncStats.syncing }}</div>
               <div class="text-caption">En cours</div>
             </v-col>
           </v-row>
@@ -653,6 +649,14 @@ const {
   retrySync,
   processQueue
 } = getGlobalSyncQueue()
+
+// ✅ CORRECTION: Protection défensive pour syncStats
+const safeSyncStats = computed(() => syncStats || {
+  pending: 0,
+  syncing: 0,
+  failed: 0,
+  success: 0
+})
 
 // État local
 const allAudits = ref([])
@@ -1077,10 +1081,10 @@ const exportAllAudits = () => {
     total_count: filteredAudits.value.length,
     filter_applied: filterMode.value,
     sync_summary: {
-      success: syncStats.success,
-      pending: syncStats.pending,
-      failed: syncStats.failed,
-      syncing: syncStats.syncing
+    success: safeSyncStats.success,
+    pending: safeSyncStats.pending,
+    failed: safeSyncStats.failed,
+    syncing: safeSyncStats.syncing
     }
   }
   
@@ -1134,7 +1138,7 @@ const setupAutoRefresh = () => {
   
   // Refresh périodique si des audits en attente
   const autoRefreshInterval = setInterval(async () => {
-    if (isOnline.value && (syncStats.pending > 0 || syncStats.syncing > 0)) {
+    if (isOnline.value && (safeSyncStats.value.pending > 0 || safeSyncStats.value.syncing > 0)) {
       console.log('🔄 Refresh automatique - Sync en cours')
       await loadAudits()
     }
@@ -1147,6 +1151,13 @@ const setupAutoRefresh = () => {
 let autoRefreshInterval = null
 
 onMounted(() => {
+  console.log('📊 AuditsHistoryView montée avec succès!')
+  console.log('🔍 Vérification DOM:', {
+    view: document.querySelector('.audits-history-view'),
+    container: document.querySelector('.v-container'),
+    auditsCount: allAudits.value.length
+  })
+  
   loadAudits()
   
   // ✅ NOUVEAU: Configurer auto-refresh
@@ -1172,7 +1183,11 @@ watch(filterMode, () => {
 
 <style scoped>
 .audits-history-view {
+  width: 100%; /* ✅ FIX: Ajout de la largeur manquante */
   min-height: 100vh;
+  background: var(--onuf-background);
+  position: relative;
+  display: block;
 }
 
 .v-container {
@@ -1196,6 +1211,25 @@ watch(filterMode, () => {
 
 .score-icon {
   font-size: 16px;
+}
+
+/* ✅ NOUVEAU: Remplacement des v-rating par des cercles personnalisés */
+.score-circles {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.score-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.score-circle--filled {
+  background-color: #F3C348 !important;
 }
 
 .score-item {

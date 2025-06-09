@@ -6,7 +6,7 @@ Ne crée pas trop de fichiers MD dans le projet, sauf si c'est utile pour Claude
 ## 📱 **Projet ONUF PWA - Contexte**
 Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase.
 
-## 🎯 **État Actuel (Juin 2025)**
+## 🎯 **État Actuel (Janvier 2025)**
 - ✅ Interface complète Vue.js + Vuetify 
 - ✅ Géolocalisation + carte Leaflet
 - ✅ 6 sections d'audit (éclairage, cheminement, etc.)
@@ -23,6 +23,7 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ **CORRIGÉ** : Calcul statistiques sync ("4 Sync")
 - ✅ **FINALISÉ** : Audits offline fonctionnels (test15 OK)
 - ✅ **RÉVOLUTION** : Stratégie Local-First implémentée
+- ✅ **REDESIGN PHASE 3.1** : Navigation moderne + Dashboard + CSS corrigés
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA
@@ -83,10 +84,19 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - **Doublons timestamp** : Plusieurs audits avec même heure (corrections en cours)
 
 ## 🚀 **Prochaines Étapes**
-1. Finaliser correction audits offline (test14)
-2. Optimiser performance interface
-3. Tableaux de bord et rapports
-4. Déploiement production
+1. **INTÉGRER PHASE 3.2** : 
+   - Remplacer AuditSection par AuditSectionModern dans AuditFormView
+   - Remplacer les cards par AuditCard dans AuditsHistoryView
+   - Tester l'intégration complète
+2. Moderniser le widget GPS et la section photos
+3. Finaliser le redesign (Phase 4)
+4. Tableaux de bord et rapports
+5. Déploiement production
+
+## 🎆 **Nouveaux composants créés (Phase 3.2)**
+- `src/components/AuditSectionModern.vue` : Section moderne avec OptionCard
+- `src/components/common/AuditCard.vue` : Carte moderne pour l'historique
+- **PRÊTS À INTÉGRER** : Voir `INTEGRATION_GUIDE_PHASE3.md`
 
 ## 📎 **Ressources**
 - **Dépôt** : `C:\Users\MiniMonster\Documents\my apps\ONUF\ONUF-pwa`

@@ -11,6 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.6",
     "@mdi/font": "^7.4.47",
     "@supabase/supabase-js": "^2.49.9",
     "dexie": "^4.0.11",

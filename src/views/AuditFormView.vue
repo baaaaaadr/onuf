@@ -1,6 +1,8 @@
 <template>
-  <v-container class="pa-4">
-    <v-form ref="auditForm">
+  <div class="audit-form-view">
+    <!-- ✅ FIX: Un seul élément racine pour les transitions -->
+    <div class="audit-wrapper">
+      <v-container class="pa-4">
       <!-- Widget de géolocalisation avec carte -->
       <v-card class="mb-4" color="blue-lighten-5" variant="tonal">
         <v-card-text>
@@ -231,8 +233,9 @@
         <v-icon start>mdi-content-save</v-icon>
         Dernière sauvegarde : {{ lastSaved }}
       </v-alert>
-    </v-form>
-  </v-container>
+    </v-container>
+    </div>
+  </div>
 
   <!-- Dialog de debug mobile -->
   <v-dialog v-model="showDebugDialog" max-width="90vw" max-height="80vh">
@@ -1396,6 +1399,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.audit-form-view {
+  width: 100%; /* ✅ FIX: Largeur manquante */
+  min-height: 100vh;
+  background: var(--onuf-background);
+  display: block;
+  position: relative;
+}
+
+.audit-wrapper {
+  width: 100%;
+  display: block;
+}
+
 .v-container {
   max-width: 600px;
 }

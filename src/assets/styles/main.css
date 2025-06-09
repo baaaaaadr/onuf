@@ -1,0 +1,306 @@
+/* Styles principaux pour ONUF PWA - Redesign v2.0 */
+/* Phase 1 : Configuration globale */
+
+/* Import de la police Inter */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+/* Import des variables CSS */
+@import './variables.css';
+
+/* === RESET ET BASE === */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  font-family: var(--font-family-primary);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--onuf-text-primary);
+  background-color: var(--onuf-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === AMÉLIORATION DES CLASSES VUETIFY === */
+
+/* Application principale */
+.v-application {
+  font-family: var(--font-family-primary) !important;
+  background: var(--onuf-background) !important;
+}
+
+/* Boutons améliorés */
+.v-btn {
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+  font-weight: var(--font-weight-medium) !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.v-btn:not(.v-btn--icon) {
+  min-width: 64px !important;
+  height: var(--button-height) !important;
+}
+
+.v-btn--size-large {
+  height: 56px !important;
+  font-size: var(--text-base) !important;
+}
+
+.v-btn--size-small {
+  height: 36px !important;
+  font-size: var(--text-sm) !important;
+}
+
+/* Effet de pression tactile pour mobile */
+.v-btn:active {
+  transform: scale(0.98) !important;
+}
+
+/* Cards améliorées */
+.v-card {
+  border-radius: var(--radius-lg) !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.v-card--variant-elevated {
+  box-shadow: var(--shadow-md) !important;
+}
+
+.v-card--variant-outlined {
+  border: 1px solid var(--onuf-surface-variant) !important;
+}
+
+/* Lists améliorées */
+.v-list {
+  border-radius: var(--radius-lg) !important;
+  background: var(--onuf-surface) !important;
+}
+
+.v-list-item {
+  border-radius: var(--radius-md) !important;
+  margin: 2px 4px !important;
+  min-height: var(--touch-target-min) !important;
+}
+
+.v-list-item:hover {
+  background: rgba(243, 195, 72, 0.08) !important;
+}
+
+.v-list-item--active {
+  background: rgba(243, 195, 72, 0.12) !important;
+  color: var(--onuf-primary) !important;
+}
+
+/* Form fields améliorés */
+.v-field {
+  border-radius: var(--radius-lg) !important;
+}
+
+.v-field--variant-outlined .v-field__outline {
+  --v-field-border-opacity: 0.3;
+}
+
+.v-field--focused .v-field__outline {
+  --v-field-border-opacity: 1;
+  color: var(--onuf-primary) !important;
+}
+
+/* Navigation bottom améliorée */
+.v-bottom-navigation {
+  border-top: 1px solid var(--onuf-surface-variant) !important;
+  background: var(--onuf-background) !important;
+}
+
+.v-btn--variant-text .v-btn__content {
+  color: var(--onuf-text-secondary) !important;
+}
+
+.v-btn--active .v-btn__content {
+  color: var(--onuf-primary) !important;
+}
+
+/* App bar améliorée */
+.v-app-bar {
+  border-bottom: 1px solid var(--onuf-surface-variant) !important;
+  background: var(--onuf-background) !important;
+}
+
+.v-app-bar-title {
+  font-weight: var(--font-weight-semibold) !important;
+  color: var(--onuf-text-primary) !important;
+}
+
+/* Progress amélioré */
+.v-progress-linear {
+  border-radius: var(--radius-pill) !important;
+}
+
+/* Chips améliorés */
+.v-chip {
+  font-weight: var(--font-weight-medium) !important;
+  border-radius: var(--radius-pill) !important;
+}
+
+/* === CLASSES SPÉCIFIQUES ONUF === */
+
+/* Container principal pour mobile */
+.onuf-container {
+  max-width: 428px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Spacing vertical */
+.onuf-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Cards de statistiques */
+.onuf-stat-card {
+  text-align: center;
+  padding: var(--spacing-lg) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--onuf-surface) !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.onuf-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Cards d'options tactiles */
+.onuf-option-card {
+  border: 1px solid var(--onuf-surface-variant);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--onuf-background);
+}
+
+.onuf-option-card:active {
+  transform: scale(0.98);
+  background: var(--onuf-surface);
+}
+
+.onuf-option-card--selected {
+  border: 3px solid var(--onuf-primary);
+  background: rgba(243, 195, 72, 0.05);
+}
+
+/* Feedback haptique pour les éléments tactiles */
+.onuf-touchable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.onuf-touchable:active {
+  transform: scale(0.98);
+}
+
+/* === ANIMATIONS === */
+
+/* Transition de page */
+.page-enter-active,
+.page-leave-active {
+  transition: all var(--transition-slow);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* Animation de chargement */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.onuf-loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* === RESPONSIVE === */
+
+/* Mobile small (iPhone SE) */
+@media (max-width: 374px) {
+  .onuf-container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .v-btn {
+    min-width: 56px !important;
+  }
+}
+
+/* Tablette */
+@media (min-width: 768px) {
+  .onuf-container {
+    max-width: 768px;
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+/* === ACCESSIBILITÉ === */
+
+/* Focus visible amélioré */
+.v-btn:focus-visible,
+.v-list-item:focus-visible,
+.onuf-option-card:focus-visible {
+  outline: 2px solid var(--onuf-primary);
+  outline-offset: 2px;
+}
+
+/* Réduction de mouvement pour accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mode sombre (préparation future) */
+@media (prefers-color-scheme: dark) {
+  /* Variables sombres à implémenter en Phase 4 */
+}
+
+/* === PRINT === */
+@media print {
+  .v-bottom-navigation,
+  .v-app-bar,
+  .v-fab {
+    display: none !important;
+  }
+}

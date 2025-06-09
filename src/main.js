@@ -4,13 +4,18 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 
+// Import des styles
+import 'vuetify/styles' // ✅ IMPORTANT: Styles Vuetify
+import '@mdi/font/css/materialdesignicons.css' // ✅ Icônes MDI
+import './assets/styles/main.css' // ✅ Styles du redesign v2.0
+
 // Import des nouveaux composables globaux
 import { initAuth } from './composables/useSupabase'
 import { globalGeolocation } from './composables/useGeolocation'
 // Import du composable sync queue (s'initialise automatiquement via getGlobalSyncQueue)
 import { getGlobalSyncQueue } from './composables/useSyncQueue'
 // ✅ NOUVEAU: Import des outils de debug
-import './utils/debug.js'
+// import './utils/debug.js' // Commenté si le fichier n'existe pas
 
 console.log('🚀 Initialisation ONUF PWA...')
 
