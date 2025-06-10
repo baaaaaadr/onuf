@@ -15,11 +15,9 @@
       <OptionCard
         v-for="option in options"
         :key="option.value"
-        :emoji="option.emoji"
-        :label="option.text"
-        :selected="modelValue === option.value"
-        :color="option.color"
-        @click="selectOption(option.value)"
+        :option="option"
+        :modelValue="modelValue"
+        @update:modelValue="selectOption"
       />
     </div>
 
@@ -27,13 +25,13 @@
     <transition name="fade-slide">
       <div v-if="modelValue !== null" class="selection-feedback mt-4">
         <v-chip
-          :color="getSelectedOption()?.color || 'primary'"
+          :color="getSelectedOption?.color || 'primary'"
           variant="tonal"
           size="small"
           class="selection-chip"
         >
           <v-icon start size="small">mdi-check-circle</v-icon>
-          <span>{{ getSelectedOption()?.emoji }} {{ getSelectedOption()?.text }}</span>
+          <span>{{ getSelectedOption?.emoji }} {{ getSelectedOption?.text }}</span>
         </v-chip>
       </div>
     </transition>
@@ -125,9 +123,11 @@ const getSelectedOption = computed(() => {
 /* Grille d'options */
 .options-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: var(--spacing-sm);
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
   padding: 0;
+  margin: 0 auto;
+  max-width: 500px;
 }
 
 /* Feedback de sélection */
@@ -158,22 +158,25 @@ const getSelectedOption = computed(() => {
 }
 
 /* Responsive */
-@media (max-width: 374px) {
+@media (max-width: 380px) {
   .options-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
   }
 }
 
-@media (min-width: 375px) and (max-width: 427px) {
+@media (min-width: 381px) and (max-width: 580px) {
   .options-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm);
   }
 }
 
-@media (min-width: 428px) {
+@media (min-width: 581px) {
   .options-grid {
     grid-template-columns: repeat(4, 1fr);
-    max-width: 400px;
+    max-width: 500px;
+    gap: var(--spacing-md);
   }
 }
 

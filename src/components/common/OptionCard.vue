@@ -187,6 +187,9 @@ const handleSelect = () => {
   -webkit-tap-highlight-color: transparent;
   outline: none;
   overflow: hidden;
+  height: 100%;
+  width: 100%;
+  min-width: 65px;
 }
 
 /* Input caché */
@@ -199,11 +202,15 @@ const handleSelect = () => {
 /* Contenu principal */
 .option-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
   position: relative;
   z-index: 1;
+  height: 100%;
+  min-height: 70px;
 }
 
 /* Visuel (emoji/icône) */
@@ -212,8 +219,9 @@ const handleSelect = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: auto;
+  margin-bottom: 4px;
 }
 
 .option-emoji {
@@ -240,6 +248,13 @@ const handleSelect = () => {
   font-weight: var(--font-weight-medium);
   color: var(--onuf-text-primary);
   line-height: 1.4;
+  word-break: normal;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-overflow: unset;
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 .option-description {
@@ -256,7 +271,9 @@ const handleSelect = () => {
 
 /* Indicateur de sélection */
 .option-indicator {
-  flex-shrink: 0;
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,13 +303,13 @@ const handleSelect = () => {
 
 /* Variants de taille */
 .option-card--small .option-content {
-  padding: var(--spacing-sm) var(--spacing-md);
-  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
+  gap: var(--spacing-xs);
+  min-height: 60px;
 }
 
 .option-card--small .option-visual {
-  width: 32px;
-  height: 32px;
+  margin-bottom: 2px;
 }
 
 .option-card--small .option-emoji {
@@ -300,17 +317,18 @@ const handleSelect = () => {
 }
 
 .option-card--small .option-label {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: normal;
 }
 
 .option-card--large .option-content {
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+  min-height: 90px;
 }
 
 .option-card--large .option-visual {
-  width: 48px;
-  height: 48px;
+  margin-bottom: 6px;
 }
 
 .option-card--large .option-emoji {

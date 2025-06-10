@@ -162,132 +162,15 @@
 
         <!-- Liste des audits avec vrais statuts de sync -->
         <div class="audit-list">
-          <v-card
+          <AuditCard
             v-for="audit in filteredAudits"
             :key="audit.id || audit.localId || audit.timestamp"
-            class="mb-3 audit-card"
-            hover
-          >
-            <v-card-text class="pa-4">
-              <div class="d-flex justify-space-between align-start mb-3">
-                <div class="flex-grow-1">
-                  <!-- TITRE AVEC INDICATEUR SYNC CORRIGÉ -->
-                  <div class="d-flex align-center mb-2">
-                    <h3 class="text-h6 mr-2">
-                      {{ audit.comment || getAuditTitle(audit) }}
-                    </h3>
-                    <v-chip 
-                      :color="getRealSyncStatusColor(audit)" 
-                      size="small" 
-                      variant="tonal"
-                    >
-                      <v-icon left size="small">{{ getRealSyncStatusIcon(audit) }}</v-icon>
-                      {{ getRealSyncStatusText(audit) }}
-                    </v-chip>
-                  </div>
-                  
-                  <!-- LOCALISATION ET DATE CORRIGÉES -->
-                  <div class="text-caption text-grey mb-2">
-                    {{ formatLocationLine(audit) }}
-                  </div>
-                  
-                  <!-- SCORES VISUELS -->
-                  <div class="d-flex align-center gap-3 mb-2">
-                    <div class="score-badge">
-                      <span class="score-icon">💡</span>
-                      <div class="score-circles">
-                        <div 
-                          v-for="n in 4" 
-                          :key="n"
-                          :class="['score-circle', { 'score-circle--filled': n <= (audit.lighting || 0) }]"
-                        ></div>
-                      </div>
-                    </div>
-                    <div class="score-badge">
-                      <span class="score-icon">🚶</span>
-                      <div class="score-circles">
-                        <div 
-                          v-for="n in 4" 
-                          :key="n"
-                          :class="['score-circle', { 'score-circle--filled': n <= (audit.walkpath || 0) }]"
-                        ></div>
-                      </div>
-                    </div>
-                    <div class="score-badge">
-                      <span class="score-icon">😊</span>
-                      <div class="score-circles">
-                        <div 
-                          v-for="n in 4" 
-                          :key="n"
-                          :class="['score-circle', { 'score-circle--filled': n <= (audit.feeling || 0) }]"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- PHOTOS INFO -->
-                  <div v-if="getPhotosCount(audit) > 0" class="text-caption text-blue">
-                    📸 {{ getPhotosCount(audit) }} photo(s)
-                  </div>
-                </div>
-                
-                <!-- SCORE GLOBAL -->
-                <div class="text-center ml-3">
-                  <div class="text-h4 font-weight-bold" :style="{ color: getScoreColor(calculateGlobalScore(audit)) + ' !important' }">
-                    {{ calculateGlobalScore(audit).toFixed(1) }}
-                  </div>
-                  <div class="text-caption">Score</div>
-                </div>
-              </div>
-              
-              <!-- ACTIONS AVEC RETRY -->
-              <div class="d-flex justify-space-between align-center">
-                <v-btn
-                  variant="outlined"
-                  size="small"
-                  @click="viewAuditDetails(audit)"
-                >
-                  <v-icon left size="small">mdi-eye</v-icon>
-                  Voir détails
-                </v-btn>
-                
-                <div class="d-flex gap-2">
-                  <!-- Bouton retry si échec -->
-                  <v-btn
-                    v-if="getRealSyncStatusText(audit) === 'Échec'"
-                    variant="text"
-                    size="small"
-                    icon="mdi-refresh"
-                    color="orange"
-                    @click="retryAuditSync(audit)"
-                    :disabled="!isOnline"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-pencil"
-                    @click="editAudit(audit)"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-share"
-                    @click="shareAudit(audit)"
-                  ></v-btn>
-                  
-                  <v-btn
-                    variant="text"
-                    size="small"
-                    icon="mdi-delete"
-                    color="error"
-                    @click="deleteAudit(audit)"
-                  ></v-btn>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
+            :audit="audit"
+            @view="viewAuditDetails"
+            @share="shareAudit"
+            @delete="deleteAudit"
+            class="mb-3"
+          />
         </div>
 
         <!-- Pagination si beaucoup d'audits -->
@@ -635,6 +518,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
+import AuditCard from '@/components/common/AuditCard.vue'
 
 // Router
 const router = useRouter()

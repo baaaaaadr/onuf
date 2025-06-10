@@ -184,6 +184,11 @@
       <!-- Contenu principal avec transitions -->
       <v-main class="onuf-main">
         <div class="page-container">
+          <!-- ✅ TEMPORAIRE: Désactiver les transitions qui causent des pages blanches -->
+          <router-view v-slot="{ Component, route }">
+            <component :is="Component" :key="route.path" />
+          </router-view>
+          <!--
           <router-view v-slot="{ Component, route }">
             <transition 
               :name="pageTransition" 
@@ -194,6 +199,7 @@
               <component :is="Component" :key="route.path" />
             </transition>
           </router-view>
+          -->
         </div>
       </v-main>
 

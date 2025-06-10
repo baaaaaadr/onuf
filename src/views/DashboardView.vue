@@ -642,6 +642,11 @@ const retryFailed = async () => {
 // Lifecycle
 onMounted(async () => {
   console.log('📊 Dashboard monté - Chargement des stats')
+  console.log('🔍 Vérification visibilité:', {
+    element: document.querySelector('.dashboard-view'),
+    container: document.querySelector('.dashboard-container'),
+    statCards: document.querySelectorAll('.stat-card').length
+  })
   await loadStats()
 })
 </script>

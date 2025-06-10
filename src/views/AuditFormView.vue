@@ -1,8 +1,6 @@
 <template>
   <div class="audit-form-view">
-    <!-- ✅ FIX: Un seul élément racine pour les transitions -->
-    <div class="audit-wrapper">
-      <v-container class="pa-4">
+    <v-container class="pa-4">
       <!-- Widget de géolocalisation avec carte -->
       <v-card class="mb-4" color="blue-lighten-5" variant="tonal">
         <v-card-text>
@@ -77,7 +75,7 @@
       </v-card>
 
       <!-- Section Éclairage -->
-      <AuditSection
+      <AuditSectionModern
         title="💡 Éclairage"
         description="Disponibilité de suffisamment de lumière pour voir tout autour de vous."
         v-model="formData.lighting"
@@ -85,7 +83,7 @@
       />
 
       <!-- Section Cheminement -->
-      <AuditSection
+      <AuditSectionModern
         title="🚶 Cheminement"
         description="Soit un trottoir, soit une route avec de l'espace pour marcher."
         v-model="formData.walkpath"
@@ -93,7 +91,7 @@
       />
 
       <!-- Section Ouverture -->
-      <AuditSection
+      <AuditSectionModern
         title="👁️ Ouverture"
         description="Capacité de voir et de se déplacer dans toutes les directions."
         v-model="formData.openness"
@@ -101,7 +99,7 @@
       />
 
       <!-- Section Sentiment de sécurité -->
-      <AuditSection
+      <AuditSectionModern
         title="😊 Ressenti"
         description="Comment vous sentez-vous dans cet endroit en ce moment ?"
         v-model="formData.feeling"
@@ -109,7 +107,7 @@
       />
 
       <!-- Section Présence d'autres personnes -->
-      <AuditSection
+      <AuditSectionModern
         title="👥 Présence humaine"
         description="Y a-t-il d'autres personnes autour de vous ?"
         v-model="formData.peoplePresence"
@@ -117,7 +115,7 @@
       />
 
       <!-- Section Propreté -->
-      <AuditSection
+      <AuditSectionModern
         title="🧹 Propreté"
         description="État général de propreté et d'entretien du lieu."
         v-model="formData.cleanliness"
@@ -234,7 +232,6 @@
         Dernière sauvegarde : {{ lastSaved }}
       </v-alert>
     </v-container>
-    </div>
   </div>
 
   <!-- Dialog de debug mobile -->
@@ -511,7 +508,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
-import AuditSection from '@/components/AuditSection.vue';
+import AuditSectionModern from '@/components/AuditSectionModern.vue';
 import { useAuth } from '@/composables/useSupabase';
 import { useAudits } from '@/composables/useAudits';
 import { useRouter } from 'vue-router';
@@ -1405,11 +1402,6 @@ onMounted(() => {
   background: var(--onuf-background);
   display: block;
   position: relative;
-}
-
-.audit-wrapper {
-  width: 100%;
-  display: block;
 }
 
 .v-container {
