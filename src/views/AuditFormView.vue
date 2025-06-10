@@ -1,61 +1,14 @@
 <template>
   <div class="audit-form-view">
     <v-container class="pa-4">
-      <!-- Widget de géolocalisation avec carte -->
-      <v-card class="mb-4" color="blue-lighten-5" variant="tonal">
-        <v-card-text>
-          <div class="d-flex align-center justify-space-between mb-3">
-            <div class="d-flex align-center">
-              <v-icon color="primary" class="mr-3" size="large">mdi-map-marker</v-icon>
-              <div>
-                <div class="font-weight-bold">📍 Localisation</div>
-                <span class="text-body-2 text-grey-darken-1">{{ locationText }}</span>
-                <div v-if="geoDetails.nearbyInfo" class="text-caption text-grey mt-1">
-                  {{ geoDetails.nearbyInfo }}
-                </div>
-              </div>
-            </div>
-            <v-btn 
-              icon 
-              size="small" 
-              color="primary" 
-              @click="getCurrentLocation"
-              :loading="locationLoading"
-              variant="tonal"
-            >
-              <v-icon>{{ locationIcon }}</v-icon>
-            </v-btn>
-          </div>
-          
-          <!-- Mini carte -->
-          <div v-if="coordinates.lat && coordinates.lng" class="mb-3">
-            <div 
-              ref="mapContainer" 
-              class="mini-map"
-              style="height: 120px; border-radius: 8px; overflow: hidden;"
-            ></div>
-            
-            <!-- Note: Bouton debug supprimé - cliquer sur précision -->
-          </div>
-          
-          <!-- Indicateur de précision cliquable -->
-          <div v-if="locationAccuracy" class="d-flex justify-space-between align-center">
-            <v-chip 
-              size="x-small" 
-              :color="getAccuracyColor()" 
-              variant="tonal"
-              @click="showDebugDialog = true"
-              class="cursor-pointer"
-            >
-              <v-icon start size="x-small">mdi-crosshairs-gps</v-icon>
-              Précision: {{ locationAccuracy }}m
-            </v-chip>
-            <v-chip size="x-small" color="info" variant="tonal" v-if="coordinates.lat">
-              <v-icon start size="x-small">mdi-map</v-icon>
-              {{ coordinates.lat.toFixed(4) }}, {{ coordinates.lng.toFixed(4) }}
-            </v-chip>
-          </div>
-        </v-card-text>
+      <!-- Widget de géolocalisation moderne -->
+      <v-card class="mb-4" variant="outlined">
+        <LocationWidget
+          v-model="coordinates"
+          :auto-start="true"
+          @location-obtained="handleLocationObtained"
+          @error="handleLocationError"
+        />
       </v-card>
 
       <!-- Barre de progression -->
@@ -124,64 +77,21 @@
 
       <!-- Section Photos -->
       <v-divider class="my-6"></v-divider>
-      <v-card>
+      <!-- Section Photos moderne -->
+      <v-divider class="my-6"></v-divider>
+      <v-card variant="outlined">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2">mdi-camera</v-icon>
-          📸 Prendre des Photos
+          📷 Photos de l'audit
         </v-card-title>
         <v-card-text>
-          <div class="d-flex align-center mb-3">
-            <v-btn 
-              icon 
-              color="primary" 
-              size="x-large" 
-              class="mr-3"
-              @click="takePhoto"
-              variant="tonal"
-            >
-              <v-icon size="30">mdi-plus</v-icon>
-            </v-btn>
-            <span class="text-body-2">Appuyez pour ajouter des photos</span>
-          </div>
-          
-          <!-- Affichage des photos prises -->
-          <div v-if="formData.photos.length > 0" class="mt-4">
-            <h4 class="text-subtitle-2 mb-2">📸 Photos prises ({{ formData.photos.length }})</h4>
-            <div class="d-flex flex-wrap gap-2">
-              <v-card
-                v-for="(photo, index) in formData.photos"
-                :key="photo.id || index"
-                class="photo-preview"
-                width="80"
-                height="80"
-              >
-                <v-img
-                  v-if="photo.data"
-                  :src="photo.data"
-                  cover
-                  class="photo-thumbnail"
-                >
-                  <v-btn
-                    icon="mdi-close"
-                    size="x-small"
-                    color="red"
-                    class="photo-delete-btn"
-                    @click="removePhoto(index)"
-                  ></v-btn>
-                </v-img>
-                <v-card-text v-else class="text-center pa-2">
-                  <v-icon>mdi-image</v-icon>
-                  <div class="text-caption">{{ typeof photo === 'string' ? 'Simulée' : photo.name }}</div>
-                  <v-btn
-                    icon="mdi-close"
-                    size="x-small"
-                    color="red"
-                    @click="removePhoto(index)"
-                  ></v-btn>
-                </v-card-text>
-              </v-card>
-            </div>
-          </div>
+          <PhotoCapture
+            v-model="formData.photos"
+            :max-photos="10"
+            :max-size-kb="100"
+            @photo-added="handlePhotoAdded"
+            @photo-removed="handlePhotoRemoved"
+          />
         </v-card-text>
       </v-card>
 
@@ -509,6 +419,8 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import AuditSectionModern from '@/components/AuditSectionModern.vue';
+import LocationWidget from '@/components/widgets/LocationWidget.vue'
+import PhotoCapture from '@/components/widgets/PhotoCapture.vue'
 import { useAuth } from '@/composables/useSupabase';
 import { useAudits } from '@/composables/useAudits';
 import { useRouter } from 'vue-router';
@@ -584,18 +496,44 @@ const addGeoLog = (message, type = 'info') => {
 };
 
 const addUserAction = (action) => {
-  const actionLog = {
-    timestamp: Date.now(),
-    message: action,
-    category: 'user'
-  };
-  userActions.value.push(actionLog);
-  addDebugLog(`👤 ${action}`, 'action');
-  // Garder seulement les 50 dernières actions
-  if (userActions.value.length > 50) {
-    userActions.value = userActions.value.slice(-50);
+  const timestamp = new Date().getTime();
+  userActions.value.unshift({
+    action,
+    timestamp,
+    formattedTime: formatTime(timestamp)
+  });
+
+  // Limiter le nombre d'actions stockées
+  if (userActions.value.length > 30) {
+    userActions.value = userActions.value.slice(0, 30);
   }
+
+  addDebugLog(`👤 ${action}`, 'action');
 };
+
+// Handlers pour LocationWidget
+const handleLocationObtained = (data) => {
+  formData.value.location = locationText.value || data.coordinates.lat + ', ' + data.coordinates.lng
+  formData.value.coordinates = data.coordinates
+  locationAccuracy.value = data.accuracy
+  addUserAction('📍 Position GPS obtenue via LocationWidget')
+}
+
+const handleLocationError = (error) => {
+  addDebugLog(`❌ Erreur GPS: ${error.message}`, 'error')
+  locationText.value = '⚠️ Erreur de géolocalisation'
+}
+
+// Handlers pour PhotoCapture  
+const handlePhotoAdded = (photo) => {
+  addUserAction(`📷 Photo ajoutée: ${photo.name}`)
+  saveProgress()
+}
+
+const handlePhotoRemoved = (photo) => {
+  addUserAction(`🗑️ Photo supprimée: ${photo.name}`)
+  saveProgress()
+}
 
 const addGeoHistory = (lat, lng, accuracy) => {
   geoHistory.value.push({

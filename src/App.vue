@@ -184,22 +184,11 @@
       <!-- Contenu principal avec transitions -->
       <v-main class="onuf-main">
         <div class="page-container">
-          <!-- ✅ TEMPORAIRE: Désactiver les transitions qui causent des pages blanches -->
           <router-view v-slot="{ Component, route }">
-            <component :is="Component" :key="route.path" />
-          </router-view>
-          <!--
-          <router-view v-slot="{ Component, route }">
-            <transition 
-              :name="pageTransition" 
-              mode="out-in"
-              @enter="onPageEnter"
-              @leave="onPageLeave"
-            >
+            <PageTransition name="auto" :duration="300">
               <component :is="Component" :key="route.path" />
-            </transition>
+            </PageTransition>
           </router-view>
-          -->
         </div>
       </v-main>
 
@@ -360,6 +349,7 @@ import { useAuth } from '@/composables/useSupabase'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import BottomNav from '@/components/navigation/BottomNav.vue'
+import PageTransition from '@/components/transitions/PageTransition.vue'
 
 // Router
 const route = useRoute()
