@@ -3,15 +3,15 @@
     <!-- Container principal -->
     <v-container class="dashboard-container pa-4" fluid>
       <!-- En-tête de bienvenue -->
-      <div class="welcome-header mb-6">
-        <div class="welcome-icon mb-3">
-          🛡️
-        </div>
-        <h1 class="welcome-title text-h5 font-weight-bold mb-2">
-          Bonjour {{ userDisplayName }} !
+      <div class="welcome-header mb-6 text-center">
+        <h1 class="welcome-title text-h4 font-weight-bold mb-2">
+          MANARA
         </h1>
-        <p class="welcome-subtitle text-body-2 text-secondary">
-          Contribuez à la sécurité urbaine d'Agadir
+        <p class="welcome-subtitle text-body-1 text-secondary">
+          Bonjour {{ userDisplayName }} !
+        </p>
+        <p class="text-caption text-medium-emphasis">
+          Votre solution de gestion urbaine intelligente
         </p>
       </div>
 
