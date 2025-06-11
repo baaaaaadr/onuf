@@ -9,7 +9,7 @@
       <!-- Bouton flottant pour ouvrir le debug -->
       <v-btn
         v-bind="props"
-        v-if="isDevelopment"
+        v-if="isDebugMode"
         position="fixed"
         location="bottom end"
         class="mb-16 mr-2"
@@ -143,7 +143,9 @@ const searchQuery = ref('')
 const selectedTypes = ref(['log', 'warn', 'error'])
 const expandedLog = ref(null)
 // Force le mode debug en production pour les tests
-const isDevelopment = import.meta.env.DEV || window.location.search.includes('debug=true')
+const isDebugMode = computed(() => {
+  return window.location.search.includes('debug=true')
+})
 
 // Computed
 const scrollHeight = computed(() => window.innerHeight - 250)

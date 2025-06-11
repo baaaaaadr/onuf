@@ -144,7 +144,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useOnline } from '@vueuse/core'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/composables/useSupabase'
 import localDB from '@/services/localDatabase'
 
 const isOnline = useOnline()
