@@ -242,6 +242,7 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: all 0.3s ease;
+  color: #212121; /* Dark gray for better contrast */
 }
 
 .log-message.expanded {
@@ -251,5 +252,14 @@ onUnmounted(() => {
 
 :deep(.v-virtual-scroll__item) {
   padding: 0 !important;
+}
+
+/* Ensure text is visible in dark mode */
+:deep(.v-theme--light) .log-message {
+  color: #212121; /* Dark gray for light theme */
+}
+
+:deep(.v-theme--dark) .log-message {
+  color: #e0e0e0; /* Light gray for dark theme */
 }
 </style>

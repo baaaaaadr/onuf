@@ -5,6 +5,7 @@ import AuditFormView from '../views/AuditFormView.vue'
 import AuditsHistoryView from '../views/AuditsHistoryView.vue'
 // Garde l'ancienne IntroView pour migration en douceur
 import IntroView from '../views/IntroView.vue'
+import MobileTestView from '../views/MobileTestView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,17 +47,16 @@ const router = createRouter({
         showBottomNav: false
       }
     },
-    // Page de test mobile - Temporarily disabled
-    // {
-    //   path: '/test-mobile',
-    //   name: 'MobileTest',
-    //   component: () => import('@/views/MobileTestView.vue'),
-    //   meta: {
-    //     title: 'Test Mobile',
-    //     showBottomNav: false,
-    //     requiresAuth: true
-    //   }
-    // },
+    {
+      path: '/test-mobile',
+      name: 'MobileTest',
+      component: MobileTestView,
+      meta: {
+        title: 'Test Mobile',
+        showBottomNav: false,
+        requiresAuth: true
+      }
+    },
     // Redirections pour compatibilité
     {
       path: '/audits',

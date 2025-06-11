@@ -1,435 +1,264 @@
-<!-- src/views/MobileTestView.vue -->
 <template>
-  <v-container class="pa-4">
-    <v-card>
-      <v-card-title>
-        🧪 Test Mobile ONUF
-        <v-spacer />
-        <v-chip :color="isOnline ? 'success' : 'error'" size="small">
-          {{ isOnline ? 'Online' : 'Offline' }}
-        </v-chip>
-      </v-card-title>
+  <div class="mobile-test-page">
+    <v-app-bar 
+      color="primary" 
+      dark 
+      height="64"
+      class="mobile-test-header"
+    >
+      <v-app-bar-title>
+        🔬 Tests Mobile ONUF
+      </v-app-bar-title>
       
-      <v-card-text>
-        <!-- Test GPS -->
-        <v-card class="mb-4" variant="outlined">
-          <v-card-title class="text-h6">
-            📍 Test GPS
-          </v-card-title>
-          <v-card-text>
-            <v-btn 
-              @click="testGPS" 
-              :loading="gpsLoading"
-              color="primary"
-              block
-            >
-              Tester la géolocalisation
-            </v-btn>
-            
-            <v-alert 
-              v-if="gpsResult" 
-              :type="gpsResult.success ? 'success' : 'error'"
-              class="mt-4"
-            >
-              <pre>{{ JSON.stringify(gpsResult, null, 2) }}</pre>
-            </v-alert>
-          </v-card-text>
-        </v-card>
+      <v-spacer></v-spacer>
+      
+      <v-btn 
+        icon 
+        @click="clearAllLogs"
+        :disabled="logs.length === 0"
+      >
+        <v-icon>mdi-delete-sweep</v-icon>
+      </v-btn>
+      
+      <v-btn 
+        icon 
+        @click="exportLogs"
+        :disabled="logs.length === 0"
+      >
+        <v-icon>mdi-download</v-icon>
+      </v-btn>
+      
+      <v-btn 
+        icon 
+        @click="runAllTests"
+        :disabled="isRunningAll"
+      >
+        <v-icon>mdi-play-circle</v-icon>
+      </v-btn>
+    </v-app-bar>
 
-        <!-- Test IndexedDB -->
-        <v-card class="mb-4" variant="outlined">
-          <v-card-title class="text-h6">
-            💾 Test IndexedDB
-          </v-card-title>
-          <v-card-text>
-            <v-btn 
-              @click="testIndexedDB" 
-              :loading="dbLoading"
-              color="primary"
-              block
-            >
-              Tester le stockage local
-            </v-btn>
-            
-            <v-alert 
-              v-if="dbResult" 
-              :type="dbResult.success ? 'success' : 'error'"
-              class="mt-4"
-            >
-              <pre>{{ JSON.stringify(dbResult, null, 2) }}</pre>
-            </v-alert>
-          </v-card-text>
-        </v-card>
+    <v-container class="pa-4">
+      <!-- Tests Status -->
+      <v-row>
+        <v-col cols="12">
+          <v-card class="mb-4">
+            <v-card-title class="text-h6">
+              📊 État des Tests
+            </v-card-title>
+            <v-card-text>
+              <div class="d-flex flex-wrap ga-2">
+                <v-chip 
+                  v-for="test in testResults" 
+                  :key="test.name"
+                  :color="test.status === 'success' ? 'success' : test.status === 'error' ? 'error' : 'grey'"
+                  class="ma-1"
+                >
+                  {{ test.status === 'success' ? '✅' : test.status === 'error' ? '❌' : '⏳' }}
+                  {{ test.name }}
+                </v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
-        <!-- Test Supabase -->
-        <v-card class="mb-4" variant="outlined">
-          <v-card-title class="text-h6">
-            ☁️ Test Supabase
-          </v-card-title>
-          <v-card-text>
-            <v-btn 
-              @click="testSupabase" 
-              :loading="supabaseLoading"
-              color="primary"
-              block
-            >
-              Tester la connexion Supabase
-            </v-btn>
-            
-            <v-alert 
-              v-if="supabaseResult" 
-              :type="supabaseResult.success ? 'success' : 'error'"
-              class="mt-4"
-            >
-              <pre>{{ JSON.stringify(supabaseResult, null, 2) }}</pre>
-            </v-alert>
-          </v-card-text>
-        </v-card>
+      <!-- Tests Individuels -->
+      <v-row>
+        <v-col cols="12" md="6">
+          <GPSTestCard 
+            ref="gpsTest"
+            @log="handleLog" 
+            @status-update="handleStatusUpdate" 
+          />
+        </v-col>
 
-        <!-- Test complet -->
-        <v-card variant="outlined">
-          <v-card-title class="text-h6">
-            🚀 Test Complet (Audit + Sync)
-          </v-card-title>
-          <v-card-text>
-            <v-btn 
-              @click="testFullFlow" 
-              :loading="fullLoading"
-              color="error"
-              block
-            >
-              Créer et synchroniser un audit test
-            </v-btn>
-            
-            <v-stepper v-if="fullSteps.length > 0" class="mt-4">
-              <v-stepper-item
-                v-for="(step, i) in fullSteps"
-                :key="i"
-                :complete="step.complete"
-                :error="step.error"
-              >
-                <template v-slot:title>
-                  {{ step.title }}
-                </template>
-                <template v-slot:subtitle>
-                  {{ step.message }}
-                </template>
-              </v-stepper-item>
-            </v-stepper>
-          </v-card-text>
-        </v-card>
+        <v-col cols="12" md="6">
+          <LocalStorageTestCard 
+            ref="localStorageTest"
+            @log="handleLog" 
+            @status-update="handleStatusUpdate" 
+          />
+        </v-col>
+      </v-row>
 
-        <!-- Logs -->
-        <v-expansion-panels class="mt-4">
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              📋 Logs détaillés ({{ logs.length }})
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <v-btn @click="clearLogs" size="small" class="mb-2">
-                Effacer
-              </v-btn>
-              <v-btn @click="copyLogs" size="small" class="mb-2 ml-2">
-                Copier
-              </v-btn>
-              <pre class="text-caption">{{ logsText }}</pre>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-card-text>
-    </v-card>
-  </v-container>
+      <v-row>
+        <v-col cols="12" md="6">
+          <SupabaseTestCard 
+            ref="supabaseTest"
+            @log="handleLog" 
+            @status-update="handleStatusUpdate" 
+          />
+        </v-col>
+
+        <v-col cols="12" md="6">
+          <FullFlowTestCard 
+            ref="fullFlowTest"
+            @log="handleLog" 
+            @status-update="handleStatusUpdate" 
+          />
+        </v-col>
+      </v-row>
+
+      <!-- Logs en temps réel -->
+      <v-row>
+        <v-col cols="12">
+          <LogsViewer :logs="logs" />
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useOnline } from '@vueuse/core'
-import { supabase } from '@/composables/useSupabase'
-import localDB from '@/services/localDatabase'
+import { useAuth } from '@/composables/useSupabase'
+import mobileDebugLogger from '@/utils/mobileDebug'
 
+// Imports des composants
+import GPSTestCard from '@/components/debug/GPSTestCard.vue'
+import LocalStorageTestCard from '@/components/debug/LocalStorageTestCard.vue'
+import SupabaseTestCard from '@/components/debug/SupabaseTestCard.vue'
+import FullFlowTestCard from '@/components/debug/FullFlowTestCard.vue'
+import LogsViewer from '@/components/debug/LogsViewer.vue'
+
+// Variables réactives
 const isOnline = useOnline()
+const { currentUser } = useAuth()
 const logs = ref([])
+const testStatuses = ref({
+  GPS: 'pending',
+  LocalStorage: 'pending',
+  Supabase: 'pending',
+  'Flux Complet': 'pending'
+})
+const isRunningAll = ref(false)
 
-// States
-const gpsLoading = ref(false)
-const gpsResult = ref(null)
-const dbLoading = ref(false)
-const dbResult = ref(null)
-const supabaseLoading = ref(false)
-const supabaseResult = ref(null)
-const fullLoading = ref(false)
-const fullSteps = ref([])
+// Références aux composants
+const gpsTest = ref(null)
+const localStorageTest = ref(null)
+const supabaseTest = ref(null)
+const fullFlowTest = ref(null)
 
-// Computed
-const logsText = computed(() => logs.value.join('\n'))
+// Résultats des tests compilés
+const testResults = computed(() => [
+  { name: 'GPS', status: testStatuses.value.GPS },
+  { name: 'LocalStorage', status: testStatuses.value.LocalStorage },
+  { name: 'Supabase', status: testStatuses.value.Supabase },
+  { name: 'Flux Complet', status: testStatuses.value['Flux Complet'] }
+])
 
-// Logger
-const log = (message, data = null) => {
-  const timestamp = new Date().toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    fractionalSecondDigits: 3
-  })
+// Gérer les logs des composants enfants
+const handleLog = (type, message, data = null) => {
+  const logEntry = {
+    type,
+    message,
+    data,
+    timestamp: Date.now()
+  }
   
-  const logEntry = `[${timestamp}] ${message}${data ? '\n' + JSON.stringify(data, null, 2) : ''}`
   logs.value.push(logEntry)
-  console.log(message, data || '')
+  
+  // Garder seulement les 100 derniers logs
+  if (logs.value.length > 100) {
+    logs.value = logs.value.slice(-100)
+  }
+  
+  // Logger aussi via le système mobile debug
+  mobileDebugLogger.log(type, `[TEST] ${message}`, data)
 }
 
-// Test GPS
-const testGPS = async () => {
-  gpsLoading.value = true
-  gpsResult.value = null
-  log('🛰️ Starting GPS test...')
+// Gérer les mises à jour de statut
+const handleStatusUpdate = (testName, status) => {
+  testStatuses.value[testName] = status
+  handleLog('info', `Test ${testName}: ${status}`)
+}
+
+// Lancer tous les tests en séquence
+const runAllTests = async () => {
+  if (isRunningAll.value) return
+  
+  isRunningAll.value = true
+  handleLog('info', '🚀 Lancement de tous les tests')
   
   try {
-    const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          log('✅ GPS Success')
-          resolve(pos)
-        },
-        (err) => {
-          log('❌ GPS Error', err)
-          reject(err)
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 0
-        }
-      )
+    // Reset statuses
+    Object.keys(testStatuses.value).forEach(key => {
+      testStatuses.value[key] = 'pending'
     })
     
-    gpsResult.value = {
-      success: true,
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      accuracy: position.coords.accuracy,
-      timestamp: new Date(position.timestamp).toISOString()
-    }
+    await gpsTest.value?.runTest()
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
+    await localStorageTest.value?.runTest()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    await supabaseTest.value?.runTest()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    await fullFlowTest.value?.runTest()
+    
+    handleLog('success', '✅ Tous les tests terminés')
   } catch (error) {
-    gpsResult.value = {
-      success: false,
-      error: error.message,
-      code: error.code
-    }
+    handleLog('error', 'Erreur lors de l\'exécution des tests', error)
   } finally {
-    gpsLoading.value = false
+    isRunningAll.value = false
   }
 }
 
-// Test IndexedDB
-const testIndexedDB = async () => {
-  dbLoading.value = true
-  dbResult.value = null
-  log('💾 Starting IndexedDB test...')
-  
-  try {
-    // Test write
-    const testAudit = {
-      id: `test_${Date.now()}`,
-      user_id: 'test_user',
-      latitude: 48.8566,
-      longitude: 2.3522,
-      location_name: 'Test Location',
-      created_at: new Date().toISOString(),
-      data: { test: true }
-    }
-    
-    log('Writing test audit...', testAudit)
-    await localDB.saveAudit(testAudit)
-    
-    // Test read
-    log('Reading audits...')
-    const audits = await localDB.getAudits()
-    
-    // Test delete
-    log('Deleting test audit...')
-    await localDB.deleteAudit(testAudit.id)
-    
-    dbResult.value = {
-      success: true,
-      auditsCount: audits.length,
-      testId: testAudit.id,
-      operations: ['write', 'read', 'delete']
-    }
-    
-    log('✅ IndexedDB test passed')
-    
-  } catch (error) {
-    dbResult.value = {
-      success: false,
-      error: error.message,
-      stack: error.stack
-    }
-    log('❌ IndexedDB error', error)
-  } finally {
-    dbLoading.value = false
-  }
-}
-
-// Test Supabase
-const testSupabase = async () => {
-  supabaseLoading.value = true
-  supabaseResult.value = null
-  log('☁️ Starting Supabase test...')
-  
-  try {
-    // Test auth status
-    log('Checking auth...')
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError) throw authError
-    
-    // Test simple query
-    log('Testing database query...')
-    const { data, error } = await supabase
-      .from('audits')
-      .select('id')
-      .limit(1)
-    
-    if (error) throw error
-    
-    supabaseResult.value = {
-      success: true,
-      authenticated: !!user,
-      userId: user?.id,
-      canQuery: true,
-      testQuery: data
-    }
-    
-    log('✅ Supabase test passed')
-    
-  } catch (error) {
-    supabaseResult.value = {
-      success: false,
-      error: error.message,
-      code: error.code,
-      details: error.details
-    }
-    log('❌ Supabase error', error)
-  } finally {
-    supabaseLoading.value = false
-  }
-}
-
-// Test complet
-const testFullFlow = async () => {
-  fullLoading.value = true
-  fullSteps.value = []
-  log('🚀 Starting full flow test...')
-  
-  const addStep = (title, message, complete = false, error = false) => {
-    fullSteps.value.push({ title, message, complete, error })
-  }
-  
-  try {
-    // Step 1: GPS
-    addStep('GPS', 'Obtention position...')
-    const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 30000
-      })
-    })
-    fullSteps.value[0].complete = true
-    fullSteps.value[0].message = `Lat: ${position.coords.latitude.toFixed(6)}`
-    
-    // Step 2: Create audit
-    addStep('Audit', 'Création audit test...')
-    const testAudit = {
-      id: `test_sync_${Date.now()}`,
-      user_id: (await supabase.auth.getUser()).data.user?.id || 'test',
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      position_accuracy: position.coords.accuracy,
-      location_name: 'Test Sync Mobile',
-      location_details: {
-        type: 'test',
-        mobile: true,
-        userAgent: navigator.userAgent
-      },
-      created_at: new Date().toISOString(),
-      data: {
-        sections: {
-          eclairage: { rating: 3, issues: ['test'] },
-          cheminement: { rating: 4, issues: [] }
-        }
-      }
-    }
-    
-    await localDB.saveAudit(testAudit)
-    fullSteps.value[1].complete = true
-    fullSteps.value[1].message = `ID: ${testAudit.id}`
-    
-    // Step 3: Add to sync queue
-    addStep('Queue', 'Ajout à la queue de sync...')
-    await localDB.addToSyncQueue({
-      id: testAudit.id,
-      type: 'audit',
-      data: testAudit,
-      timestamp: Date.now()
-    })
-    fullSteps.value[2].complete = true
-    
-    // Step 4: Sync to Supabase
-    addStep('Sync', 'Synchronisation Supabase...')
-    const { data, error } = await supabase
-      .from('audits')
-      .insert([testAudit])
-      .select()
-    
-    if (error) throw error
-    
-    fullSteps.value[3].complete = true
-    fullSteps.value[3].message = 'Synchronisé avec succès!'
-    
-    log('✅ Full flow test completed successfully!', data)
-    
-  } catch (error) {
-    const currentStep = fullSteps.value.findIndex(s => !s.complete)
-    if (currentStep >= 0) {
-      fullSteps.value[currentStep].error = true
-      fullSteps.value[currentStep].message = error.message
-    }
-    log('❌ Full flow error', error)
-  } finally {
-    fullLoading.value = false
-  }
-}
-
-// Utils
-const clearLogs = () => {
+// Nettoyer tous les logs
+const clearAllLogs = () => {
   logs.value = []
+  handleLog('info', 'Logs nettoyés')
 }
 
-const copyLogs = async () => {
-  try {
-    await navigator.clipboard.writeText(logsText.value)
-    alert('Logs copiés!')
-  } catch (e) {
-    alert('Erreur copie: ' + e.message)
+// Exporter les logs
+const exportLogs = () => {
+  const exportData = {
+    timestamp: new Date().toISOString(),
+    device: {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      online: isOnline.value,
+      user: currentUser.value?.username || 'Non connecté'
+    },
+    testResults: testResults.value,
+    logs: logs.value
   }
+  
+  const dataStr = JSON.stringify(exportData, null, 2)
+  const dataBlob = new Blob([dataStr], { type: 'application/json' })
+  
+  // Créer un lien de téléchargement
+  const url = URL.createObjectURL(dataBlob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `onuf-mobile-test-logs-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`
+  
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  
+  URL.revokeObjectURL(url)
+  
+  handleLog('success', '📁 Logs exportés avec succès')
 }
 
-// Init
+// Initialisation
 onMounted(() => {
-  log('📱 Mobile test page loaded', {
-    userAgent: navigator.userAgent,
-    online: isOnline.value,
-    url: window.location.href
-  })
+  handleLog('info', '🔧 Page de test mobile initialisée')
+  handleLog('info', `État connexion: ${isOnline.value ? 'En ligne' : 'Hors ligne'}`)
+  handleLog('info', `Utilisateur: ${currentUser.value?.username || 'Non connecté'}`)
 })
 </script>
 
 <style scoped>
-pre {
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 300px;
-  overflow-y: auto;
+.mobile-test-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.mobile-test-header {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 </style>
