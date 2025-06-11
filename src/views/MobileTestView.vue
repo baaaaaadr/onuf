@@ -165,7 +165,7 @@ const handleLog = (type, message, data = null) => {
   }
   
   // Logger aussi via le système mobile debug
-  mobileDebugLogger.log(type, `[TEST] ${message}`, data)
+  mobileDebugLogger.addLog(type, [`[TEST] ${message}`, data])
 }
 
 // Gérer les mises à jour de statut

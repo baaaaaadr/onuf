@@ -234,21 +234,20 @@ export const useGeolocation = () => {
   }
 
   return {
-    // État (readonly)
-    currentPosition: readonly(currentPosition),
+    // État
+    position: readonly(currentPosition),
     accuracy: readonly(accuracy),
+    accuracyLevel: readonly(accuracyLevel),
     isTracking: readonly(isTracking),
     lastUpdate: readonly(lastUpdate),
     error: readonly(error),
+    isGpsAvailable: readonly(isGpsAvailable),
+    formattedPosition: readonly(formattedPosition),
     
-    // Computed
-    accuracyLevel,
-    isGpsAvailable,
-    formattedPosition,
-    
-    // Actions
+    // Méthodes
     startTracking,
     stopTracking,
+    getPosition: getCurrentPosition,
     getCurrentPosition,
     requestPermission,
     calculateDistance,
