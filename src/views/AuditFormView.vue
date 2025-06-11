@@ -75,13 +75,10 @@
         :options="cleanlinessOptions"
       />
 
-      <!-- Section Photos -->
-      <v-divider class="my-6"></v-divider>
       <!-- Section Photos moderne -->
       <v-divider class="my-6"></v-divider>
       <v-card variant="outlined">
         <v-card-title class="d-flex align-center">
-          <v-icon class="mr-2">mdi-camera</v-icon>
           📷 Photos de l'audit
         </v-card-title>
         <v-card-text>

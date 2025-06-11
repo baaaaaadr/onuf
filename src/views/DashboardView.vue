@@ -22,28 +22,14 @@
         </h2>
         
         <v-row class="stats-grid" dense>
-          <v-col cols="6">
+          <v-col cols="12">
             <StatCard
               label="Audits Réalisés"
               :value="stats.totalAudits"
               :subtitle="stats.totalAudits > 0 ? 'Merci !' : 'Commencez maintenant'"
               :icon="stats.totalAudits > 0 ? 'mdi-check-circle' : 'mdi-clipboard-plus'"
               :color="stats.totalAudits > 0 ? 'success' : 'surface'"
-              size="medium"
-              variant="elevated"
-              @click="viewHistory"
-              :clickable="stats.totalAudits > 0"
-            />
-          </v-col>
-          
-          <v-col cols="6">
-            <StatCard
-              label="Score Moyen"
-              :value="stats.averageScore > 0 ? `${stats.averageScore}/100` : '-'"
-              :subtitle="getScoreQuality(stats.averageScore)"
-              icon="mdi-chart-line"
-              :color="getScoreColor(stats.averageScore)"
-              size="medium"
+              size="large"
               variant="elevated"
               @click="viewHistory"
               :clickable="stats.totalAudits > 0"
@@ -88,37 +74,19 @@
             Démarrer un Audit
           </v-btn>
           
-          <!-- Actions secondaires -->
-          <v-row dense>
-            <v-col cols="6">
-              <v-btn
-                color="surface"
-                size="large"
-                rounded="pill"
-                block
-                variant="elevated"
-                @click="viewHistory"
-                :disabled="stats.totalAudits === 0"
-              >
-                <v-icon start>mdi-history</v-icon>
-                Historique
-              </v-btn>
-            </v-col>
-            
-            <v-col cols="6">
-              <v-btn
-                color="surface"
-                size="large"
-                rounded="pill"
-                block
-                variant="elevated"
-                @click="showGpsInfo = true"
-              >
-                <v-icon start :color="gpsStatusColor">{{ gpsStatusIcon }}</v-icon>
-                GPS
-              </v-btn>
-            </v-col>
-          </v-row>
+          <!-- Action secondaire -->
+          <v-btn
+            color="surface"
+            size="large"
+            rounded="pill"
+            block
+            variant="elevated"
+            @click="viewHistory"
+            :disabled="stats.totalAudits === 0"
+          >
+            <v-icon start>mdi-history</v-icon>
+            Historique
+          </v-btn>
         </div>
       </section>
 

@@ -53,6 +53,18 @@
             ± {{ Math.round(accuracy) }}m
           </v-chip>
         </div>
+        <div class="map-controls">
+          <v-btn
+            icon
+            size="small"
+            variant="elevated"
+            color="white"
+            @click="recenterMap"
+            class="recenter-btn"
+          >
+            <v-icon>mdi-crosshairs-gps</v-icon>
+          </v-btn>
+        </div>
       </div>
 
       <!-- Infos de localisation -->
@@ -371,7 +383,13 @@ const updateMap = async () => {
       // Créer la carte
       map.value = window.L.map(mapContainer.value, {
         zoomControl: false,
-        attributionControl: false
+        attributionControl: false,
+        dragging: true,
+        touchZoom: true,
+        doubleClickZoom: true,
+        scrollWheelZoom: true,
+        boxZoom: false,
+        keyboard: false
       }).setView([lat, lng], 16)
 
       // Ajouter les tuiles
@@ -381,8 +399,8 @@ const updateMap = async () => {
       const pulsingIcon = window.L.divIcon({
         className: 'pulsing-marker',
         html: '<div class="marker-pin"></div><div class="marker-pulse"></div>',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
+        iconSize: [12, 12],
+        iconAnchor: [6, 6]
       })
 
       marker.value = window.L.marker([lat, lng], { icon: pulsingIcon }).addTo(map.value)
@@ -410,6 +428,16 @@ const updateMap = async () => {
 const refreshLocation = () => {
   refreshing.value = true
   requestLocation()
+}
+
+const recenterMap = () => {
+  if (map.value && hasLocation.value) {
+    const { lat, lng } = coordinates.value
+    map.value.setView([lat, lng], 16, {
+      animate: true,
+      duration: 0.5
+    })
+  }
 }
 
 const openInMaps = () => {
@@ -547,6 +575,17 @@ watch(() => props.modelValue, (newValue) => {
   z-index: 1000;
 }
 
+.map-controls {
+  position: absolute;
+  bottom: var(--spacing-sm);
+  right: var(--spacing-sm);
+  z-index: 1000;
+}
+
+.recenter-btn {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .accuracy-chip {
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.9) !important;
@@ -614,11 +653,11 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 :deep(.marker-pin) {
-  width: 20px;
-  height: 20px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--onuf-primary);
-  border: 3px solid white;
+  border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -627,8 +666,8 @@ watch(() => props.modelValue, (newValue) => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--onuf-primary);
   animation: pulse-gps 2s infinite;

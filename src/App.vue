@@ -202,17 +202,7 @@
         class="onuf-bottom-nav"
       />
 
-      <!-- FAB pour nouvel audit (affiché conditionnellement) -->
-      <v-fab
-        v-if="showFab"
-        color="primary"
-        icon="mdi-plus"
-        location="bottom end"
-        size="large"
-        class="onuf-fab"
-        :style="fabStyle"
-        @click="createNewAudit"
-      />
+
 
       <!-- Snackbars de notification -->
       <!-- Bienvenue -->

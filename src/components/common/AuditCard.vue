@@ -5,43 +5,22 @@
     rounded="lg"
     :elevation="hover ? 3 : 1"
     @click="handleClick"
+    @mouseenter="hover = true"
+    @mouseleave="hover = false"
   >
-    <v-card-text class="pa-4">
+    <v-card-text class="pa-3">
       <!-- En-tête avec localisation et date -->
-      <div class="audit-header mb-3">
-        <div class="audit-location">
-          <v-icon size="small" color="primary" class="mr-1">mdi-map-marker</v-icon>
-          <span class="text-body-2 font-weight-medium">{{ displayLocation }}</span>
-        </div>
-        <div class="audit-date text-caption text-secondary">
-          {{ formattedDate }}
-        </div>
-      </div>
-
-      <!-- Scores visuels -->
-      <div class="scores-container mb-3">
-        <div 
-          v-for="score in scoreItems" 
-          :key="score.key"
-          class="score-item"
-        >
-          <span class="score-emoji">{{ score.emoji }}</span>
-          <div class="score-dots">
-            <span 
-              v-for="n in 4" 
-              :key="n"
-              class="score-dot"
-              :class="{ 'active': n <= score.value }"
-              :style="{ backgroundColor: n <= score.value ? score.color : '#E0E0E0' }"
-            />
+      <div class="audit-header mb-2">
+        <div class="audit-main-info">
+          <div class="audit-location">
+            <v-icon size="small" color="primary" class="mr-1">mdi-map-marker</v-icon>
+            <span class="text-body-2 font-weight-medium">{{ displayLocation }}</span>
+          </div>
+          <div class="audit-date text-caption text-secondary">
+            {{ formattedDate }}
           </div>
         </div>
-      </div>
-
-      <!-- Score global et métadonnées -->
-      <div class="audit-footer">
-        <div class="global-score">
-          <span class="score-label text-caption">Score</span>
+        <div class="audit-score-badge">
           <span 
             class="score-value text-h6 font-weight-bold"
             :style="{ color: getScoreColor(globalScore) }"
@@ -49,53 +28,38 @@
             {{ globalScore.toFixed(1) }}
           </span>
         </div>
+      </div>
 
-        <!-- Indicateurs -->
+      <!-- Commentaire si présent -->
+      <div v-if="audit.comment" class="audit-comment mb-2">
+        <p class="text-caption text-secondary mb-0">{{ audit.comment }}</p>
+      </div>
+
+      <!-- Indicateurs en bas -->
+      <div class="audit-footer">
         <div class="audit-indicators">
           <!-- Photos -->
-          <v-chip 
+          <v-icon 
             v-if="photosCount > 0"
-            size="x-small"
-            variant="tonal"
+            size="small"
             color="info"
-            class="mr-1"
+            class="mr-3"
           >
-            <v-icon start size="x-small">mdi-camera</v-icon>
-            {{ photosCount }}
-          </v-chip>
+            mdi-camera
+          </v-icon>
+
+          <!-- Commercial/rue si disponible -->
+          <span v-if="displayCommerce" class="text-caption text-secondary mr-3">
+            {{ displayCommerce }}
+          </span>
 
           <!-- Statut sync -->
-          <v-chip
-            size="x-small"
+          <v-icon
+            size="small"
             :color="syncStatus.color"
-            variant="tonal"
           >
-            <v-icon start size="x-small">{{ syncStatus.icon }}</v-icon>
-            {{ syncStatus.text }}
-          </v-chip>
-        </div>
-
-        <!-- Actions -->
-        <div class="audit-actions">
-          <v-btn
-            icon="mdi-eye"
-            size="x-small"
-            variant="text"
-            @click.stop="$emit('view', audit)"
-          />
-          <v-btn
-            icon="mdi-share"
-            size="x-small"
-            variant="text"
-            @click.stop="$emit('share', audit)"
-          />
-          <v-btn
-            icon="mdi-delete"
-            size="x-small"
-            variant="text"
-            color="error"
-            @click.stop="$emit('delete', audit)"
-          />
+            {{ syncStatus.icon }}
+          </v-icon>
         </div>
       </div>
     </v-card-text>
@@ -135,6 +99,14 @@ const displayLocation = computed(() => {
     return `${props.audit.latitude.toFixed(4)}, ${props.audit.longitude.toFixed(4)}`
   }
   return 'Position inconnue'
+})
+
+// Commerce ou rue proche
+const displayCommerce = computed(() => {
+  // Si on a un nom de commerce ou de rue stocké
+  if (props.audit.nearby_commerce) return props.audit.nearby_commerce
+  if (props.audit.street_name) return props.audit.street_name
+  return null
 })
 
 // Date formatée
@@ -254,15 +226,18 @@ const handleClick = () => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+}
+
+.audit-main-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .audit-location {
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 0;
+  margin-bottom: 4px;
 }
 
 .audit-location span {
@@ -271,66 +246,42 @@ const handleClick = () => {
   white-space: nowrap;
 }
 
-/* Scores */
-.scores-container {
-  display: flex;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-
-.score-item {
+.audit-score-badge {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: var(--onuf-surface-light);
 }
 
-.score-emoji {
-  font-size: 1.2rem;
+/* Commentaire */
+.audit-comment {
+  padding: 8px 0;
+  border-top: 1px solid var(--onuf-border-light);
+  border-bottom: 1px solid var(--onuf-border-light);
 }
 
-.score-dots {
-  display: flex;
-  gap: 4px;
-}
-
-.score-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  transition: all var(--transition-fast);
-}
-
-.score-dot.active {
-  transform: scale(1.2);
+.audit-comment p {
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Footer */
 .audit-footer {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.global-score {
   display: flex;
-  flex-direction: column;
   align-items: center;
-}
-
-.score-label {
-  color: var(--onuf-text-secondary);
+  padding-top: 8px;
 }
 
 .audit-indicators {
   display: flex;
-  gap: var(--spacing-xs);
-  justify-content: center;
-}
-
-.audit-actions {
-  display: flex;
-  gap: var(--spacing-xs);
+  align-items: center;
+  flex: 1;
 }
 
 /* Responsive */

@@ -29,7 +29,7 @@
       <div v-else>
         <!-- Statistiques rapides avec vrais statuts -->
         <v-row class="mb-4">
-          <v-col cols="3">
+          <v-col cols="6">
             <v-card class="text-center" color="blue-lighten-5">
               <v-card-text class="pa-3">
                 <v-icon size="30" color="primary" class="mb-2">mdi-counter</v-icon>
@@ -38,25 +38,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="3">
-            <v-card class="text-center" color="green-lighten-5">
-              <v-card-text class="pa-3">
-                <v-icon size="30" color="success" class="mb-2">mdi-chart-line</v-icon>
-                <div class="text-h6">{{ averageScore.toFixed(1) }}</div>
-                <div class="text-caption">Score</div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="3">
-            <v-card class="text-center" color="orange-lighten-5">
-              <v-card-text class="pa-3">
-                <v-icon size="30" color="warning" class="mb-2">mdi-image</v-icon>
-                <div class="text-h6">{{ totalPhotos }}</div>
-                <div class="text-caption">Photos</div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="3">
+          <v-col cols="6">
             <v-card 
               class="text-center cursor-pointer" 
               :color="safeSyncStats.failed > 0 ? 'red-lighten-5' : 'purple-lighten-5'"
@@ -80,70 +62,103 @@
         <!-- Barre d'actions avec vrais statuts -->
         <v-row class="mb-4">
           <v-col>
-            <div class="d-flex justify-space-between align-center">
-              <div class="d-flex gap-2">
-                <!-- Filtres -->
-                <v-btn-toggle
-                  v-model="filterMode"
-                  mandatory
-                  density="compact"
-                  variant="outlined"
-                >
-                  <v-btn value="all" size="small">
-                    <v-icon left size="small">mdi-all-inclusive</v-icon>
+            <div class="filter-controls mb-3">
+              <!-- Filtres -->
+              <v-row dense>
+                <v-col cols="6">
+                  <v-btn
+                    block
+                    :variant="filterMode === 'all' ? 'flat' : 'outlined'"
+                    :color="filterMode === 'all' ? 'primary' : undefined"
+                    @click="filterMode = 'all'"
+                    height="48"
+                    class="filter-btn"
+                  >
+                    <v-icon left>mdi-all-inclusive</v-icon>
                     Tous
+                    <v-chip class="ml-2" size="small" variant="tonal">{{ allAuditsCount }}</v-chip>
                   </v-btn>
-                  <v-btn value="synced" size="small">
-                    <v-icon left size="small">mdi-cloud-check</v-icon>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    block
+                    :variant="filterMode === 'synced' ? 'flat' : 'outlined'"
+                    :color="filterMode === 'synced' ? 'primary' : undefined"
+                    @click="filterMode = 'synced'"
+                    height="48"
+                    class="filter-btn"
+                  >
+                    <v-icon left>mdi-cloud-check</v-icon>
                     Cloud
+                    <v-chip class="ml-2" size="small" variant="tonal">{{ syncedCount }}</v-chip>
                   </v-btn>
-                  <v-btn value="local" size="small">
-                    <v-icon left size="small">mdi-harddisk</v-icon>
+                </v-col>
+                <v-col cols="6">
+                  <v-btn
+                    block
+                    :variant="filterMode === 'local' ? 'flat' : 'outlined'"
+                    :color="filterMode === 'local' ? 'primary' : undefined"
+                    @click="filterMode = 'local'"
+                    height="48"
+                    class="filter-btn"
+                  >
+                    <v-icon left>mdi-harddisk</v-icon>
                     Local
+                    <v-chip class="ml-2" size="small" variant="tonal">{{ localCount }}</v-chip>
                   </v-btn>
-                  <v-btn value="failed" size="small" v-if="safeSyncStats.failed > 0">
-                    <v-icon left size="small">mdi-cloud-alert</v-icon>
+                </v-col>
+                <v-col cols="6" v-if="safeSyncStats.failed > 0">
+                  <v-btn
+                    block
+                    :variant="filterMode === 'failed' ? 'flat' : 'outlined'"
+                    :color="filterMode === 'failed' ? 'error' : undefined"
+                    @click="filterMode = 'failed'"
+                    height="48"
+                    class="filter-btn"
+                  >
+                    <v-icon left>mdi-cloud-alert</v-icon>
                     Échecs
+                    <v-chip class="ml-2" size="small" variant="tonal" color="error">{{ safeSyncStats.failed }}</v-chip>
                   </v-btn>
-                </v-btn-toggle>
-              </div>
+                </v-col>
+              </v-row>
+            </div>
 
-              <div class="d-flex gap-2">
-                <!-- Actions de sync -->
-                <v-btn
-                  v-if="safeSyncStats.pending > 0 || safeSyncStats.failed > 0"
-                  color="primary"
-                  size="small"
-                  @click="syncAllAudits"
-                  :loading="safeSyncStats.syncing > 0"
-                  :disabled="!isOnline"
-                >
-                  <v-icon left size="small">mdi-cloud-sync</v-icon>
-                  Synchroniser ({{ safeSyncStats.pending + safeSyncStats.failed }})
-                </v-btn>
+            <div class="d-flex gap-2">
+              <!-- Actions de sync -->
+              <v-btn
+                v-if="safeSyncStats.pending > 0 || safeSyncStats.failed > 0"
+                color="primary"
+                size="small"
+                @click="syncAllAudits"
+                :loading="safeSyncStats.syncing > 0"
+                :disabled="!isOnline"
+              >
+                <v-icon left size="small">mdi-cloud-sync</v-icon>
+                Synchroniser ({{ safeSyncStats.pending + safeSyncStats.failed }})
+              </v-btn>
 
-                <!-- Export -->
-                <v-btn
-                  color="secondary"
-                  size="small"
-                  @click="exportAllAudits"
-                  :disabled="filteredAudits.length === 0"
-                >
-                  <v-icon left size="small">mdi-download</v-icon>
-                  Export
-                </v-btn>
+              <!-- Export -->
+              <v-btn
+                color="secondary"
+                size="small"
+                @click="exportAllAudits"
+                :disabled="filteredAudits.length === 0"
+              >
+                <v-icon left size="small">mdi-download</v-icon>
+                Export
+              </v-btn>
 
-                <!-- Nettoyage -->
-                <v-btn
-                  color="error"
-                  size="small"
-                  @click="showDeleteDialog = true"
-                  :disabled="allAudits.length === 0"
-                >
-                  <v-icon left size="small">mdi-delete-sweep</v-icon>
-                  Nettoyer
-                </v-btn>
-              </div>
+              <!-- Nettoyage -->
+              <v-btn
+                color="error"
+                size="small"
+                @click="showDeleteDialog = true"
+                :disabled="allAudits.length === 0"
+              >
+                <v-icon left size="small">mdi-delete-sweep</v-icon>
+                Nettoyer
+              </v-btn>
             </div>
           </v-col>
         </v-row>
@@ -704,6 +719,23 @@ const getAuditSource = (audit) => {
   return 'LocalStorage'
 }
 
+// Computed pour les compteurs de filtres
+const allAuditsCount = computed(() => allAudits.value.length)
+
+const syncedCount = computed(() => {
+  return allAudits.value.filter(audit => 
+    audit.synced || audit.source === 'cloud' || 
+    getSyncStatus(audit.id || audit.localId) === 'synced'
+  ).length
+})
+
+const localCount = computed(() => {
+  return allAudits.value.filter(audit => 
+    !audit.synced || audit.source === 'local' || 
+    ['pending', 'failed', 'local_only'].includes(getSyncStatus(audit.id || audit.localId))
+  ).length
+})
+
 // Computed avec vrais composables
 const filteredAudits = computed(() => {
   let filtered = allAudits.value
@@ -1072,6 +1104,25 @@ watch(filterMode, () => {
   background: var(--onuf-background);
   position: relative;
   display: block;
+}
+
+/* Styles pour les boutons de filtres */
+.filter-controls {
+  margin-bottom: 1rem;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  text-transform: none;
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.filter-btn .v-icon {
+  margin-right: 8px;
 }
 
 .v-container {

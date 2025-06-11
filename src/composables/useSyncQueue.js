@@ -47,6 +47,9 @@ window.addEventListener('offline', () => {
 
 // Mettre à jour les statistiques
 const updateSyncStats = () => {
+  // Nettoyer la queue des éléments supprimés
+  cleanupDeletedItems()
+  
   syncStats.pending = syncQueue.value.filter(i => i.status === SYNC_STATUS.PENDING).length
   syncStats.syncing = syncQueue.value.filter(i => i.status === SYNC_STATUS.SYNCING).length
   syncStats.failed = syncQueue.value.filter(i => i.status === SYNC_STATUS.FAILED).length
@@ -200,6 +203,26 @@ const cleanupSyncedItems = () => {
   
   updateSyncStats()
   saveQueueToStorage()
+}
+
+// Nettoyer les items supprimés de la queue
+const cleanupDeletedItems = () => {
+  const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+  const localIds = new Set(localAudits.map(audit => audit.id || audit.localId))
+  
+  // Filtrer la queue pour garder seulement les audits qui existent encore
+  const initialLength = syncQueue.value.length
+  syncQueue.value = syncQueue.value.filter(item => {
+    const auditExists = localIds.has(item.id)
+    if (!auditExists && item.status === SYNC_STATUS.FAILED) {
+      console.log(`🗑️ Suppression de l'audit échoué ${item.id} de la queue (audit supprimé)`)
+    }
+    return auditExists || item.status === SYNC_STATUS.SYNCED
+  })
+  
+  if (syncQueue.value.length !== initialLength) {
+    saveQueueToStorage()
+  }
 }
 
 export const useSyncQueue = () => {

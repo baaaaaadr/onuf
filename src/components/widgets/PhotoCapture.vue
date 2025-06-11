@@ -7,44 +7,30 @@
       </div>
       
       <h3 class="text-h6 mt-3 mb-2">Prendre des photos</h3>
-      <p class="text-body-2 text-grey mb-4">
+      <p class="text-body-2 text-medium-emphasis mb-4">
         Documentez votre audit avec des photos
       </p>
-
-      <!-- Zone de drop -->
-      <div 
-        class="drop-zone"
-        :class="{ 'drop-zone--active': isDragging }"
-        @drop="handleDrop"
-        @dragover.prevent="isDragging = true"
-        @dragleave="isDragging = false"
-      >
-        <v-icon size="32" color="primary">mdi-cloud-upload</v-icon>
-        <p class="text-body-2 mt-2 mb-3">
-          Glissez des photos ici ou
-        </p>
         
-        <!-- Boutons d'action -->
-        <div class="action-buttons">
-          <v-btn
-            color="primary"
-            rounded="lg"
-            @click="openCamera"
-            class="mb-2"
-          >
-            <v-icon start>mdi-camera</v-icon>
-            Prendre une photo
-          </v-btn>
-          
-          <v-btn
-            variant="outlined"
-            rounded="lg"
-            @click="openGallery"
-          >
-            <v-icon start>mdi-image-multiple</v-icon>
-            Choisir depuis la galerie
-          </v-btn>
-        </div>
+      <!-- Boutons d'action -->
+      <div class="action-buttons">
+        <v-btn
+          color="primary"
+          rounded="lg"
+          @click="openCamera"
+          class="mb-2"
+        >
+          <v-icon start>mdi-camera</v-icon>
+          Prendre une photo
+        </v-btn>
+        
+        <v-btn
+          variant="outlined"
+          rounded="lg"
+          @click="openGallery"
+        >
+          <v-icon start>mdi-image-multiple</v-icon>
+          Choisir depuis la galerie
+        </v-btn>
       </div>
     </div>
 
@@ -309,7 +295,7 @@ const emit = defineEmits(['update:modelValue', 'photo-added', 'photo-removed'])
 
 // État
 const photos = ref([...props.modelValue])
-const isDragging = ref(false)
+
 const showAddMenu = ref(false)
 const showViewer = ref(false)
 const selectedPhoto = ref(null)
@@ -353,23 +339,7 @@ const handleFileSelect = async (event) => {
   event.target.value = ''
 }
 
-const handleDrop = async (event) => {
-  event.preventDefault()
-  isDragging.value = false
-  
-  const files = Array.from(event.dataTransfer.files)
-  
-  if (photos.value.length + files.length > props.maxPhotos) {
-    showError(`Maximum ${props.maxPhotos} photos autorisées`)
-    return
-  }
 
-  for (const file of files) {
-    if (file.type.startsWith('image/')) {
-      await processPhoto(file)
-    }
-  }
-}
 
 const processPhoto = async (file) => {
   const photoId = Date.now() + Math.random()
@@ -636,20 +606,7 @@ watch(() => props.modelValue, (newValue) => {
   margin-bottom: var(--spacing-md);
 }
 
-/* Zone de drop */
-.drop-zone {
-  border: 2px dashed var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  transition: all 0.3s ease;
-  background: var(--surface-light);
-}
 
-.drop-zone--active {
-  border-color: var(--onuf-primary);
-  background: var(--onuf-primary-light);
-  transform: scale(1.02);
-}
 
 .action-buttons {
   display: flex;
