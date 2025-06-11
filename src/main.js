@@ -15,7 +15,7 @@ import { globalGeolocation } from './composables/useGeolocation'
 // Import du composable sync queue (s'initialise automatiquement via getGlobalSyncQueue)
 import { getGlobalSyncQueue } from './composables/useSyncQueue'
 // ✅ NOUVEAU: Import des outils de debug
-// import './utils/debug.js' // Commenté si le fichier n'existe pas
+import mobileDebugLogger from './utils/mobileDebug'
 
 console.log('🚀 Initialisation ONUF PWA...')
 

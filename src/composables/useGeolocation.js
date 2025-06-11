@@ -1,6 +1,7 @@
 // src/composables/useGeolocation.js
 // Géolocalisation globale avec indicateur de précision
 import { ref, computed, readonly } from 'vue'
+import mobileDebugLogger from '@/utils/mobileDebug'
 
 // État global de géolocalisation
 const currentPosition = ref(null)
@@ -132,6 +133,9 @@ export const useGeolocation = () => {
 
     console.log(`📍 Position GPS mise à jour: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (±${Math.round(posAccuracy)}m)`)
     
+    // Logger avec le helper spécial
+    mobileDebugLogger.logGeolocation(position)
+    
     // Émettre événement global pour les composants qui écoutent
     window.dispatchEvent(new CustomEvent('gps-position-updated', {
       detail: {
@@ -160,6 +164,9 @@ export const useGeolocation = () => {
     
     error.value = errorMessage
     console.error('❌ Erreur GPS:', errorMessage, err)
+    
+    // Logger avec le helper spécial
+    mobileDebugLogger.logGeolocation(null, err)
     
     // Émettre événement d'erreur
     window.dispatchEvent(new CustomEvent('gps-error', {

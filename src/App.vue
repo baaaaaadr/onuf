@@ -338,6 +338,9 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <!-- Mobile Debug Viewer -->
+      <MobileDebugViewer />
     </div>
   </v-app>
 </template>
@@ -350,6 +353,7 @@ import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import BottomNav from '@/components/navigation/BottomNav.vue'
 import PageTransition from '@/components/transitions/PageTransition.vue'
+import MobileDebugViewer from '@/components/debug/MobileDebugViewer.vue'
 
 // Router
 const route = useRoute()

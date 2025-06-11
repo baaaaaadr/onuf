@@ -3,6 +3,7 @@ import { ref, readonly } from 'vue'
 import { supabase } from './useSupabase.js'
 import { useAuth } from './useSupabase.js'
 import { getGlobalSyncQueue } from './useSyncQueue.js'
+import mobileDebugLogger from '@/utils/mobileDebug'
 
 export const useAudits = () => {
   const { currentUser } = useAuth()
@@ -116,6 +117,9 @@ export const useAudits = () => {
       
       console.log('📤 Envoi DB avec coordonnées:', { latitude, longitude, accuracy: dbAudit.location_accuracy })
 
+      // Logger l'appel Supabase
+      mobileDebugLogger.logSupabaseCall('insert', 'audits', dbAudit)
+
       // Insérer audit
       const { data: audit, error: auditError } = await supabase
         .from('audits')
@@ -123,7 +127,10 @@ export const useAudits = () => {
         .select()
         .single()
 
-      if (auditError) throw auditError
+      if (auditError) {
+        mobileDebugLogger.logSupabaseCall('insert', 'audits', dbAudit, auditError)
+        throw auditError
+      }
 
       // Upload photos si présentes
       if (auditData.photos && auditData.photos.length > 0) {
@@ -153,6 +160,16 @@ export const useAudits = () => {
       if (!currentUser.value) {
         throw new Error('Utilisateur non connecté')
       }
+
+      // 🔍 LOG: Vérifier les données GPS reçues
+      console.log('📍 Saving audit with location data:', {
+        coordinates: auditData.coordinates,
+        latitude: auditData.latitude,
+        longitude: auditData.longitude,
+        location: auditData.location,
+        locationAccuracy: auditData.locationAccuracy,
+        accuracy: auditData.accuracy
+      })
 
       // ✅ NOUVEAU: Valider audit même sans GPS parfait
       const enrichedAuditData = {
@@ -210,6 +227,16 @@ export const useAudits = () => {
         locationAccuracy: auditData.locationAccuracy || auditData.accuracy || 999999,
         timestamp: auditData.timestamp || Date.now()
       }
+
+      // 🔍 LOG: Vérifier les données avant sauvegarde locale
+      console.log('💾 Saving to localStorage with:', {
+        id: safeAuditData.id,
+        coordinates: safeAuditData.coordinates,
+        latitude: safeAuditData.latitude,
+        longitude: safeAuditData.longitude,
+        location: safeAuditData.location,
+        locationAccuracy: safeAuditData.locationAccuracy
+      })
 
       // Préparer données locales
       const localAudit = {

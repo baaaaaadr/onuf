@@ -46,6 +46,17 @@ const router = createRouter({
         showBottomNav: false
       }
     },
+    // Page de test mobile
+    {
+      path: '/test-mobile',
+      name: 'MobileTest',
+      component: () => import('@/views/MobileTestView.vue'),
+      meta: {
+        title: 'Test Mobile',
+        showBottomNav: false,
+        requiresAuth: true
+      }
+    },
     // Redirections pour compatibilité
     {
       path: '/audits',

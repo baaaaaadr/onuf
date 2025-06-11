@@ -98,7 +98,18 @@ const loadQueueFromStorage = () => {
 
 // Traiter la queue de sync
 const processQueue = async () => {
-  if (!isOnline.value || !saveToCloudFunction) return
+  console.log('🔍 Processus de sync démarré:', {
+    isOnline: isOnline.value,
+    hasSaveFunction: !!saveToCloudFunction,
+    queueLength: syncQueue.value.length
+  })
+  
+  if (!isOnline.value || !saveToCloudFunction) {
+    console.log('⛔ Sync impossible:', {
+      raison: !isOnline.value ? 'Hors ligne' : 'Pas de fonction de sauvegarde'
+    })
+    return
+  }
 
   const pendingItems = syncQueue.value.filter(
     item => item.status === SYNC_STATUS.PENDING || 
@@ -120,8 +131,17 @@ const processQueue = async () => {
       updateSyncStats()
 
       console.log(`☁️ Sync audit ${item.id} (tentative ${item.attempts})`)
+      console.log('📤 Données envoyées:', {
+        id: item.data.id,
+        coordinates: item.data.coordinates,
+        latitude: item.data.latitude,
+        longitude: item.data.longitude,
+        location: item.data.location
+      })
 
       const result = await saveToCloudFunction(item.data)
+      
+      console.log('📥 Résultat sync:', result)
       
       if (result.success) {
         item.status = SYNC_STATUS.SYNCED
