@@ -485,9 +485,17 @@ const showOnboarding = ref(false)
 
 // Computed
 const userDisplayName = computed(() => {
-  return currentUser.value?.display_name || 
-         currentUser.value?.username || 
-         'Utilisateur'
+  // Check if the user object has a display_name or username property
+  // If not, fall back to the user's email (without the domain) or 'Utilisateur'
+  if (currentUser.value?.display_name) {
+    return currentUser.value.display_name;
+  } else if (currentUser.value?.username) {
+    return currentUser.value.username;
+  } else if (currentUser.value?.email) {
+    // Return the part before the @ in the email
+    return currentUser.value.email.split('@')[0];
+  }
+  return 'Utilisateur';
 })
 
 // ✅ CORRECTION: syncStats est un objet reactive, pas une ref

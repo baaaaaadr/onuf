@@ -221,6 +221,12 @@ const defaults = {
 export default createVuetify({
   components,
   directives,
+  defaults: {
+    VCardTitle: {
+      class: 'text-h5 font-weight-bold',
+      style: 'letter-spacing: 0.0125em;' // Slightly increase letter spacing for better readability
+    }
+  },
   theme: {
     defaultTheme: 'onufLight',
     themes: {
