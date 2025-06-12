@@ -72,8 +72,8 @@
         <div class="location-header">
           <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
           <div class="location-text">
-            <h4 class="text-subtitle-1 font-weight-bold">{{ locationName }}</h4>
-            <p class="text-caption text-medium-emphasis">
+            <h4 class="text-subtitle-1 font-weight-bold text-grey-darken-3">{{ locationName }}</h4>
+            <p class="text-caption text-grey-darken-1">
               {{ coordinates.lat.toFixed(6) }}, {{ coordinates.lng.toFixed(6) }}
             </p>
           </div>
@@ -104,6 +104,7 @@
           <v-btn
             size="small"
             variant="tonal"
+            color="grey-darken-2"
             @click="shareLocation"
           >
             <v-icon start size="small">mdi-share</v-icon>
@@ -119,8 +120,8 @@
         >
           <v-expansion-panel>
             <v-expansion-panel-title>
-              <v-icon class="mr-2" size="small">mdi-information</v-icon>
-              Détails GPS
+              <v-icon class="mr-2" size="small" color="grey-darken-2">mdi-information</v-icon>
+              <span class="text-grey-darken-2">Détails GPS</span>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <div class="gps-details">
@@ -629,11 +630,13 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .detail-label {
-  color: var(--onuf-text-secondary);
+  color: #616161; /* grey-darken-2 */
+  font-weight: 500;
 }
 
 .detail-value {
-  font-weight: 500;
+  font-weight: 600;
+  color: #424242; /* grey-darken-3 */
 }
 
 /* Bouton localisation */
