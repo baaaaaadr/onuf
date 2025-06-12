@@ -8,7 +8,7 @@
       </div>
       
       <h3 class="text-h6 mt-3 mb-2">Localisation requise</h3>
-      <p class="text-body-2 text-grey mb-4">
+      <p class="text-body-2 text-medium-emphasis mb-4">
         Activez la géolocalisation pour continuer
       </p>
       
@@ -73,7 +73,7 @@
           <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
           <div class="location-text">
             <h4 class="text-subtitle-1 font-weight-bold">{{ locationName }}</h4>
-            <p class="text-caption text-grey">
+            <p class="text-caption text-medium-emphasis">
               {{ coordinates.lat.toFixed(6) }}, {{ coordinates.lng.toFixed(6) }}
             </p>
           </div>
@@ -629,7 +629,7 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .detail-label {
-  color: var(--text-secondary);
+  color: var(--onuf-text-secondary);
 }
 
 .detail-value {

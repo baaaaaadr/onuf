@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "gitpush": "@echo off && echo === Changes to be committed === && git status --short && echo === Staged changes === && git diff --cached --stat && echo === Unstaged changes === && git diff --stat && set /p confirmation=Continue with commit and push to main? (y/n)  && if /i \"%confirmation%\"==\"y\" (git add . && git commit -m \"Update: %date% %time%\" && git push origin main) else (echo Push cancelled.)",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },

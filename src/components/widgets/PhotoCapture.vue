@@ -3,7 +3,7 @@
     <!-- État : Aucune photo -->
     <div v-if="photos.length === 0" class="photo-empty">
       <div class="empty-icon">
-        <v-icon size="64" color="grey-lighten-1">mdi-camera-outline</v-icon>
+        <v-icon size="64" color="grey">mdi-camera-outline</v-icon>
       </div>
       
       <h3 class="text-h6 mt-3 mb-2">Prendre des photos</h3>

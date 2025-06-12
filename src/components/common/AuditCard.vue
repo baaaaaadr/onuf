@@ -35,32 +35,87 @@
         <p class="text-caption text-secondary mb-0">{{ audit.comment }}</p>
       </div>
 
+      <!-- Section des scores visuels -->
+      <div class="scores-visual mb-2">
+        <div class="score-item" v-for="item in scoreItems" :key="item.key">
+          <span class="score-emoji">{{ item.emoji }}</span>
+          <div class="score-dots">
+            <span 
+              v-for="n in 4" 
+              :key="n"
+              class="score-dot"
+              :class="{ 'score-dot--filled': n <= item.value }"
+              :style="{ backgroundColor: n <= item.value ? item.color : '#E0E0E0' }"
+            ></span>
+          </div>
+        </div>
+      </div>
+
       <!-- Indicateurs en bas -->
       <div class="audit-footer">
         <div class="audit-indicators">
           <!-- Photos -->
-          <v-icon 
+          <v-chip 
             v-if="photosCount > 0"
-            size="small"
+            size="x-small"
             color="info"
-            class="mr-3"
+            variant="tonal"
+            class="mr-2"
           >
-            mdi-camera
-          </v-icon>
-
-          <!-- Commercial/rue si disponible -->
-          <span v-if="displayCommerce" class="text-caption text-secondary mr-3">
-            {{ displayCommerce }}
-          </span>
+            <v-icon start size="x-small">mdi-camera</v-icon>
+            {{ photosCount }}
+          </v-chip>
 
           <!-- Statut sync -->
-          <v-icon
-            size="small"
+          <v-chip
+            size="x-small"
             :color="syncStatus.color"
+            variant="tonal"
           >
-            {{ syncStatus.icon }}
-          </v-icon>
+            <v-icon start size="x-small">{{ syncStatus.icon }}</v-icon>
+            {{ syncStatus.text }}
+          </v-chip>
         </div>
+        
+        <!-- Menu actions -->
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              icon
+              size="x-small"
+              variant="text"
+              v-bind="props"
+              @click.stop
+            >
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          
+          <v-list density="compact">
+            <v-list-item @click.stop="emit('view', audit)">
+              <template v-slot:prepend>
+                <v-icon size="small">mdi-eye</v-icon>
+              </template>
+              <v-list-item-title>Voir détails</v-list-item-title>
+            </v-list-item>
+            
+            <v-list-item @click.stop="emit('share', audit)">
+              <template v-slot:prepend>
+                <v-icon size="small">mdi-share</v-icon>
+              </template>
+              <v-list-item-title>Partager</v-list-item-title>
+            </v-list-item>
+            
+            <v-divider />
+            
+            <v-list-item @click.stop="emit('delete', audit)" class="text-error">
+              <template v-slot:prepend>
+                <v-icon size="small" color="error">mdi-delete</v-icon>
+              </template>
+              <v-list-item-title>Supprimer</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </v-card-text>
   </v-card>
@@ -271,17 +326,51 @@ const handleClick = () => {
   -webkit-box-orient: vertical;
 }
 
+/* Scores visuels */
+.scores-visual {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.score-emoji {
+  font-size: 16px;
+}
+
+.score-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.score-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.score-dot--filled {
+  transform: scale(1.1);
+}
+
 /* Footer */
 .audit-footer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding-top: 8px;
 }
 
 .audit-indicators {
   display: flex;
   align-items: center;
-  flex: 1;
+  gap: var(--spacing-xs);
 }
 
 /* Responsive */
