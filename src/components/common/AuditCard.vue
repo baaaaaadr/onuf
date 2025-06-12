@@ -14,7 +14,12 @@
         <div class="audit-main-info">
           <div class="audit-location">
             <v-icon size="small" color="primary" class="mr-1">mdi-map-marker</v-icon>
-            <span class="text-body-2 font-weight-medium">{{ displayLocation }}</span>
+            <span class="text-body-2 font-weight-medium">
+              {{ displayLocation }}
+              <span v-if="displayPrecision" class="text-caption text-grey ml-1">
+                {{ displayPrecision }}
+              </span>
+            </span>
           </div>
           <div class="audit-date text-caption text-secondary">
             {{ formattedDate }}
@@ -122,7 +127,8 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { reverseGeocode } from '@/services/geocoding.js'
 
 const props = defineProps({
   audit: {
@@ -138,6 +144,22 @@ const props = defineProps({
 const emit = defineEmits(['click', 'view', 'share', 'delete'])
 
 const hover = ref(false)
+const enrichedLocation = ref(null)
+
+// Enrichir l'audit avec le géocodage si nécessaire
+onMounted(async () => {
+  // Si pas de nearby_info mais des coordonnées, faire le géocodage
+  if ((!props.audit.nearby_info || props.audit.nearby_info === '') && 
+      props.audit.latitude && props.audit.longitude &&
+      props.audit.latitude !== 0 && props.audit.longitude !== 0) {
+    try {
+      const geocodeResult = await reverseGeocode(props.audit.latitude, props.audit.longitude)
+      enrichedLocation.value = geocodeResult.displayName
+    } catch (error) {
+      console.warn('Géocodage échoué pour audit:', props.audit.id)
+    }
+  }
+})
 
 // Classes dynamiques
 const cardClasses = computed(() => ({
@@ -146,14 +168,43 @@ const cardClasses = computed(() => ({
   'audit-card--pending': !props.audit.synced && props.audit.source === 'local'
 }))
 
-// Localisation formatée
+// Localisation formatée avec priorité à nearby_info
 const displayLocation = computed(() => {
-  if (props.audit.address) return props.audit.address
-  if (props.audit.location_text) return props.audit.location_text
+  // Priorité 1: nearby_info (géocodage inverse de Supabase ou local)
+  if (props.audit.nearby_info && props.audit.nearby_info !== '') {
+    return props.audit.nearby_info
+  }
+  
+  // Priorité 2: Localisation enrichie dynamiquement
+  if (enrichedLocation.value) {
+    return enrichedLocation.value
+  }
+  
+  // Priorité 3: Adresse enrichie par géocodage (local seulement)
+  if (props.audit.address && props.audit.address !== 'Position non disponible') {
+    return props.audit.address
+  }
+  
+  // Priorité 4: Texte de localisation existant
+  if (props.audit.location_text && props.audit.location_text !== 'Position non disponible') {
+    return props.audit.location_text
+  }
+  
+  // Priorité 5: Coordonnées GPS
   if (props.audit.latitude && props.audit.longitude) {
     return `${props.audit.latitude.toFixed(4)}, ${props.audit.longitude.toFixed(4)}`
   }
+  
   return 'Position inconnue'
+})
+
+// Afficher la précision GPS si disponible
+const displayPrecision = computed(() => {
+  const accuracy = props.audit.location_accuracy || props.audit.locationAccuracy || props.audit.accuracy
+  if (accuracy && accuracy < 999999) {
+    return `±${Math.round(accuracy)}m`
+  }
+  return null
 })
 
 // Commerce ou rue proche

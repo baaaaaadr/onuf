@@ -4,6 +4,7 @@ import { supabase } from './useSupabase.js'
 import { useAuth } from './useSupabase.js'
 import { getGlobalSyncQueue } from './useSyncQueue.js'
 import mobileDebugLogger from '@/utils/mobileDebug'
+import { reverseGeocode, formatAddressForCard } from '@/services/geocoding.js'
 
 export const useAudits = () => {
   const { currentUser } = useAuth()
@@ -87,6 +88,18 @@ export const useAudits = () => {
         longitude = -9.545752
       }
       
+      // ✅ NOUVEAU: Enrichir avec géocodage inverse si pas déjà fait
+      let geocodeResult = null
+      if (latitude && longitude && latitude !== 0 && longitude !== 0 && !auditData.address) {
+        try {
+          console.log('🌍 Géocodage inverse pour cloud:', { latitude, longitude })
+          geocodeResult = await reverseGeocode(latitude, longitude)
+          console.log('📍 Résultat géocodage cloud:', geocodeResult)
+        } catch (geocodeError) {
+          console.warn('⚠️ Erreur géocodage cloud (non bloquante):', geocodeError)
+        }
+      }
+
       // Préparer données pour la base
       const dbAudit = {
         user_id: currentUser.value.user_id,
@@ -95,6 +108,8 @@ export const useAudits = () => {
         location_text: auditData.location || 'Position non disponible',
         location_accuracy: auditData.locationAccuracy || auditData.accuracy || 999999, // ✅ CORRIGÉ: Valeur par défaut valide
         nearby_info: auditData.nearbyInfo,
+        // ✅ NOUVEAU: Utiliser nearby_info pour stocker le géocodage inverse
+        nearby_info: geocodeResult?.displayName || auditData.address || auditData.location || null,
         lighting: auditData.lighting,
         walkpath: auditData.walkpath,
         openness: auditData.openness,
@@ -238,7 +253,22 @@ export const useAudits = () => {
         locationAccuracy: safeAuditData.locationAccuracy
       })
 
-      // Préparer données locales
+      // ✅ NOUVEAU: Enrichir avec géocodage inverse si coordonnées valides
+      let geocodeResult = null
+      const lat = safeAuditData.coordinates?.lat || safeAuditData.latitude
+      const lng = safeAuditData.coordinates?.lng || safeAuditData.longitude
+      
+      if (lat && lng && lat !== 0 && lng !== 0) {
+        try {
+          console.log('🌍 Géocodage inverse pour:', { lat, lng })
+          geocodeResult = await reverseGeocode(lat, lng)
+          console.log('📍 Résultat géocodage:', geocodeResult)
+        } catch (geocodeError) {
+          console.warn('⚠️ Erreur géocodage (non bloquante):', geocodeError)
+        }
+      }
+
+      // Préparer données locales enrichies
       const localAudit = {
         ...safeAuditData,
         userId: currentUser.value.user_id,
@@ -246,7 +276,14 @@ export const useAudits = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         synced: false,
-        localOnly: true
+        localOnly: true,
+        // ✅ NOUVEAU: Utiliser nearby_info pour le géocodage inverse
+        nearby_info: geocodeResult?.displayName || null,
+        // Garder address pour compatibilité avec l'interface
+        address: geocodeResult?.displayName || safeAuditData.location || 'Position non disponible',
+        // Garder aussi les coordonnées pour compatibilité
+        latitude: lat || null,
+        longitude: lng || null
       }
 
       // Récupérer audits existants

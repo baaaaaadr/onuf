@@ -28,6 +28,7 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ **REDESIGN PHASE 3.3** : LocationWidget + PhotoCapture + Transitions + FAB
 - ✅ **INTÉGRATION** : Widgets modernes intégrés dans AuditFormView
 - ✅ **CORRECTIONS 18/01** : Contraste textes + disposition boutons + cartes cliquables
+- ✅ **GÉOCODAGE INVERSE** : Intégration complète avec nearby_info + affichage enrichi
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA

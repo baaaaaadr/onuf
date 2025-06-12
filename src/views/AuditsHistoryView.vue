@@ -217,6 +217,9 @@
             <p class="text-body-2">{{ formatAddress(selectedAudit) }}</p>
             <div v-if="hasCoordinates(selectedAudit)" class="text-caption text-grey">
               Coordonnées: {{ formatCoordinates(selectedAudit) }}
+              <span v-if="getLocationAccuracy(selectedAudit)" class="ml-2">
+                • Précision: ±{{ Math.round(getLocationAccuracy(selectedAudit)) }}m
+              </span>
             </div>
             <div class="text-caption text-grey">
               Date: {{ formatDate(getAuditDate(selectedAudit)) }}
@@ -595,10 +598,28 @@ const formatDate = (dateInput) => {
 }
 
 const formatAddress = (audit) => {
-  if (audit.address && audit.address !== '') return audit.address
-  if (audit.location_text && audit.location_text !== '') return audit.location_text
+  // Priorité 1: nearby_info (géocodage inverse)
+  if (audit.nearby_info && audit.nearby_info !== '') {
+    return audit.nearby_info
+  }
+  
+  // Priorité 2: Adresse enrichie par géocodage (local)
+  if (audit.address && audit.address !== '' && audit.address !== 'Position non disponible') {
+    return audit.address
+  }
+  
+  // Priorité 3: Texte de localisation existant
+  if (audit.location_text && audit.location_text !== '' && audit.location_text !== 'Position non disponible') {
+    return audit.location_text
+  }
+  
   if (audit.location && audit.location !== '') return audit.location
-  if (audit.latitude && audit.longitude) return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
+  
+  // Priorité 4: Coordonnées GPS
+  if (audit.latitude && audit.longitude) {
+    return `${audit.latitude.toFixed(4)}, ${audit.longitude.toFixed(4)}`
+  }
+  
   return 'Position inconnue'
 }
 
@@ -705,6 +726,14 @@ const getAuditSource = (audit) => {
   if (audit.synced || audit.source === 'cloud') return 'Cloud Supabase'
   if (audit.source === 'local') return 'Local (non synchronisé)'
   return 'LocalStorage'
+}
+
+const getLocationAccuracy = (audit) => {
+  const accuracy = audit.location_accuracy || audit.locationAccuracy || audit.accuracy
+  if (accuracy && accuracy < 999999) {
+    return accuracy
+  }
+  return null
 }
 
 // Computed pour les compteurs de filtres
