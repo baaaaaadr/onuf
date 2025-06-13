@@ -655,11 +655,21 @@ const getConnectionInfo = () => {
   }
   return 'Information non disponible';
 };
+// Import SVG assets
+import lumi1 from '@/assets/icons/lumi1.svg'
+import lumi2 from '@/assets/icons/lumi2.svg'
+import lumi3 from '@/assets/icons/lumi3.svg'
+import lumi4 from '@/assets/icons/lumi4.svg'
+import walk1 from '@/assets/icons/walk1.svg'
+import walk2 from '@/assets/icons/walk2.svg'
+import walk3 from '@/assets/icons/walk3.svg'
+import walk4 from '@/assets/icons/walk4.svg'
+
 const lightingOptions = [
   { 
     value: 1, 
     text: 'Aucun', 
-    svgPath: '/src/assets/icons/lumi1.svg',
+    svgPath: lumi1,
     emoji: '🌑', 
     icon: 'mdi-lightbulb-off-outline', 
     color: 'grey-lighten-1',
@@ -668,7 +678,7 @@ const lightingOptions = [
   { 
     value: 2, 
     text: 'Faible', 
-    svgPath: '/src/assets/icons/lumi2.svg',
+    svgPath: lumi2,
     emoji: '🌒', 
     icon: 'mdi-lightbulb-outline', 
     color: 'red-darken-1',
@@ -677,7 +687,7 @@ const lightingOptions = [
   { 
     value: 3, 
     text: 'Suffisant', 
-    svgPath: '/src/assets/icons/lumi3.svg',
+    svgPath: lumi3,
     emoji: '🌕', 
     icon: 'mdi-lightbulb-on-outline', 
     color: 'orange-darken-1',
@@ -686,7 +696,7 @@ const lightingOptions = [
   { 
     value: 4, 
     text: 'Excellent', 
-    svgPath: '/src/assets/icons/lumi4.svg',
+    svgPath: lumi4,
     emoji: '☀️', 
     icon: 'mdi-lightbulb-on', 
     color: 'green-darken-1',
@@ -698,7 +708,7 @@ const walkpathOptions = [
   { 
     value: 1, 
     text: 'Aucun', 
-    svgPath: '/src/assets/icons/walk1.svg',
+    svgPath: walk1,
     emoji: '🚫', 
     icon: 'mdi-cancel', 
     color: 'grey-lighten-1',
@@ -707,7 +717,7 @@ const walkpathOptions = [
   { 
     value: 2, 
     text: 'Mauvais', 
-    svgPath: '/src/assets/icons/walk2.svg',
+    svgPath: walk2,
     emoji: '🕳️', 
     icon: 'mdi-alert-circle-outline', 
     color: 'red-darken-1',
@@ -716,7 +726,7 @@ const walkpathOptions = [
   { 
     value: 3, 
     text: 'Correct', 
-    svgPath: '/src/assets/icons/walk3.svg',
+    svgPath: walk3,
     emoji: '🛤️', 
     icon: 'mdi-check-circle-outline', 
     color: 'orange-darken-1',
@@ -725,7 +735,7 @@ const walkpathOptions = [
   { 
     value: 4, 
     text: 'Excellent', 
-    svgPath: '/src/assets/icons/walk4.svg',
+    svgPath: walk4,
     emoji: '🛣️', 
     icon: 'mdi-thumb-up-outline', 
     color: 'green-darken-1',
