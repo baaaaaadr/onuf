@@ -2,16 +2,21 @@
   <label 
     class="option-card"
     :class="optionClasses"
-    @click="handleSelect"
-    @keydown.enter="handleSelect"
-    @keydown.space="handleSelect"
+    :style="svgBorderColor ? { 
+      '--svg-border-color': svgBorderColor,
+      '--svg-shadow-color': svgBorderColor + '40'
+    } : {}"
+    @click="handleSelect($event)"
+    @keydown.enter="handleSelect($event)"
+    @keydown.space="handleSelect($event)"
     tabindex="0"
     role="radio"
     :aria-checked="isSelected"
     :aria-describedby="option.description ? `${optionId}-desc` : undefined"
   >
-    <!-- Input radio caché -->
+    <!-- Input radio caché (seulement si pas SVG) -->
     <input 
+      v-if="!option.svgPath"
       type="radio" 
       :value="option.value"
       :checked="isSelected"
@@ -22,23 +27,43 @@
     
     <!-- Contenu principal -->
     <div class="option-content">
-      <!-- Emoji/Icône -->
+      <!-- SVG/Emoji/Icône -->
       <div class="option-visual">
-        <span v-if="option.emoji" class="option-emoji">
-          {{ option.emoji }}
-        </span>
-        <v-icon 
-          v-else-if="option.icon" 
-          :color="iconColor"
-          :size="iconSize"
+        <!-- SVG personnalisé (mode épuré) -->
+        <div 
+          v-if="option.svgPath" 
+          class="option-svg option-svg--clean"
+          :class="{ 'option-svg--selected': isSelected }"
         >
-          {{ option.icon }}
-        </v-icon>
-        <div v-else class="option-placeholder"></div>
+          <img 
+            :src="option.svgPath" 
+            :alt="option.text || option.label"
+            class="svg-icon"
+          />
+        </div>
+        
+        <!-- Mode classique avec texte pour autres options -->
+        <template v-else>
+          <!-- Emoji -->
+          <span v-if="option.emoji" class="option-emoji">
+            {{ option.emoji }}
+          </span>
+          
+          <!-- Icône Vuetify -->
+          <v-icon 
+            v-else-if="option.icon" 
+            :color="iconColor"
+            :size="iconSize"
+          >
+            {{ option.icon }}
+          </v-icon>
+          
+          <div v-else class="option-placeholder"></div>
+        </template>
       </div>
       
-      <!-- Texte -->
-      <div class="option-text">
+      <!-- Texte (seulement si pas SVG) -->
+      <div v-if="!option.svgPath" class="option-text">
         <div class="option-label">
           {{ option.text || option.label }}
         </div>
@@ -51,8 +76,8 @@
         </div>
       </div>
       
-      <!-- Badge optionnel -->
-      <div v-if="option.badge" class="option-badge">
+      <!-- Badge optionnel (seulement si pas SVG) -->
+      <div v-if="option.badge && !option.svgPath" class="option-badge">
         <v-chip 
           size="x-small" 
           :color="option.badgeColor || 'info'"
@@ -63,8 +88,8 @@
       </div>
     </div>
     
-    <!-- Indicateur de sélection -->
-    <div class="option-indicator">
+    <!-- Indicateur de sélection (seulement si pas SVG) -->
+    <div v-if="!option.svgPath" class="option-indicator">
       <v-icon 
         v-if="isSelected"
         color="primary"
@@ -144,7 +169,8 @@ const optionClasses = computed(() => [
     'option-card--selected': isSelected.value,
     'option-card--disabled': props.disabled,
     'option-card--readonly': props.readonly,
-    'option-card--with-description': !!props.option.description
+    'option-card--with-description': !!props.option.description,
+    'option-card--svg-clean': !!props.option.svgPath // Pour compatibilité CSS
   }
 ])
 
@@ -153,6 +179,18 @@ const iconColor = computed(() => {
   if (props.disabled) return 'grey'
   if (isSelected.value) return 'primary'
   return 'grey-darken-1'
+})
+
+// Couleur de cadre selon la valeur pour SVG
+const svgBorderColor = computed(() => {
+  if (!props.option.svgPath || !isSelected.value) return null
+  
+  const value = props.option.value
+  if (value === 1) return '#f44336' // Rouge (très mauvais)
+  if (value === 2) return '#ff9800' // Orange (mauvais)
+  if (value === 3) return '#fdd835' // Jaune (correct)
+  if (value === 4) return '#4caf50' // Vert (excellent)
+  return null
 })
 
 // Taille de l'icône
@@ -165,12 +203,35 @@ const iconSize = computed(() => {
   return sizes[props.size] || 24
 })
 
-// Gestion de la sélection
-const handleSelect = () => {
+// Gestion de la sélection/désélection
+const handleSelect = (event) => {
   if (props.disabled || props.readonly) return
   
-  emit('update:modelValue', props.option.value)
+  // Prévenir la propagation double
+  event?.preventDefault()
+  event?.stopPropagation()
+  
+  // Désélection si déjà sélectionné (seulement pour SVG)
+  const newValue = (isSelected.value && props.option.svgPath) ? null : props.option.value
+  
+  emit('update:modelValue', newValue)
   emit('select', props.option)
+  
+  // Feedback haptique amélioré pour SVG (seulement ici, pas dans AuditSectionModern)
+  if (window.navigator?.vibrate) {
+    if (props.option.svgPath) {
+      if (newValue === null) {
+        // Vibration courte pour désélection
+        window.navigator.vibrate(5)
+      } else {
+        // Vibration plus longue pour sélection
+        window.navigator.vibrate([15, 10, 15])
+      }
+    } else {
+      // Vibration standard pour les autres
+      window.navigator.vibrate(10)
+    }
+  }
 }
 </script>
 
@@ -213,6 +274,13 @@ const handleSelect = () => {
   min-height: 70px;
 }
 
+/* Mode épuré - plus de padding pour SVG uniquement */
+.option-card:has(.option-svg--clean) .option-content,
+.option-card.option-card--svg-clean .option-content {
+  min-height: 80px;
+  padding: var(--spacing-md);
+}
+
 /* Visuel (emoji/icône) */
 .option-visual {
   flex-shrink: 0;
@@ -227,6 +295,50 @@ const handleSelect = () => {
 .option-emoji {
   font-size: 24px;
   line-height: 1;
+}
+
+/* Styles pour les SVG */
+.option-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  transition: all var(--transition-fast);
+}
+
+/* Mode épuré pour SVG (sans texte) */
+.option-svg--clean {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg-icon {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Animation SVG lorsque sélectionné - SANS glow pour éviter confusion éclairage */
+.option-svg--selected .svg-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) contrast(1.1) saturate(1.2);
+}
+
+/* Animation au tap/touch pour mobile */
+.option-card:active .option-svg--clean .svg-icon {
+  transform: scale(0.95);
+  transition: all 0.1s ease;
+}
+
+.option-card:active .option-svg--selected .svg-icon {
+  transform: scale(1.05);
+  transition: all 0.1s ease;
 }
 
 .option-placeholder {
@@ -316,6 +428,16 @@ const handleSelect = () => {
   font-size: 20px;
 }
 
+.option-card--small .option-svg {
+  width: 28px;
+  height: 28px;
+}
+
+.option-card--small .option-svg--clean {
+  width: 50px;
+  height: 50px;
+}
+
 .option-card--small .option-label {
   font-size: 12px;
   font-weight: normal;
@@ -335,6 +457,16 @@ const handleSelect = () => {
   font-size: 28px;
 }
 
+.option-card--large .option-svg {
+  width: 44px;
+  height: 44px;
+}
+
+.option-card--large .option-svg--clean {
+  width: 70px;
+  height: 70px;
+}
+
 .option-card--large .option-label {
   font-size: 16px;
 }
@@ -350,13 +482,7 @@ const handleSelect = () => {
   box-shadow: var(--shadow-sm);
 }
 
-/* États */
-.option-card:hover:not(.option-card--disabled):not(.option-card--readonly) {
-  border-color: rgba(243, 195, 72, 0.5);
-  background: rgba(243, 195, 72, 0.02);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* États - Pas de hover pour mobile */
 
 .option-card:active:not(.option-card--disabled):not(.option-card--readonly) {
   transform: scale(0.98);
@@ -366,7 +492,17 @@ const handleSelect = () => {
 .option-card--selected {
   border-color: var(--onuf-primary) !important;
   background: rgba(243, 195, 72, 0.05) !important;
-  box-shadow: 0 0 0 1px rgba(243, 195, 72, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(243, 195, 72, 0.3) !important;
+}
+
+/* Sélection améliorée pour mode épuré SVG */
+.option-card--selected:has(.option-svg--clean),
+.option-card--selected.option-card--svg-clean {
+  border-color: var(--svg-border-color, var(--onuf-primary)) !important;
+  background: rgba(243, 195, 72, 0.08) !important;
+  box-shadow: 0 0 0 3px var(--svg-shadow-color, rgba(243, 195, 72, 0.4)), 
+              0 4px 12px var(--svg-shadow-color, rgba(243, 195, 72, 0.2)) !important;
+  transform: translateY(-2px);
 }
 
 .option-card--selected .option-radio {

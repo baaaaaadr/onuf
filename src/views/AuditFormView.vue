@@ -656,17 +656,81 @@ const getConnectionInfo = () => {
   return 'Information non disponible';
 };
 const lightingOptions = [
-  { value: 1, text: 'Aucun', emoji: '🌑', icon: 'mdi-lightbulb-off-outline', color: 'grey-lighten-1' },
-  { value: 2, text: 'Faible', emoji: '🌒', icon: 'mdi-lightbulb-outline', color: 'red-darken-1' },
-  { value: 3, text: 'Suffisant', emoji: '🌕', icon: 'mdi-lightbulb-on-outline', color: 'orange-darken-1' },
-  { value: 4, text: 'Excellent', emoji: '☀️', icon: 'mdi-lightbulb-on', color: 'green-darken-1' },
+  { 
+    value: 1, 
+    text: 'Aucun', 
+    svgPath: '/src/assets/icons/lumi1.svg',
+    emoji: '🌑', 
+    icon: 'mdi-lightbulb-off-outline', 
+    color: 'grey-lighten-1',
+    description: 'Pas d\'éclairage visible'
+  },
+  { 
+    value: 2, 
+    text: 'Faible', 
+    svgPath: '/src/assets/icons/lumi2.svg',
+    emoji: '🌒', 
+    icon: 'mdi-lightbulb-outline', 
+    color: 'red-darken-1',
+    description: 'Éclairage insuffisant'
+  },
+  { 
+    value: 3, 
+    text: 'Suffisant', 
+    svgPath: '/src/assets/icons/lumi3.svg',
+    emoji: '🌕', 
+    icon: 'mdi-lightbulb-on-outline', 
+    color: 'orange-darken-1',
+    description: 'Bon niveau d\'éclairage'
+  },
+  { 
+    value: 4, 
+    text: 'Excellent', 
+    svgPath: '/src/assets/icons/lumi4.svg',
+    emoji: '☀️', 
+    icon: 'mdi-lightbulb-on', 
+    color: 'green-darken-1',
+    description: 'Très bien éclairé'
+  },
 ];
 
 const walkpathOptions = [
-  { value: 1, text: 'Aucun', emoji: '🚫', icon: 'mdi-cancel', color: 'grey-lighten-1' },
-  { value: 2, text: 'Mauvais', emoji: '🕳️', icon: 'mdi-alert-circle-outline', color: 'red-darken-1' },
-  { value: 3, text: 'Correct', emoji: '🛤️', icon: 'mdi-check-circle-outline', color: 'orange-darken-1' },
-  { value: 4, text: 'Excellent', emoji: '🛣️', icon: 'mdi-thumb-up-outline', color: 'green-darken-1' },
+  { 
+    value: 1, 
+    text: 'Aucun', 
+    svgPath: '/src/assets/icons/walk1.svg',
+    emoji: '🚫', 
+    icon: 'mdi-cancel', 
+    color: 'grey-lighten-1',
+    description: 'Pas de cheminement'
+  },
+  { 
+    value: 2, 
+    text: 'Mauvais', 
+    svgPath: '/src/assets/icons/walk2.svg',
+    emoji: '🕳️', 
+    icon: 'mdi-alert-circle-outline', 
+    color: 'red-darken-1',
+    description: 'Cheminement difficile'
+  },
+  { 
+    value: 3, 
+    text: 'Correct', 
+    svgPath: '/src/assets/icons/walk3.svg',
+    emoji: '🛤️', 
+    icon: 'mdi-check-circle-outline', 
+    color: 'orange-darken-1',
+    description: 'Cheminement praticable'
+  },
+  { 
+    value: 4, 
+    text: 'Excellent', 
+    svgPath: '/src/assets/icons/walk4.svg',
+    emoji: '🛣️', 
+    icon: 'mdi-thumb-up-outline', 
+    color: 'green-darken-1',
+    description: 'Cheminement optimal'
+  },
 ];
 
 const opennessOptions = [

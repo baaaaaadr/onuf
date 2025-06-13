@@ -78,14 +78,18 @@ const selectOption = (value) => {
   // Émettre l'événement
   emit('update:modelValue', value)
   
-  // Feedback haptique si disponible
-  if (window.navigator?.vibrate) {
+  // Feedback haptique seulement pour les options non-SVG
+  if (window.navigator?.vibrate && !option?.svgPath) {
     window.navigator.vibrate(10)
   }
   
   // Log global si disponible
   if (window.addUserAction) {
-    window.addUserAction(`🎯 Sélection "${props.title}": ${optionText}`)
+    if (value === null) {
+      window.addUserAction(`🗙️ Désélection "${props.title}"`)
+    } else {
+      window.addUserAction(`🎯 Sélection "${props.title}": ${optionText}`)
+    }
   }
   
   // Sauvegarder le progrès si disponible
