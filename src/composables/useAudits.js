@@ -374,8 +374,14 @@ export const useAudits = () => {
     
     try {
       // 1. TOUJOURS charger les audits locaux (disponibles offline)
-      const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
-      console.log(`📋 Local-First: ${localAudits.length} audits locaux chargés`)
+      const allLocalAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      
+      // ✅ IMPORTANT: Filtrer par utilisateur connecté
+      const localAudits = allLocalAudits.filter(audit => 
+        audit.userId === currentUser.value?.user_id
+      )
+      
+      console.log(`📋 Local-First: ${localAudits.length} audits locaux de l'utilisateur (sur ${allLocalAudits.length} total)`)
       
       // 2. Si ONLINE: charger aussi le cloud pour détecter nouveaux audits
       let cloudAudits = []
@@ -384,7 +390,7 @@ export const useAudits = () => {
         const cloudResult = await getUserAudits()
         if (cloudResult.success) {
           cloudAudits = cloudResult.audits
-          console.log(`☁️ Cloud: ${cloudAudits.length} audits récupérés`)
+          console.log(`☁️ Cloud: ${cloudAudits.length} audits récupérés pour l'utilisateur`)
         } else {
           console.warn('⚠️ Erreur cloud (non bloquante):', cloudResult.error)
         }
@@ -402,7 +408,10 @@ export const useAudits = () => {
       
       // ✅ FALLBACK: En cas d'erreur, au moins retourner le local
       try {
-        const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+        const allLocalAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+        const localAudits = allLocalAudits.filter(audit => 
+          audit.userId === currentUser.value?.user_id
+        )
         console.log('🚑 Fallback: utilisation local uniquement')
         return { success: true, audits: localAudits }
       } catch (fallbackErr) {
@@ -522,6 +531,18 @@ export const useAudits = () => {
     try {
       // Supprimer du local
       const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      
+      // ✅ IMPORTANT: Vérifier que l'audit appartient à l'utilisateur avant de supprimer
+      const auditToDelete = localAudits.find(a => 
+        (a.id === auditId || a.localId === auditId) && 
+        a.userId === currentUser.value?.user_id
+      )
+      
+      if (!auditToDelete) {
+        console.warn('⚠️ Tentative de suppression d\'un audit non autorisé')
+        return { success: false, error: 'Audit non trouvé ou non autorisé' }
+      }
+      
       const filteredLocal = localAudits.filter(a => a.id !== auditId && a.localId !== auditId)
       localStorage.setItem('onuf_audits_local', JSON.stringify(filteredLocal))
 
@@ -650,10 +671,16 @@ export const useAudits = () => {
     if (!isOnline.value) return { success: false, error: 'Connexion requise' }
 
     try {
-      const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
-      const unsynced = localAudits.filter(audit => !audit.synced)
+      const allLocalAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      
+      // ✅ IMPORTANT: Filtrer par utilisateur connecté
+      const userAudits = allLocalAudits.filter(audit => 
+        audit.userId === currentUser.value?.user_id
+      )
+      
+      const unsynced = userAudits.filter(audit => !audit.synced)
 
-      console.log(`🔄 Synchronisation de ${unsynced.length} audits locaux...`)
+      console.log(`🔄 Synchronisation de ${unsynced.length} audits locaux de l'utilisateur...`)
 
       for (const audit of unsynced) {
         addToSyncQueue(audit)

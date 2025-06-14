@@ -173,20 +173,37 @@ const processQueue = async () => {
 }
 
 // Auto-sync périodique
+let autoSyncInterval = null
+
 const startAutoSync = () => {
   if (!isOnline.value) return
 
-  // Sync immédiat
-  processQueue()
+  // ✅ CORRECTION: Vérifier que la fonction de sauvegarde est disponible avant de sync
+  if (saveToCloudFunction) {
+    // Sync immédiat
+    processQueue()
+  } else {
+    console.log('⏳ Auto-sync différée - En attente de la fonction de sauvegarde')
+  }
+
+  // Nettoyer l'ancien interval s'il existe
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval)
+  }
 
   // Sync toutes les 30 secondes
-  const interval = setInterval(() => {
-    if (isOnline.value && syncStats.pending > 0) {
+  autoSyncInterval = setInterval(() => {
+    if (isOnline.value && syncStats.pending > 0 && saveToCloudFunction) {
       processQueue()
     }
   }, 30000)
 
-  return () => clearInterval(interval)
+  return () => {
+    if (autoSyncInterval) {
+      clearInterval(autoSyncInterval)
+      autoSyncInterval = null
+    }
+  }
 }
 
 // Nettoyer les audits synchronisés (plus de 24h)
@@ -309,6 +326,12 @@ export const useSyncQueue = () => {
   const setSaveToCloudFunction = (saveFunction) => {
     saveToCloudFunction = saveFunction
     console.log('✅ Fonction de sauvegarde cloud injectée')
+    
+    // ✅ NOUVEAU: Démarrer la sync maintenant que la fonction est disponible
+    if (isOnline.value && syncStats.pending > 0) {
+      console.log('🚀 Démarrage sync automatique après injection')
+      processQueue()
+    }
   }
 
   // Statistiques calculées
@@ -366,8 +389,14 @@ export const getGlobalSyncQueue = () => {
       // Nettoyer au démarrage
       cleanupSyncedItems()
       
-      // Démarrer sync
-      startAutoSync()
+      // ✅ CORRECTION: Ne pas démarrer sync immédiatement
+      // Attendre que la fonction de sauvegarde soit injectée
+      console.log('📋 Queue de sync initialisée - En attente de la fonction de sauvegarde')
+      
+      // Démarrer auto-sync mais sans processQueue immédiat
+      setTimeout(() => {
+        startAutoSync()
+      }, 100)
       
       // Nettoyer toutes les heures
       setInterval(cleanupSyncedItems, 60 * 60 * 1000)

@@ -87,13 +87,32 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - `src/components/transitions/PageTransition.vue` : Transitions entre pages
 - `src/components/common/FloatingActionButton.vue` : Bouton flottant avec ripple
 
+## 🔐 **Sécurité & Privacy (20 Janvier 2025)**
+- **✅ CORRIGÉ** : Filtrage des audits par utilisateur
+- Chaque agent ne voit que ses propres audits
+- Protection contre la suppression d'audits d'autres utilisateurs
+- Séparation complète des données entre agents
+- Voir `FIX_FILTER_AUDITS_BY_USER.md` pour détails
+
+## 🔧 **Corrections Techniques (20 Janvier 2025)**
+- **✅ CORRIGÉ** : Boucle récursive dans AuditsHistoryView
+- **✅ CORRIGÉ** : Problème d'initialisation de la sync
+- **✅ CORRIGÉ** : Avertissements Vue.js répétés
+- Voir `FIX_RECURSIVE_ERRORS.md` et `APPLY_FIXES.md`
+
 ## 🚨 **Points d'attention**
 - **Intégration widgets** : LocationWidget et PhotoCapture doivent être intégrés dans AuditFormView
 - **Import animations** : Ajouter `@import './styles/animations.css';` dans main.css
 - **Test mobile** : Vérifier performances des nouvelles animations sur appareils bas de gamme
 
 ## 🚀 **Prochaines Étapes**
-1. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
+1. **DASHBOARD "MA VILLE"** : 📊 EN COURS
+   - Tableau de bord collectif pour visualiser l'impact
+   - Carte interactive avec heatmap des audits
+   - Statistiques et insights automatiques
+   - Voir `/ma-ville/PLAN_MA_VILLE.md` pour détails
+
+2. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
    - Tester l'application complète sur vrais dispositifs mobiles
    - Vérifier les performances avec connexion lente
    - Collecter feedback sur le nouveau design

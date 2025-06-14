@@ -61,6 +61,17 @@ const router = createRouter({
     {
       path: '/audits',
       redirect: '/history'
+    },
+    // Nouvelle route pour la page Ma Ville
+    {
+      path: '/ma-ville',
+      name: 'ma-ville',
+      component: () => import('@/views/MaVilleView.vue'),
+      meta: { 
+        title: 'Ma Ville',
+        showBottomNav: true,
+        requiresAuth: true 
+      }
     }
   ]
 })

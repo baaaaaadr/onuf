@@ -25,7 +25,7 @@ export const useGeolocation = () => {
   // Configuration GPS optimisée
   const geoOptions = {
     enableHighAccuracy: true,
-    timeout: 15000,
+    timeout: 120000, // 120 secondes de timeout
     maximumAge: 60000
   }
 
