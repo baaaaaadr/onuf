@@ -39,6 +39,7 @@
                   :color="stat.color"
                   :format="stat.format"
                   :loading="false"
+                  class="stat-card-fixed-height"
                 />
               </v-col>
             </v-row>
@@ -109,7 +110,7 @@
             </v-row>
           </section>
   
-          <!-- FAB Refresh -->
+          <!-- FAB Refresh - Repositionné pour éviter la bottom nav -->
           <v-btn
             v-if="!loading"
             icon="mdi-refresh"
@@ -117,7 +118,7 @@
             position="fixed"
             location="bottom end"
             size="large"
-            class="ma-4"
+            class="refresh-fab"
             elevation="8"
             @click="refreshAll"
           >
@@ -247,6 +248,32 @@ const handleInsightAction = (actionData) => {
     border-radius: 2px;
   }
   
+  /* Cartes de stats avec hauteur fixe */
+  :deep(.stat-card-fixed-height) {
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  :deep(.stat-card-fixed-height .v-card) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  :deep(.stat-card-fixed-height .v-card-text) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Bouton refresh repositionné */
+  .refresh-fab {
+    bottom: 84px !important; /* Au-dessus de la bottom nav (64px) + marge */
+    right: 16px !important;
+  }
+  
   /* Responsive */
   @media (max-width: 960px) {
     .view-header {
@@ -255,6 +282,17 @@ const handleInsightAction = (actionData) => {
     
     section {
       margin-bottom: 24px !important;
+    }
+    
+    /* Ajuster la position du refresh sur mobile */
+    .refresh-fab {
+      bottom: 88px !important;
+      right: 12px !important;
+    }
+    
+    /* Cartes de stats plus petites sur mobile */
+    :deep(.stat-card-fixed-height) {
+      height: 120px;
     }
   }
   </style>

@@ -157,16 +157,28 @@
     { value: 365, label: 'Tout' }
   ]
   
+  // Centre d'Agadir et limites
+  const AGADIR_CENTER = [30.4278, -9.5981]
+  const MAX_DISTANCE_KM = 30
+  
+  // Calculer les bounds maximum (approximation : 1° ≈ 111km)
+  const degreesPerKm = 1 / 111
+  const maxDegrees = MAX_DISTANCE_KM * degreesPerKm
+  
+  const AGADIR_BOUNDS = [
+    [AGADIR_CENTER[0] - maxDegrees, AGADIR_CENTER[1] - maxDegrees], // Sud-Ouest
+    [AGADIR_CENTER[0] + maxDegrees, AGADIR_CENTER[1] + maxDegrees]  // Nord-Est
+  ]
+  
   // Initialiser la carte
   const initMap = () => {
-    // Position par défaut : Agadir (vous pouvez ajuster)
-    const defaultCenter = [30.4278, -9.5981]
-    
-    // Créer la carte
+    // Créer la carte avec contraintes
     map.value = L.map(mapContainer.value, {
       zoomControl: true,
-      attributionControl: true
-    }).setView(defaultCenter, 13)
+      attributionControl: true,
+      maxBounds: AGADIR_BOUNDS,
+      maxBoundsViscosity: 1.0
+    }).setView(AGADIR_CENTER, 13)
     
     // Ajouter les tuiles de base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -226,10 +238,20 @@
     // Ajouter des marqueurs informatifs pour les zones avec beaucoup de données
     addInfoMarkers()
     
-    // Ajuster la vue si on a des données
+    // Ajuster la vue si on a des données, mais rester dans les limites d'Agadir
     if (heatData.length > 0) {
       const bounds = L.latLngBounds(heatData.map(point => [point[0], point[1]]))
-      map.value.fitBounds(bounds, { padding: [50, 50] })
+      
+      // Vérifier si les bounds sont dans la zone d'Agadir
+      const agadirBounds = L.latLngBounds(AGADIR_BOUNDS)
+      const constrainedBounds = bounds.intersect ? bounds.intersect(agadirBounds) : bounds
+      
+      // Si les bounds contraintes sont valides, les utiliser, sinon centrer sur Agadir
+      if (constrainedBounds && constrainedBounds.isValid()) {
+        map.value.fitBounds(constrainedBounds, { padding: [30, 30], maxZoom: 15 })
+      } else {
+        map.value.setView(AGADIR_CENTER, 13)
+      }
     }
   }
   

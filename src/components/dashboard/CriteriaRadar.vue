@@ -244,12 +244,12 @@ onMounted(() => {
 <style scoped>
 .radar-container {
   position: relative;
-  height: 300px;
+  height: 400px;
   margin-bottom: 16px;
 }
 
 canvas {
-  max-height: 300px !important;
+  max-height: 400px !important;
 }
 
 .trend-item {
@@ -288,7 +288,7 @@ canvas {
 /* Responsive */
 @media (max-width: 600px) {
   .radar-container {
-    height: 250px;
+    height: 300px; /* Un peu plus grand que avant */
   }
   
   .trend-item {
@@ -301,6 +301,12 @@ canvas {
   
   .trend-value {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 960px) {
+  .radar-container {
+    height: 350px; /* Taille intermédiaire pour tablettes */
   }
 }
 </style>
