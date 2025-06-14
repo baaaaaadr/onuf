@@ -106,11 +106,14 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - **Test mobile** : Vérifier performances des nouvelles animations sur appareils bas de gamme
 
 ## 🚀 **Prochaines Étapes**
-1. **DASHBOARD "MA VILLE"** : 📊 EN COURS
-   - Tableau de bord collectif pour visualiser l'impact
-   - Carte interactive avec heatmap des audits
-   - Statistiques et insights automatiques
-   - Voir `/ma-ville/PLAN_MA_VILLE.md` pour détails
+1. **DASHBOARD "MA VILLE"** : 🎉 TERMINÉ (85%)
+   - ✅ Tableau de bord collectif fonctionnel
+   - ✅ Carte interactive avec heatmap + filtres temporels
+   - ✅ Graphique radar des scores par critère
+   - ✅ Insights automatiques avec cartes interactives
+   - ✅ Cache optimisé et performance mobile
+   - 📋 Tests finaux et documentation restants
+   - Voir `/ma-ville/PROGRESS.md` et `/ma-ville/GUIDE_TEST.md`
 
 2. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
    - Tester l'application complète sur vrais dispositifs mobiles

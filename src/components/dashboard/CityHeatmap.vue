@@ -16,22 +16,45 @@
       </v-card-title>
       
       <v-card-subtitle>
-        <v-chip-group
-          v-model="selectedFilter"
-          mandatory
-          selected-class="primary"
-        >
-          <v-chip
-            v-for="filter in filters"
-            :key="filter.value"
-            :value="filter.value"
-            variant="outlined"
-            size="small"
+        <!-- Filtres par critère -->
+        <div class="mb-3">
+          <v-chip-group
+            v-model="selectedFilter"
+            mandatory
+            selected-class="primary"
           >
-            <v-icon start size="16">{{ filter.icon }}</v-icon>
-            {{ filter.label }}
-          </v-chip>
-        </v-chip-group>
+            <v-chip
+              v-for="filter in filters"
+              :key="filter.value"
+              :value="filter.value"
+              variant="outlined"
+              size="small"
+            >
+              <v-icon start size="16">{{ filter.icon }}</v-icon>
+              {{ filter.label }}
+            </v-chip>
+          </v-chip-group>
+        </div>
+        
+        <!-- Filtres temporels -->
+        <div>
+          <span class="text-caption text-medium-emphasis mr-2">Période:</span>
+          <v-chip-group
+            v-model="selectedPeriod"
+            mandatory
+            selected-class="secondary"
+          >
+            <v-chip
+              v-for="period in periods"
+              :key="period.value"
+              :value="period.value"
+              variant="outlined"
+              size="x-small"
+            >
+              {{ period.label }}
+            </v-chip>
+          </v-chip-group>
+        </div>
       </v-card-subtitle>
       
       <v-card-text class="pa-0">
@@ -115,6 +138,7 @@
   const map = ref(null)
   const heatmapLayer = ref(null)
   const selectedFilter = ref('all')
+  const selectedPeriod = ref(30)
   const isFullscreen = ref(false)
   
   // Filtres disponibles
@@ -124,6 +148,13 @@
     { value: 'feeling', label: 'Sécurité', icon: 'mdi-shield' },
     { value: 'walkpath', label: 'Mobilité', icon: 'mdi-walk' },
     { value: 'cleanliness', label: 'Propreté', icon: 'mdi-broom' }
+  ]
+  
+  // Périodes temporelles
+  const periods = [
+    { value: 7, label: '7j' },
+    { value: 30, label: '30j' },
+    { value: 365, label: 'Tout' }
   ]
   
   // Initialiser la carte
@@ -192,11 +223,79 @@
       }
     }).addTo(map.value)
     
+    // Ajouter des marqueurs informatifs pour les zones avec beaucoup de données
+    addInfoMarkers()
+    
     // Ajuster la vue si on a des données
     if (heatData.length > 0) {
       const bounds = L.latLngBounds(heatData.map(point => [point[0], point[1]]))
       map.value.fitBounds(bounds, { padding: [50, 50] })
     }
+  }
+  
+  // Ajouter des marqueurs informatifs
+  const addInfoMarkers = () => {
+    // Grouper les points proches et ajouter des marqueurs pour les zones importantes
+    const significantZones = props.heatmapData.filter(point => 
+      point.count && point.count >= 3 // Minimum 3 audits pour afficher un marqueur
+    )
+    
+    significantZones.forEach(zone => {
+      const marker = L.circleMarker([zone.lat, zone.lng], {
+        radius: 8,
+        fillColor: getZoneColor(zone.intensity),
+        color: '#fff',
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.6
+      })
+      
+      // Popup avec informations
+      const popupContent = `
+        <div style="font-family: 'Roboto', sans-serif; min-width: 200px;">
+          <h4 style="margin: 0 0 8px; color: #1976d2; font-size: 14px;">
+            📍 Zone d'audits
+          </h4>
+          <div style="margin-bottom: 8px;">
+            <strong>${zone.count || 1} audit${(zone.count || 1) > 1 ? 's' : ''}</strong>
+          </div>
+          <div style="margin-bottom: 4px; font-size: 12px;">
+            🎯 Intensité: ${(zone.intensity * 100).toFixed(0)}%
+          </div>
+          <div style="font-size: 11px; color: #666; border-top: 1px solid #eee; padding-top: 4px; margin-top: 8px;">
+            Coordonnées: ${zone.lat.toFixed(4)}, ${zone.lng.toFixed(4)}
+          </div>
+        </div>
+      `
+      
+      marker.bindPopup(popupContent)
+      
+      // Effet hover
+      marker.on('mouseover', function() {
+        this.setStyle({
+          radius: 12,
+          weight: 3
+        })
+      })
+      
+      marker.on('mouseout', function() {
+        this.setStyle({
+          radius: 8,
+          weight: 2
+        })
+      })
+      
+      marker.addTo(map.value)
+    })
+  }
+  
+  // Couleur en fonction de l'intensité
+  const getZoneColor = (intensity) => {
+    if (intensity > 0.8) return '#ff4444'
+    if (intensity > 0.6) return '#ff8800'
+    if (intensity > 0.4) return '#ffaa00'
+    if (intensity > 0.2) return '#88dd00'
+    return '#00aa88'
   }
   
   // Plein écran
@@ -214,9 +313,22 @@
   // Watchers
   watch(selectedFilter, (newFilter) => {
     console.log('🔄 Changement de filtre:', newFilter)
-    emit('filter-change', newFilter)
-    emit('load-data', newFilter)
+    loadData()
   })
+  
+  watch(selectedPeriod, (newPeriod) => {
+    console.log('📅 Changement de période:', newPeriod, 'jours')
+    loadData()
+  })
+  
+  // Helper pour charger les données
+  const loadData = () => {
+    emit('filter-change', {
+      filter: selectedFilter.value,
+      period: selectedPeriod.value
+    })
+    emit('load-data', selectedFilter.value, selectedPeriod.value)
+  }
   
   watch(() => props.heatmapData, () => {
     updateHeatmap()

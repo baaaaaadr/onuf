@@ -68,51 +68,10 @@
           <section class="mb-8">
             <v-row>
               <v-col cols="12" md="8">
-                <v-card rounded="xl" elevation="2">
-                  <v-card-title>
-                    <v-icon class="mr-2">mdi-chart-bar</v-icon>
-                    État de nos Espaces Publics
-                  </v-card-title>
-                  <v-card-text>
-                    <div v-if="loading && scores.length === 0" class="text-center py-8">
-                      <v-progress-circular indeterminate color="primary" />
-                    </div>
-                    
-                    <div v-else-if="scores.length > 0">
-                      <div 
-                        v-for="score in scores" 
-                        :key="score.criterion"
-                        class="score-item mb-4"
-                      >
-                        <div class="d-flex justify-space-between align-center mb-1">
-                          <span class="text-body-2 font-weight-medium">
-                            {{ score.criterion_label }}
-                          </span>
-                          <span class="text-caption">
-                            {{ score.avg_score }}/{{ score.max_score }}
-                            <v-icon 
-                              v-if="score.trend !== 0"
-                              :icon="score.trend > 0 ? 'mdi-trending-up' : 'mdi-trending-down'"
-                              :color="score.trend > 0 ? 'success' : 'error'"
-                              size="small"
-                              class="ml-1"
-                            />
-                          </span>
-                        </div>
-                        <v-progress-linear
-                          :model-value="(score.avg_score / score.max_score) * 100"
-                          :color="getScoreColor(score.avg_score, score.max_score)"
-                          height="8"
-                          rounded
-                        />
-                      </div>
-                    </div>
-                    
-                    <p v-else class="text-center text-grey py-8">
-                      Aucune donnée disponible
-                    </p>
-                  </v-card-text>
-                </v-card>
+                <CriteriaRadar
+                  :scores="scores"
+                  :loading="loading"
+                />
               </v-col>
               
               <!-- Section 4: Insights -->
@@ -129,31 +88,18 @@
                 </div>
                 
                 <div v-else class="insights-list">
-                  <v-card
+                  <InsightCard
                     v-for="(insight, index) in formattedInsights"
                     :key="index"
+                    :insight="insight"
+                    :title="insight.title"
+                    :icon="insight.icon"
                     :color="insight.color"
-                    rounded="xl"
-                    elevation="1"
+                    :action="insight.action"
+                    :action-icon="insight.actionIcon"
                     class="mb-3"
-                  >
-                    <v-card-text class="pa-4">
-                      <div class="d-flex align-center mb-2">
-                        <v-icon 
-                          :icon="insight.icon" 
-                          size="24"
-                          class="mr-2"
-                        />
-                        <div class="insight-title text-subtitle-2 font-weight-medium">
-                          {{ insight.title }}
-                        </div>
-                      </div>
-                      
-                      <div class="insight-text text-body-2">
-                        {{ insight.insight_text }}
-                      </div>
-                    </v-card-text>
-                  </v-card>
+                    @action="handleInsightAction"
+                  />
                   
                   <p v-if="formattedInsights.length === 0" class="text-center text-grey">
                     Aucun insight disponible
@@ -196,6 +142,8 @@ import { useCityDashboard } from '@/composables/useCityDashboard'
 import PageTransition from '@/components/transitions/PageTransition.vue'
 import DashboardStatCard from '@/components/common/StatCard.vue'
 import CityHeatmap from '@/components/dashboard/CityHeatmap.vue'
+import CriteriaRadar from '@/components/dashboard/CriteriaRadar.vue'
+import InsightCard from '@/components/dashboard/InsightCard.vue'
 
 // Composable (UN SEUL APPEL)
 const {
@@ -216,25 +164,32 @@ const {
 const loadingMap = ref(false)
 
 // Handler pour le changement de filtre
-const handleFilterChange = async (filter) => {
+const handleFilterChange = async (filterData) => {
   loadingMap.value = true
   try {
-    await loadHeatmapData(filter, 30)
+    // filterData peut être un string (ancien format) ou un objet (nouveau format)
+    const filter = typeof filterData === 'string' ? filterData : filterData.filter
+    const period = typeof filterData === 'object' ? filterData.period : 30
+    
+    await loadHeatmapData(filter, period)
   } finally {
     loadingMap.value = false
   }
 }
 
-// ... le reste de votre script ...
-  
-  // Helpers
-  const getScoreColor = (score, maxScore) => {
-    const percentage = (score / maxScore) * 100
-    if (percentage >= 75) return 'success'
-    if (percentage >= 50) return 'info'
-    if (percentage >= 25) return 'warning'
-    return 'error'
+// Handler pour les actions des insights
+const handleInsightAction = (actionData) => {
+  console.log('📍 Action insight:', actionData)
+  // Ici on pourrait ajouter des actions comme:
+  // - Centrer la carte sur une zone
+  // - Filtrer les données
+  // - Naviguer vers un audit spécifique
+  if (actionData.type === 'show-on-map') {
+    // TODO: Centrer la carte sur les coordonnées
+    console.log('Centrer carte sur:', actionData.lat, actionData.lng)
   }
+}
+
   
   // Lifecycle
   onMounted(async () => {

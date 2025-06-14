@@ -110,11 +110,17 @@ export const useCityDashboard = () => {
       
       if (err) throw err
       
-      scores.value = data || []
-      setCached(cacheKey, data)
+      // Ajouter les labels français
+      const scoresWithLabels = (data || []).map(score => ({
+        ...score,
+        criterion_label: getCriterionLabel(score.criterion)
+      }))
       
-      console.log('📈 Scores chargés:', data?.length || 0, 'critères')
-      return data
+      scores.value = scoresWithLabels
+      setCached(cacheKey, scoresWithLabels)
+      
+      console.log('📈 Scores chargés:', scoresWithLabels?.length || 0, 'critères')
+      return scoresWithLabels
     } catch (err) {
       console.error('❌ Erreur scores:', err)
       return []
@@ -234,6 +240,19 @@ export const useCityDashboard = () => {
     } catch (e) {
       return value
     }
+  }
+  
+  // Mapping des critères vers les labels français
+  const getCriterionLabel = (criterion) => {
+    const labels = {
+      'lighting': 'Éclairage',
+      'walkpath': 'Cheminement',
+      'openness': 'Ouverture visuelle',
+      'feeling': 'Sentiment de sécurité',
+      'people_presence': 'Présence humaine',
+      'cleanliness': 'Propreté'
+    }
+    return labels[criterion] || criterion
   }
   
   // Refresh toutes les données
