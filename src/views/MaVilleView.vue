@@ -34,10 +34,9 @@
                 <DashboardStatCard
                   :icon="stat.icon"
                   :label="stat.label"
-                  :value="stat.value"
+                  :value="stat.format === 'percentage' ? stat.value + '%' : stat.value"
                   :subtitle="stat.subtitle"
                   :color="stat.color"
-                  :format="stat.format"
                   :loading="false"
                   class="stat-card-fixed-height"
                 />
@@ -55,57 +54,73 @@
           </section>
   
           <!-- Section 2: Carte Interactive -->
-            <section class="mb-8">
-            <CityHeatmap
+          <section class="mb-8">
+            <div class="map-section">
+              <CityHeatmap
                 :heatmap-data="heatmapData"
                 :loading="loadingMap"
-                height="500px"
+                :height="mapHeight"
                 @filter-change="handleFilterChange"
                 @load-data="loadHeatmapData"
-            />
-            </section>
+              />
+            </div>
+          </section>
   
-          <!-- Section 3: Baromètre -->
+          <!-- Section 3: Baromètre et Insights -->
           <section class="mb-8">
-            <v-row>
-              <v-col cols="12" md="8">
+            <v-row class="d-flex align-stretch">
+              <!-- Colonne du graphique radar -->
+              <v-col cols="12" md="8" class="d-flex">
                 <CriteriaRadar
                   :scores="scores"
                   :loading="loading"
+                  class="flex-fill"
                 />
               </v-col>
               
-              <!-- Section 4: Insights -->
-              <v-col cols="12" md="4">
-                <h2 class="text-h6 mb-4">Insights</h2>
-                
-                <div v-if="loading && formattedInsights.length === 0">
-                  <v-skeleton-loader 
-                    v-for="i in 3" 
-                    :key="i"
-                    type="card"
-                    class="mb-3"
-                  />
-                </div>
-                
-                <div v-else class="insights-list">
-                  <InsightCard
-                    v-for="(insight, index) in formattedInsights"
-                    :key="index"
-                    :insight="insight"
-                    :title="insight.title"
-                    :icon="insight.icon"
-                    :color="insight.color"
-                    :action="insight.action"
-                    :action-icon="insight.actionIcon"
-                    class="mb-3"
-                    @action="handleInsightAction"
-                  />
+              <!-- Colonne des Insights -->
+              <v-col cols="12" md="4" class="d-flex flex-column">
+                <v-card rounded="xl" elevation="2" class="flex-fill insights-card">
+                  <v-card-title>
+                    <v-icon class="mr-2">mdi-lightbulb</v-icon>
+                    Insights
+                  </v-card-title>
                   
-                  <p v-if="formattedInsights.length === 0" class="text-center text-grey">
-                    Aucun insight disponible
-                  </p>
-                </div>
+                  <v-card-text class="pa-0 flex-fill">
+                    <div v-if="loading && formattedInsights.length === 0" class="pa-4">
+                      <v-skeleton-loader 
+                        v-for="i in 3" 
+                        :key="i"
+                        type="card"
+                        class="mb-3"
+                      />
+                    </div>
+                    
+                    <div v-else class="insights-list pa-3">
+                      <InsightCard
+                        v-for="(insight, index) in formattedInsights"
+                        :key="index"
+                        :insight="insight"
+                        :title="insight.title"
+                        :icon="insight.icon"
+                        :color="insight.color"
+                        :action="insight.action"
+                        :action-icon="insight.actionIcon"
+                        class="mb-3"
+                        @action="handleInsightAction"
+                      />
+                      
+                      <div v-if="formattedInsights.length === 0" class="text-center py-8">
+                        <v-icon size="48" color="grey-lighten-1" class="mb-3">
+                          mdi-lightbulb-outline
+                        </v-icon>
+                        <p class="text-body-2 text-grey">
+                          Aucun insight disponible
+                        </p>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
           </section>
@@ -138,7 +153,7 @@
   <script setup>
   // src/views/MaVilleView.vue -> <script setup>
 
-import { ref, onMounted } from 'vue' // Assurez-vous d'importer ref
+import { ref, onMounted, computed } from 'vue'
 import { useCityDashboard } from '@/composables/useCityDashboard'
 import PageTransition from '@/components/transitions/PageTransition.vue'
 import DashboardStatCard from '@/components/common/StatCard.vue'
@@ -161,8 +176,16 @@ const {
   refreshAll
 } = useCityDashboard()
 
-// Ref pour le loading spécifique à la carte (c'est une bonne pratique)
+// Refs
 const loadingMap = ref(false)
+
+// Computed pour la hauteur de la carte
+const mapHeight = computed(() => {
+  // Adapter la hauteur en fonction de la taille de l'écran
+  if (window.innerWidth < 600) return '350px'
+  if (window.innerWidth < 960) return '400px'
+  return '450px'
+})
 
 // Handler pour le changement de filtre
 const handleFilterChange = async (filterData) => {
@@ -220,10 +243,19 @@ const handleInsightAction = (actionData) => {
     margin-bottom: 0 !important;
   }
   
+  /* Card des insights */
+  .insights-card {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .insights-card .v-card-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
   .insights-list {
-    max-height: 600px;
-    overflow-y: auto;
-    padding-right: 8px;
+    padding-bottom: 16px;
   }
   
   .insight-title {
@@ -234,23 +266,19 @@ const handleInsightAction = (actionData) => {
     line-height: 1.4;
   }
   
-  /* Scrollbar personnalisée */
-  .insights-list::-webkit-scrollbar {
-    width: 4px;
+
+  
+  /* Section de la carte */
+  .map-section {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
   
-  .insights-list::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .insights-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 2px;
-  }
-  
-  /* Cartes de stats avec hauteur fixe */
+  /* Cartes de stats avec hauteur flexible */
   :deep(.stat-card-fixed-height) {
-    height: 140px;
+    min-height: 120px;
+    height: auto;
     display: flex;
     flex-direction: column;
   }
@@ -266,6 +294,7 @@ const handleInsightAction = (actionData) => {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 16px !important;
   }
   
   /* Bouton refresh repositionné */
@@ -292,7 +321,9 @@ const handleInsightAction = (actionData) => {
     
     /* Cartes de stats plus petites sur mobile */
     :deep(.stat-card-fixed-height) {
-      height: 120px;
+      min-height: 100px;
     }
+    
+    /* Ajustements pour les insights sur mobile */
   }
   </style>

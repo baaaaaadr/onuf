@@ -106,14 +106,20 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - **Test mobile** : Vérifier performances des nouvelles animations sur appareils bas de gamme
 
 ## 🚀 **Prochaines Étapes**
-1. **DASHBOARD "MA VILLE"** : 🎉 TERMINÉ (85%)
+1. **DASHBOARD "MA VILLE"** : 🎉 TERMINÉ (95%)
    - ✅ Tableau de bord collectif fonctionnel
    - ✅ Carte interactive avec heatmap + filtres temporels
    - ✅ Graphique radar des scores par critère
    - ✅ Insights automatiques avec cartes interactives
    - ✅ Cache optimisé et performance mobile
-   - 📋 Tests finaux et documentation restants
-   - Voir `/ma-ville/PROGRESS.md` et `/ma-ville/GUIDE_TEST.md`
+   - ✅ **CORRIGÉ (20/01)** : Titres responsives
+   - ✅ **CORRIGÉ (20/01)** : Carte limitée à 10km d'Agadir
+   - ✅ **CORRIGÉ (20/01)** : Scores/insights sans scroll
+   - ✅ **CORRIGÉ (20/01)** : Score avec symbole %
+   - ✅ **CORRIGÉ (20/01)** : Bouton fermeture plein écran
+   - ✅ **CORRIGÉ (20/01)** : Erreur Leaflet résolue
+   - 📋 Tests finaux restants (5%)
+   - Voir `/ma-ville/PROGRESS.md`, `/ma-ville/CORRECTIONS_FINALES.md`
 
 2. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
    - Tester l'application complète sur vrais dispositifs mobiles

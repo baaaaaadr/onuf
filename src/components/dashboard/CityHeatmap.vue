@@ -1,14 +1,16 @@
 <!-- src/components/dashboard/CityHeatmap.vue -->
 <template>
     <v-card rounded="xl" elevation="2">
-      <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2">mdi-map-marker-radius</v-icon>
-        Carte de la Sécurité Urbaine
+      <v-card-title class="d-flex align-center flex-wrap">
+        <div class="d-flex align-center">
+          <v-icon class="mr-2">mdi-map-marker-radius</v-icon>
+          <span class="text-h6 text-sm-h5">Carte de la Sécurité Urbaine</span>
+        </div>
         
         <v-spacer />
         
         <v-btn
-          icon="mdi-fullscreen"
+          :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
           variant="text"
           size="small"
           @click="toggleFullscreen"
@@ -64,6 +66,16 @@
           :class="{ 'fullscreen': isFullscreen }"
         />
         
+        <!-- Bouton de fermeture en mode plein écran -->
+        <v-btn
+          v-if="isFullscreen"
+          icon="mdi-close"
+          color="primary"
+          size="large"
+          class="fullscreen-close-btn"
+          @click="toggleFullscreen"
+        />
+        
         <!-- Légende -->
         <div class="map-legend" v-show="!loading && heatmapData.length > 0">
           <div class="legend-title">Intensité</div>
@@ -117,8 +129,8 @@
   // Props
   const props = defineProps({
     height: { 
-      type: String, 
-      default: '400px' 
+    type: String, 
+    default: '450px' 
     },
     heatmapData: {
       type: Array,
@@ -159,15 +171,19 @@
   
   // Centre d'Agadir et limites
   const AGADIR_CENTER = [30.4278, -9.5981]
-  const MAX_DISTANCE_KM = 30
+  const MAX_DISTANCE_KM = 10
   
   // Calculer les bounds maximum (approximation : 1° ≈ 111km)
-  const degreesPerKm = 1 / 111
-  const maxDegrees = MAX_DISTANCE_KM * degreesPerKm
+  // Mais pour la latitude, la distance varie avec la latitude
+  const degreesPerKmLat = 1 / 111
+  const degreesPerKmLng = 1 / (111 * Math.cos(AGADIR_CENTER[0] * Math.PI / 180))
+  
+  const maxDegreesLat = MAX_DISTANCE_KM * degreesPerKmLat
+  const maxDegreesLng = MAX_DISTANCE_KM * degreesPerKmLng
   
   const AGADIR_BOUNDS = [
-    [AGADIR_CENTER[0] - maxDegrees, AGADIR_CENTER[1] - maxDegrees], // Sud-Ouest
-    [AGADIR_CENTER[0] + maxDegrees, AGADIR_CENTER[1] + maxDegrees]  // Nord-Est
+    [AGADIR_CENTER[0] - maxDegreesLat, AGADIR_CENTER[1] - maxDegreesLng], // Sud-Ouest
+    [AGADIR_CENTER[0] + maxDegreesLat, AGADIR_CENTER[1] + maxDegreesLng]  // Nord-Est
   ]
   
   // Initialiser la carte
@@ -177,27 +193,34 @@
       zoomControl: true,
       attributionControl: true,
       maxBounds: AGADIR_BOUNDS,
-      maxBoundsViscosity: 1.0
-    }).setView(AGADIR_CENTER, 13)
+      maxBoundsViscosity: 1.0,
+      minZoom: 10,
+      maxZoom: 16
+    }).setView(AGADIR_CENTER, 12)
     
     // Ajouter les tuiles de base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
-      maxZoom: 18
+      maxZoom: 16
     }).addTo(map.value)
     
     // Style pour mieux voir la heatmap
     mapContainer.value.style.backgroundColor = '#f5f5f5'
     
-    console.log('🗺️ Carte initialisée')
+    console.log('🗺️ Carte initialisée avec limites:', AGADIR_BOUNDS)
   }
   
   // Mettre à jour la heatmap
   const updateHeatmap = () => {
+    if (!map.value) {
+      console.warn('🗺️ Map non initialisée')
+      return
+    }
+    
     console.log('🔥 Mise à jour heatmap:', props.heatmapData.length, 'points')
     
     // Supprimer l'ancien layer
-    if (heatmapLayer.value) {
+    if (heatmapLayer.value && map.value.hasLayer(heatmapLayer.value)) {
       map.value.removeLayer(heatmapLayer.value)
       heatmapLayer.value = null
     }
@@ -220,20 +243,28 @@
     })
     
     // Créer le nouveau layer heatmap
-    heatmapLayer.value = L.heatLayer(heatData, {
-      radius: 30,
-      blur: 20,
-      maxZoom: 15,
-      max: 1.0,
-      gradient: {
-        0.0: 'blue',
-        0.3: 'cyan',
-        0.5: 'lime',
-        0.7: 'yellow',
-        0.9: 'orange',
-        1.0: 'red'
+    try {
+      heatmapLayer.value = L.heatLayer(heatData, {
+        radius: 30,
+        blur: 20,
+        maxZoom: 15,
+        max: 1.0,
+        gradient: {
+          0.0: 'blue',
+          0.3: 'cyan',
+          0.5: 'lime',
+          0.7: 'yellow',
+          0.9: 'orange',
+          1.0: 'red'
+        }
+      })
+      
+      if (map.value) {
+        heatmapLayer.value.addTo(map.value)
       }
-    }).addTo(map.value)
+    } catch (e) {
+      console.error('Erreur création heatmap:', e)
+    }
     
     // Ajouter des marqueurs informatifs pour les zones avec beaucoup de données
     addInfoMarkers()
@@ -242,21 +273,50 @@
     if (heatData.length > 0) {
       const bounds = L.latLngBounds(heatData.map(point => [point[0], point[1]]))
       
-      // Vérifier si les bounds sont dans la zone d'Agadir
+      // Limiter les bounds à la zone d'Agadir
       const agadirBounds = L.latLngBounds(AGADIR_BOUNDS)
-      const constrainedBounds = bounds.intersect ? bounds.intersect(agadirBounds) : bounds
       
-      // Si les bounds contraintes sont valides, les utiliser, sinon centrer sur Agadir
-      if (constrainedBounds && constrainedBounds.isValid()) {
-        map.value.fitBounds(constrainedBounds, { padding: [30, 30], maxZoom: 15 })
+      // Utiliser l'intersection des bounds si disponible
+      let viewBounds = bounds
+      
+      // Vérifier si les données sont dans la zone d'Agadir
+      if (bounds.getNorth() > agadirBounds.getNorth() ||
+          bounds.getSouth() < agadirBounds.getSouth() ||
+          bounds.getEast() > agadirBounds.getEast() ||
+          bounds.getWest() < agadirBounds.getWest()) {
+        // Si les données dépassent, recentrer sur Agadir
+        map.value.setView(AGADIR_CENTER, 12)
       } else {
-        map.value.setView(AGADIR_CENTER, 13)
+        // Ajuster la vue sur les données avec padding
+        map.value.fitBounds(bounds, { 
+          padding: [50, 50], 
+          maxZoom: 14 
+        })
       }
+    } else {
+      // Pas de données, centrer sur Agadir
+      map.value.setView(AGADIR_CENTER, 12)
     }
   }
   
+  // Variable pour stocker les marqueurs
+  const markers = ref([])
+  
   // Ajouter des marqueurs informatifs
   const addInfoMarkers = () => {
+    if (!map.value) return
+    
+    // Supprimer les anciens marqueurs
+    markers.value.forEach(marker => {
+      try {
+        if (map.value && map.value.hasLayer(marker)) {
+          map.value.removeLayer(marker)
+        }
+      } catch (e) {
+        console.warn('Erreur suppression marqueur:', e)
+      }
+    })
+    markers.value = []
     // Grouper les points proches et ajouter des marqueurs pour les zones importantes
     const significantZones = props.heatmapData.filter(point => 
       point.count && point.count >= 3 // Minimum 3 audits pour afficher un marqueur
@@ -308,6 +368,7 @@
       })
       
       marker.addTo(map.value)
+      markers.value.push(marker)
     })
   }
   
@@ -327,9 +388,15 @@
     // Attendre que l'animation CSS soit terminée
     setTimeout(() => {
       if (map.value) {
-        map.value.invalidateSize()
+        try {
+          map.value.invalidateSize()
+          // Recentrer la carte
+          map.value.setView(AGADIR_CENTER, map.value.getZoom())
+        } catch (e) {
+          console.warn('Erreur invalidateSize:', e)
+        }
       }
-    }, 300)
+    }, 350)
   }
   
   // Watchers
@@ -353,19 +420,38 @@
   }
   
   watch(() => props.heatmapData, () => {
-    updateHeatmap()
-  }, { deep: true })
+    if (map.value) {
+      updateHeatmap()
+    }
+  }, { deep: true, immediate: false })
   
   // Lifecycle
   onMounted(() => {
     // Attendre que le container soit prêt
     setTimeout(() => {
-      initMap()
-      updateHeatmap()
+      if (mapContainer.value) {
+        initMap()
+        updateHeatmap()
+      }
     }, 100)
   })
   
   onUnmounted(() => {
+    // Nettoyer les marqueurs
+    markers.value.forEach(marker => {
+      if (map.value && map.value.hasLayer(marker)) {
+        map.value.removeLayer(marker)
+      }
+    })
+    markers.value = []
+    
+    // Nettoyer la heatmap
+    if (heatmapLayer.value && map.value && map.value.hasLayer(heatmapLayer.value)) {
+      map.value.removeLayer(heatmapLayer.value)
+      heatmapLayer.value = null
+    }
+    
+    // Supprimer la carte
     if (map.value) {
       map.value.remove()
       map.value = null
@@ -380,6 +466,8 @@
     position: relative;
     transition: all 0.3s ease;
     z-index: 1;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
   }
   
   .city-heatmap.fullscreen {
@@ -389,7 +477,18 @@
     right: 0;
     bottom: 0;
     height: 100vh !important;
-    z-index: 9999;
+    z-index: 2000;
+    background: white;
+  }
+  
+  /* Bouton de fermeture en mode plein écran */
+  .fullscreen-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2001;
+    background: white !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   
   /* Légende */
