@@ -227,7 +227,7 @@ const formattedDate = computed(() => {
   })
 })
 
-// Items de score avec emojis
+// Items de score avec emojis - afficher 6 critères principaux
 const scoreItems = computed(() => [
   { 
     key: 'lighting', 
@@ -246,6 +246,24 @@ const scoreItems = computed(() => [
     emoji: '😊', 
     value: props.audit.feeling || 0,
     color: getScoreColor(props.audit.feeling || 0)
+  },
+  { 
+    key: 'natural_surveillance', 
+    emoji: '👁️‍🗨️', 
+    value: props.audit.natural_surveillance || props.audit.naturalSurveillance || 0,
+    color: getScoreColor(props.audit.natural_surveillance || props.audit.naturalSurveillance || 0)
+  },
+  { 
+    key: 'transport_access', 
+    emoji: '🚌', 
+    value: props.audit.transport_access || props.audit.transportAccess || 0,
+    color: getScoreColor(props.audit.transport_access || props.audit.transportAccess || 0)
+  },
+  { 
+    key: 'formal_security', 
+    emoji: '👮', 
+    value: props.audit.formal_security || props.audit.formalSecurity || 0,
+    color: getScoreColor(props.audit.formal_security || props.audit.formalSecurity || 0)
   }
 ])
 
@@ -257,7 +275,11 @@ const globalScore = computed(() => {
     props.audit.openness,
     props.audit.feeling,
     props.audit.people_presence || props.audit.peoplePresence,
-    props.audit.cleanliness
+    props.audit.cleanliness,
+    props.audit.natural_surveillance || props.audit.naturalSurveillance,
+    props.audit.space_diversity || props.audit.spaceDiversity,
+    props.audit.transport_access || props.audit.transportAccess,
+    props.audit.formal_security || props.audit.formalSecurity
   ].filter(score => score > 0)
   
   if (scores.length === 0) return 0

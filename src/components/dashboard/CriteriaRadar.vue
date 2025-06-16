@@ -121,7 +121,11 @@ const getCriterionIcon = (criterion) => {
     'openness': 'mdi-eye',
     'feeling': 'mdi-shield-check',
     'people_presence': 'mdi-account-group',
-    'cleanliness': 'mdi-broom'
+    'cleanliness': 'mdi-broom',
+    'natural_surveillance': 'mdi-eye-outline',
+    'space_diversity': 'mdi-account-multiple',
+    'transport_access': 'mdi-bus',
+    'formal_security': 'mdi-shield-account'
   }
   return icons[criterion] || 'mdi-help-circle'
 }

@@ -250,7 +250,11 @@ export const useCityDashboard = () => {
       'openness': 'Ouverture visuelle',
       'feeling': 'Sentiment de sécurité',
       'people_presence': 'Présence humaine',
-      'cleanliness': 'Propreté'
+      'cleanliness': 'Propreté',
+      'natural_surveillance': 'Surveillance naturelle',
+      'space_diversity': 'Mixité de l\'espace',
+      'transport_access': 'Accès aux transports',
+      'formal_security': 'Sécurité formelle'
     }
     return labels[criterion] || criterion
   }

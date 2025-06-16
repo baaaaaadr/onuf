@@ -252,7 +252,7 @@ export default {
       })
     })
     
-    // Scores d'audit
+    // Scores d'audit - Afficher 4 critères principaux
     const auditScores = computed(() => [
       { 
         key: 'lighting', 
@@ -262,29 +262,41 @@ export default {
         color: getScoreColor(props.audit.lighting)
       },
       { 
-        key: 'walkpath', 
-        value: props.audit.walkpath || 0, 
-        label: 'Chemin',
-        icon: 'mdi-walk',
-        color: getScoreColor(props.audit.walkpath)
-      },
-      { 
         key: 'feeling', 
         value: props.audit.feeling || 0, 
         label: 'Ressenti',
         icon: 'mdi-emoticon',
         color: getScoreColor(props.audit.feeling)
+      },
+      { 
+        key: 'natural_surveillance', 
+        value: props.audit.natural_surveillance || props.audit.naturalSurveillance || 0, 
+        label: 'Surveillance',
+        icon: 'mdi-eye-outline',
+        color: getScoreColor(props.audit.natural_surveillance || props.audit.naturalSurveillance)
+      },
+      { 
+        key: 'formal_security', 
+        value: props.audit.formal_security || props.audit.formalSecurity || 0, 
+        label: 'Sécurité',
+        icon: 'mdi-shield-account',
+        color: getScoreColor(props.audit.formal_security || props.audit.formalSecurity)
       }
     ])
     
+    // Calcul du score global sur 10 critères
     const globalScore = computed(() => {
       const scores = [
         props.audit.lighting,
         props.audit.walkpath,
         props.audit.openness,
         props.audit.feeling,
-        props.audit.people_presence,
-        props.audit.cleanliness
+        props.audit.people_presence || props.audit.peoplePresence,
+        props.audit.cleanliness,
+        props.audit.natural_surveillance || props.audit.naturalSurveillance,
+        props.audit.space_diversity || props.audit.spaceDiversity,
+        props.audit.transport_access || props.audit.transportAccess,
+        props.audit.formal_security || props.audit.formalSecurity
       ].filter(score => score > 0)
       
       if (scores.length === 0) return 0

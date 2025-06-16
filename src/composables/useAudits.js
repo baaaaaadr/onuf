@@ -116,6 +116,11 @@ export const useAudits = () => {
         feeling: auditData.feeling,
         people_presence: auditData.peoplePresence,
         cleanliness: auditData.cleanliness,
+        // Nouvelles questions d'audit
+        natural_surveillance: auditData.naturalSurveillance,
+        space_diversity: auditData.spaceDiversity,
+        transport_access: auditData.transportAccess,
+        formal_security: auditData.formalSecurity,
         comment: auditData.comment,
         total_photos: auditData.photos?.length || 0,
         ui_language: 'fr',
@@ -724,36 +729,25 @@ export const useAudits = () => {
       let scoredAudits = 0
       
       userAudits.forEach(audit => {
-        // Calculer un score simple basé sur les réponses (0-100)
-        let score = 0
-        let factors = 0
+        // Calculer un score simple basé sur les réponses (0-100) pour 10 questions
+        const scores = [
+          audit.lighting,
+          audit.walkpath,
+          audit.openness,
+          audit.feeling,
+          audit.people_presence || audit.peoplePresence,
+          audit.cleanliness,
+          audit.natural_surveillance || audit.naturalSurveillance,
+          audit.space_diversity || audit.spaceDiversity,
+          audit.transport_access || audit.transportAccess,
+          audit.formal_security || audit.formalSecurity
+        ].filter(s => s !== null && s !== undefined)
         
-        // Éclairage (0-4 devient 0-25 points)
-        if (audit.lighting !== undefined) {
-          score += (audit.lighting / 4) * 25
-          factors++
-        }
-        
-        // Cheminement (0-3 devient 0-25 points)
-        if (audit.walkpath !== undefined) {
-          score += (audit.walkpath / 3) * 25
-          factors++
-        }
-        
-        // Ouverture (0-3 devient 0-25 points)
-        if (audit.openness !== undefined) {
-          score += (audit.openness / 3) * 25
-          factors++
-        }
-        
-        // Ressenti (0-4 devient 0-25 points)
-        if (audit.feeling !== undefined) {
-          score += (audit.feeling / 4) * 25
-          factors++
-        }
-        
-        if (factors > 0) {
-          totalScore += score / factors // Score normalisé pour cet audit
+        if (scores.length > 0) {
+          // Moyenne des scores (1-4) convertie en pourcentage (0-100)
+          const avgScore = scores.reduce((sum, s) => sum + s, 0) / scores.length
+          const score = ((avgScore - 1) / 3) * 100 // Convertir de 1-4 à 0-100
+          totalScore += score
           scoredAudits++
         }
       })
