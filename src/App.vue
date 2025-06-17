@@ -181,15 +181,17 @@
         </template>
       </v-app-bar>
 
-      <!-- Contenu principal avec transitions -->
+      <!-- Contenu principal avec transitions et swipe navigation -->
       <v-main class="onuf-main">
-        <div class="page-container">
-          <router-view v-slot="{ Component, route }">
-            <PageTransition name="auto" :duration="300">
-              <component :is="Component" :key="route.path" />
-            </PageTransition>
-          </router-view>
-        </div>
+        <SwipeNavigation>
+          <div class="page-container">
+            <router-view v-slot="{ Component, route }">
+              <PageTransition name="auto" :duration="300">
+                <component :is="Component" :key="route.path" />
+              </PageTransition>
+            </router-view>
+          </div>
+        </SwipeNavigation>
       </v-main>
 
       <!-- Navigation bottom moderne -->
@@ -343,6 +345,7 @@ import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import BottomNav from '@/components/navigation/BottomNav.vue'
 import PageTransition from '@/components/transitions/PageTransition.vue'
+import SwipeNavigation from '@/components/navigation/SwipeNavigation.vue'
 import MobileDebugViewer from '@/components/debug/MobileDebugViewer.vue'
 
 // Router

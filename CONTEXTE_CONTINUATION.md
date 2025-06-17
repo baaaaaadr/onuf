@@ -29,6 +29,8 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ **INTÉGRATION** : Widgets modernes intégrés dans AuditFormView
 - ✅ **CORRECTIONS 18/01** : Contraste textes + disposition boutons + cartes cliquables
 - ✅ **GÉOCODAGE INVERSE** : Intégration complète avec nearby_info + affichage enrichi
+- ✅ **CORRECTIONS 20/01** : Erreur DashboardView.vue (syncStats.value) corrigée
+- ✅ **NAVIGATION SWIPE** : Navigation par gestes swipe entre les 4 écrans principaux
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA
@@ -41,13 +43,11 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - **Admin** : `admin` / `admin123!`
 - **Agents** : `agent01`, `agent02`, `agent03` / `field123!`
 
-## 🛠️ **Dernières Réalisations (18 Janvier 2025)**
-- **✅ Intégration complète** : LocationWidget et PhotoCapture intégrés dans AuditFormView
-- **✅ Contraste amélioré** : Tous les textes maintenant lisibles (medium-emphasis)
-- **✅ Historique optimisé** : Filtres en chips, actions iconiques, cartes cliquables
-- **✅ AuditCard redesigné** : Scores visuels avec points colorés + menu contextuel
-- **✅ Performance** : Animations fluides, transitions optimisées
-- **✅ UX améliorée** : Interactions tactiles, feedback visuel sur toutes les actions
+## 🛠️ **Dernières Réalisations (20 Janvier 2025)**
+- **✅ Correction erreur Vue** : Correction de l'erreur `Cannot read properties of undefined (reading 'value')` dans DashboardView.vue
+- **✅ Navigation par swipe** : Ajout de la navigation par gestes tactiles entre les 4 écrans principaux (Accueil, Audit, Historique, Ma Ville)
+- **✅ SwipeNavigation.vue créé** : Composant pour gérer les swipes avec indicateur visuel et support clavier
+- **✅ Intégration dans App.vue** : SwipeNavigation encapsule maintenant le router-view
 
 ## 📁 **Fichiers Importants**
 - `src/composables/useAudits.js` : Gestion CRUD + stratégie Local-First
@@ -55,11 +55,12 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - `src/views/AuditFormView.vue` : Formulaire principal (corrections récentes)
 - `src/views/AuditsHistoryView.vue` : Historique + auto-refresh
 - `src/components/StatusBar.vue` : Header avec bouton "+" et indicateurs
-- `src/components/widgets/LocationWidget.vue` : **NOUVEAU** Widget GPS moderne
-- `src/components/widgets/PhotoCapture.vue` : **NOUVEAU** Interface photo moderne
-- `src/components/transitions/PageTransition.vue` : **NOUVEAU** Transitions de page
-- `src/components/common/FloatingActionButton.vue` : **NOUVEAU** FAB avec ripple
-- `src/assets/styles/animations.css` : **NOUVEAU** Animations globales
+- `src/components/widgets/LocationWidget.vue` : Widget GPS moderne
+- `src/components/widgets/PhotoCapture.vue` : Interface photo moderne
+- `src/components/transitions/PageTransition.vue` : Transitions de page
+- `src/components/navigation/SwipeNavigation.vue` : **NOUVEAU** Navigation par swipe
+- `src/components/common/FloatingActionButton.vue` : FAB avec ripple
+- `src/assets/styles/animations.css` : Animations globales
 - `src/utils/debug.js` : Outils debug (window.__debugONUF)
 - `STRATEGIE_LOCAL_FIRST.md` : Documentation nouvelle approche
 
@@ -87,6 +88,13 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - `src/components/transitions/PageTransition.vue` : Transitions entre pages
 - `src/components/common/FloatingActionButton.vue` : Bouton flottant avec ripple
 
+### Navigation (✅ Nouveau)
+- `src/components/navigation/SwipeNavigation.vue` : Navigation par gestes swipe
+  - Swipe gauche/droite pour naviguer entre les écrans
+  - Indicateur visuel pendant le swipe
+  - Support clavier (flèches gauche/droite)
+  - Ignorer les swipes sur éléments interactifs
+
 ## 🔐 **Sécurité & Privacy (20 Janvier 2025)**
 - **✅ CORRIGÉ** : Filtrage des audits par utilisateur
 - Chaque agent ne voit que ses propres audits
@@ -98,43 +106,34 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - **✅ CORRIGÉ** : Boucle récursive dans AuditsHistoryView
 - **✅ CORRIGÉ** : Problème d'initialisation de la sync
 - **✅ CORRIGÉ** : Avertissements Vue.js répétés
+- **✅ CORRIGÉ** : Erreur syncStats.value dans DashboardView
 - Voir `FIX_RECURSIVE_ERRORS.md` et `APPLY_FIXES.md`
 
 ## 🚨 **Points d'attention**
-- **Intégration widgets** : LocationWidget et PhotoCapture doivent être intégrés dans AuditFormView
+- **Canvas warning dans CityHeatmap** : Avertissement Canvas2D sur willReadFrequently (performance)
 - **Import animations** : Ajouter `@import './styles/animations.css';` dans main.css
 - **Test mobile** : Vérifier performances des nouvelles animations sur appareils bas de gamme
 
 ## 🚀 **Prochaines Étapes**
-1. **DASHBOARD "MA VILLE"** : 🎉 TERMINÉ (95%)
-   - ✅ Tableau de bord collectif fonctionnel
-   - ✅ Carte interactive avec heatmap + filtres temporels
-   - ✅ Graphique radar des scores par critère
-   - ✅ Insights automatiques avec cartes interactives
-   - ✅ Cache optimisé et performance mobile
-   - ✅ **CORRIGÉ (20/01)** : Titres responsives
-   - ✅ **CORRIGÉ (20/01)** : Carte limitée à 10km d'Agadir
-   - ✅ **CORRIGÉ (20/01)** : Scores/insights sans scroll
-   - ✅ **CORRIGÉ (20/01)** : Score avec symbole %
-   - ✅ **CORRIGÉ (20/01)** : Bouton fermeture plein écran
-   - ✅ **CORRIGÉ (20/01)** : Erreur Leaflet résolue
-   - 📋 Tests finaux restants (5%)
-   - Voir `/ma-ville/PROGRESS.md`, `/ma-ville/CORRECTIONS_FINALES.md`
+1. **OPTIMISER HEATMAP** : 🐛 À FAIRE
+   - Corriger l'avertissement Canvas2D dans CityHeatmap.vue
+   - Ajouter willReadFrequently: true au contexte canvas
 
 2. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
    - Tester l'application complète sur vrais dispositifs mobiles
    - Vérifier les performances avec connexion lente
+   - Tester la navigation par swipe sur différents appareils
    - Collecter feedback sur le nouveau design
    - Identifier bugs restants
 
-2. **PHASE 3.4 - Optimisation Finale** :
+3. **PHASE 3.4 - Optimisation Finale** :
    - Bundle size optimization (réduire taille JS/CSS)
    - Service Worker avancé (cache intelligent)
    - Core Web Vitals > 90 (LCP, FID, CLS)
    - Virtual scrolling pour grandes listes
    - Web Workers pour compression photos
 
-3. **PHASE 4 - Finalisation** :
+4. **PHASE 4 - Finalisation** :
    - Tests end-to-end automatisés
    - Documentation utilisateur finale
    - Déploiement production (Netlify/Vercel)
@@ -148,6 +147,6 @@ __debugONUF.reloadAudits()       // Forcer reload interface
   - `redesign\PHASE3_STEP3_COMPLETE.md` : Résumé Phase 3.3
   - `redesign\PHASE3_STEP4_TODO.md` : Plan Phase 3.4
 
-> **Note** : 🎉 La Phase 3.3 est 100% COMPLÈTE et INTÉGRÉE avec tous les widgets fonctionnels. 
-> **STATUT ACTUEL** : Application prête pour tests utilisateur - design moderne, interactions fluides, offline-first.
-> **DERNIÈRES CORRECTIONS** : Voir `CORRECTIONS_2025_01_18.md` pour les améliorations de contraste et UX.
+> **Note** : 🎉 Navigation par swipe maintenant fonctionnelle! L'application supporte la navigation par gestes tactiles entre les 4 écrans principaux.
+> **STATUT ACTUEL** : Application prête pour tests utilisateur - design moderne, interactions fluides, offline-first, navigation par swipe.
+> **DERNIÈRES CORRECTIONS** : Erreur syncStats corrigée, navigation swipe ajoutée.

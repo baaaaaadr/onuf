@@ -501,11 +501,12 @@ const userDisplayName = computed(() => {
 // ✅ CORRECTION: syncStats est un objet reactive, pas une ref
 const safeSyncStats = computed(() => {
   // S'assurer qu'on a toujours un objet valide
+  // syncStats est directement accessible, pas besoin de .value
   return {
-    pending: syncStats?.pending || 0,
-    syncing: syncStats?.syncing || 0,
-    failed: syncStats?.failed || 0,
-    success: syncStats?.success || 0
+    pending: syncStats.pending || 0,
+    syncing: syncStats.syncing || 0,
+    failed: syncStats.failed || 0,
+    success: syncStats.success || 0
   }
 })
 
