@@ -1,4 +1,4 @@
-<!-- AuditsHistoryView.vue - Version avec vrais composables + formatage corrigé -->
+<!-- AuditsHistoryView.vue - Version CORRIGÉE pour éviter les boucles récursives -->
 <template>
   <div class="audits-history-view">
     <v-container class="pa-4">
@@ -540,13 +540,20 @@ const {
   processQueue
 } = getGlobalSyncQueue()
 
-// ✅ CORRECTION: Protection défensive pour syncStats
-const safeSyncStats = computed(() => syncStats || {
+// ✅ CORRECTION: Utiliser une référence réactive stable
+const safeSyncStats = ref({
   pending: 0,
   syncing: 0,
   failed: 0,
   success: 0
 })
+
+// Mettre à jour safeSyncStats quand syncStats change
+watch(() => syncStats, (newStats) => {
+  if (newStats) {
+    safeSyncStats.value = { ...newStats }
+  }
+}, { immediate: true, deep: true })
 
 // État local
 const allAudits = ref([])
@@ -841,11 +848,7 @@ const calculateGlobalScore = (audit) => {
     audit.openness,
     audit.feeling,
     audit.people_presence || audit.peoplePresence,
-    audit.cleanliness,
-    audit.natural_surveillance || audit.naturalSurveillance,
-    audit.space_diversity || audit.spaceDiversity,
-    audit.transport_access || audit.transportAccess,
-    audit.formal_security || audit.formalSecurity
+    audit.cleanliness
   ].filter(score => score > 0)
   
   if (scores.length === 0) return 0
@@ -867,11 +870,7 @@ const getScoreItems = (audit) => {
     { key: 'openness', icon: '👁️', label: 'Ouverture', value: audit.openness || 0, color: getScoreColor(audit.openness) },
     { key: 'feeling', icon: '😊', label: 'Ressenti', value: audit.feeling || 0, color: getScoreColor(audit.feeling) },
     { key: 'people_presence', icon: '👥', label: 'Présence', value: audit.people_presence || audit.peoplePresence || 0, color: getScoreColor(audit.people_presence || audit.peoplePresence) },
-    { key: 'cleanliness', icon: '🧹', label: 'Propreté', value: audit.cleanliness || 0, color: getScoreColor(audit.cleanliness) },
-    { key: 'natural_surveillance', icon: '👁️‍🗨️', label: 'Surveillance', value: audit.natural_surveillance || audit.naturalSurveillance || 0, color: getScoreColor(audit.natural_surveillance || audit.naturalSurveillance) },
-    { key: 'space_diversity', icon: '👨‍👩‍👧‍👦', label: 'Mixité', value: audit.space_diversity || audit.spaceDiversity || 0, color: getScoreColor(audit.space_diversity || audit.spaceDiversity) },
-    { key: 'transport_access', icon: '🚌', label: 'Transports', value: audit.transport_access || audit.transportAccess || 0, color: getScoreColor(audit.transport_access || audit.transportAccess) },
-    { key: 'formal_security', icon: '👮', label: 'Sécurité', value: audit.formal_security || audit.formalSecurity || 0, color: getScoreColor(audit.formal_security || audit.formalSecurity) }
+    { key: 'cleanliness', icon: '🧹', label: 'Propreté', value: audit.cleanliness || 0, color: getScoreColor(audit.cleanliness) }
   ]
 }
 
@@ -1022,10 +1021,10 @@ const exportAllAudits = () => {
     total_count: filteredAudits.value.length,
     filter_applied: filterMode.value,
     sync_summary: {
-    success: safeSyncStats.success,
-    pending: safeSyncStats.pending,
-    failed: safeSyncStats.failed,
-    syncing: safeSyncStats.syncing
+      success: safeSyncStats.value.success,
+      pending: safeSyncStats.value.pending,
+      failed: safeSyncStats.value.failed,
+      syncing: safeSyncStats.value.syncing
     }
   }
   
@@ -1062,37 +1061,50 @@ const confirmDelete = async () => {
 
 // ✅ NOUVEAU: Setup auto-refresh à la reconnexion
 const setupAutoRefresh = () => {
+  // ✅ CORRECTION: Utiliser un flag pour éviter les appels multiples
+  let isRefreshing = false
+  
   // Watcher sur l'état de connexion
-  watch(isOnline, async (newOnlineStatus, oldOnlineStatus) => {
+  const unwatch = watch(isOnline, async (newOnlineStatus, oldOnlineStatus) => {
     // Quand on passe de offline à online
-    if (newOnlineStatus && !oldOnlineStatus) {
+    if (newOnlineStatus && !oldOnlineStatus && !isRefreshing) {
       console.log('🌐 Reconnexion détectée - Refresh automatique des audits')
+      isRefreshing = true
       
       // Attendre un peu pour que la connexion se stabilise
       setTimeout(async () => {
-        await loadAudits()
-        // Déclencher aussi la sync queue
-        await processQueue()
+        try {
+          await loadAudits()
+          // Déclencher aussi la sync queue
+          await processQueue()
+        } finally {
+          isRefreshing = false
+        }
       }, 1000)
     }
   })
   
   // Refresh périodique si des audits en attente
   const autoRefreshInterval = setInterval(async () => {
-    if (isOnline.value && (safeSyncStats.value.pending > 0 || safeSyncStats.value.syncing > 0)) {
+    if (isOnline.value && (safeSyncStats.value.pending > 0 || safeSyncStats.value.syncing > 0) && !isRefreshing) {
       console.log('🔄 Refresh automatique - Sync en cours')
-      await loadAudits()
+      isRefreshing = true
+      try {
+        await loadAudits()
+      } finally {
+        isRefreshing = false
+      }
     }
   }, 10000) // Toutes les 10 secondes
   
-  return autoRefreshInterval
+  return { interval: autoRefreshInterval, unwatch }
 }
 
 // Lifecycle
-let autoRefreshInterval = null
+let autoRefreshSetup = null
 
 onMounted(() => {
-  console.log('📊 AuditsHistoryView montée avec succès!')
+  console.log('📋 AuditsHistoryView montée avec succès!')
   console.log('🔍 Vérification DOM:', {
     view: document.querySelector('.audits-history-view'),
     container: document.querySelector('.v-container'),
@@ -1102,7 +1114,7 @@ onMounted(() => {
   loadAudits()
   
   // ✅ NOUVEAU: Configurer auto-refresh
-  autoRefreshInterval = setupAutoRefresh()
+  autoRefreshSetup = setupAutoRefresh()
   
   // Écouter événements de force reload
   window.addEventListener('onuf-force-reload', loadAudits)
@@ -1110,8 +1122,13 @@ onMounted(() => {
 
 onUnmounted(() => {
   // Nettoyer les intervals et listeners
-  if (autoRefreshInterval) {
-    clearInterval(autoRefreshInterval)
+  if (autoRefreshSetup) {
+    if (autoRefreshSetup.interval) {
+      clearInterval(autoRefreshSetup.interval)
+    }
+    if (autoRefreshSetup.unwatch) {
+      autoRefreshSetup.unwatch()
+    }
   }
   window.removeEventListener('onuf-force-reload', loadAudits)
 })

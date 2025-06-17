@@ -225,7 +225,7 @@ const handleSelect = (event) => {
         window.navigator.vibrate(5)
       } else {
         // Vibration plus longue pour sélection
-        window.navigator.vibrate([15, 10, 15])
+        window.navigator.vibrate(20)
       }
     } else {
       // Vibration standard pour les autres

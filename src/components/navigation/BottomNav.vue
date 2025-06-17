@@ -63,6 +63,22 @@
         <div v-if="isActive(historyValue)" class="nav-indicator"></div>
       </div>
     </v-btn>
+
+    <!-- Onglet Ma Ville -->
+    <v-btn 
+      value="ma-ville"
+      class="nav-btn"
+      :class="{ 'nav-btn--active': isActive('ma-ville') }"
+      @click="navigateTo('/ma-ville')"
+    >
+      <div class="nav-content">
+        <v-icon :size="iconSize">
+          {{ isActive('ma-ville') ? 'mdi-city-variant' : 'mdi-city-variant-outline' }}
+        </v-icon>
+        <span class="nav-label">Ma Ville</span>
+        <div v-if="isActive('ma-ville')" class="nav-indicator"></div>
+      </div>
+    </v-btn>
   </v-bottom-navigation>
 </template>
 
@@ -97,6 +113,10 @@ const props = defineProps({
   historyValue: {
     type: String,
     default: 'history'
+  },
+  cityValue: {
+    type: String,
+    default: 'ma-ville'
   },
   
   // Apparence
@@ -139,6 +159,9 @@ const activeTab = computed(() => {
   }
   if (path.includes('/history')) {
     return props.historyValue
+  }
+  if (path.includes('/ma-ville')) {
+    return props.cityValue
   }
   return props.homeValue
 })
@@ -185,6 +208,9 @@ const handleTabChange = (newValue) => {
       break
     case props.historyValue:
       targetPath = '/history'
+      break
+    case props.cityValue:
+      targetPath = '/ma-ville'
       break
     default:
       targetPath = '/'
