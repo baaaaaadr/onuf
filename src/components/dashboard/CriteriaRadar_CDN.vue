@@ -1,4 +1,6 @@
-<!-- src/components/dashboard/CriteriaRadar.vue -->
+<!-- Version alternative de CriteriaRadar.vue avec CDN -->
+<!-- À utiliser si l'import local de Chart.js continue de poser problème -->
+
 <template>
   <v-card rounded="xl" elevation="2" class="criteria-radar-card">
     <v-card-title class="d-flex align-center flex-wrap">
@@ -87,28 +89,6 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-// Import Chart.js avec tous les composants nécessaires pour le radar
-import {
-  Chart,
-  RadarController,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-} from 'chart.js'
-
-// Enregistrer les composants
-Chart.register(
-  RadarController,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-)
 
 // Props
 const props = defineProps({
@@ -125,6 +105,30 @@ const props = defineProps({
 // Refs
 const chartCanvas = ref(null)
 const chart = ref(null)
+
+// Charger Chart.js depuis CDN
+const loadChartJS = async () => {
+  if (window.Chart) {
+    console.log('📈 Chart.js déjà chargé')
+    return
+  }
+  
+  console.log('📈 Chargement de Chart.js depuis CDN...')
+  
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.js'
+    script.onload = () => {
+      console.log('✅ Chart.js chargé avec succès')
+      resolve()
+    }
+    script.onerror = () => {
+      console.error('❌ Erreur chargement Chart.js')
+      reject(new Error('Impossible de charger Chart.js'))
+    }
+    document.head.appendChild(script)
+  })
+}
 
 // Computed
 const totalAudits = computed(() => {
@@ -169,10 +173,20 @@ const getBorderColor = (score, maxScore) => {
 }
 
 // Créer ou mettre à jour le graphique
-const updateChart = () => {
+const updateChart = async () => {
   if (!chartCanvas.value || !props.scores.length) {
     console.warn('📈 Canvas ou scores non disponibles')
     return
+  }
+  
+  // S'assurer que Chart.js est chargé
+  if (!window.Chart) {
+    try {
+      await loadChartJS()
+    } catch (error) {
+      console.error('❌ Impossible de charger Chart.js:', error)
+      return
+    }
   }
   
   const labels = props.scores.map(s => s.criterion_label)
@@ -193,7 +207,7 @@ const updateChart = () => {
   } else {
     // Créer un nouveau graphique
     const ctx = chartCanvas.value.getContext('2d')
-    chart.value = new Chart(ctx, {
+    chart.value = new window.Chart(ctx, {
       type: 'radar',
       data: {
         labels: labels,
@@ -284,6 +298,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Styles identiques à la version originale */
 .criteria-radar-card {
   display: flex;
   flex-direction: column;
@@ -359,12 +374,9 @@ canvas {
 
 /* Responsive */
 @media (max-width: 600px) {
-
-  
   .radar-wrapper {
     height: 280px;
   }
-
   
   .trend-item {
     padding: 8px 12px;
@@ -385,6 +397,4 @@ canvas {
     height: 320px;
   }
 }
-
-
 </style>
