@@ -274,11 +274,11 @@ const handleSelect = (event) => {
   min-height: 70px;
 }
 
-/* Mode épuré - plus de padding pour SVG uniquement */
+/* Mode épuré - padding réduit pour SVG */
 .option-card:has(.option-svg--clean) .option-content,
 .option-card.option-card--svg-clean .option-content {
   min-height: 80px;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
 }
 
 /* Visuel (emoji/icône) */
@@ -317,8 +317,8 @@ const handleSelect = (event) => {
 }
 
 .svg-icon {
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));

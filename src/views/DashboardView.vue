@@ -499,11 +499,14 @@ const userDisplayName = computed(() => {
 })
 
 // ✅ CORRECTION: syncStats est un objet reactive, pas une ref
-const safeSyncStats = computed(() => syncStats || {
-  pending: 0,
-  syncing: 0,
-  failed: 0,
-  success: 0
+const safeSyncStats = computed(() => {
+  // S'assurer qu'on a toujours un objet valide
+  return {
+    pending: syncStats?.pending || 0,
+    syncing: syncStats?.syncing || 0,
+    failed: syncStats?.failed || 0,
+    success: syncStats?.success || 0
+  }
 })
 
 // Statut sync
@@ -535,8 +538,8 @@ const hasSyncIssues = computed(() => {
 const isSyncing = computed(() => safeSyncStats.value.syncing > 0)
 
 // Statut GPS
-const gpsStatusColor = computed(() => gpsAccuracyLevel.value.color)
-const gpsStatusIcon = computed(() => gpsAccuracyLevel.value.icon)
+const gpsStatusColor = computed(() => gpsAccuracyLevel.value?.color || 'grey')
+const gpsStatusIcon = computed(() => gpsAccuracyLevel.value?.icon || 'mdi-crosshairs-gps')
 const gpsStatusText = computed(() => {
   if (currentPosition.value) {
     return `Précision: ${formattedPosition.value?.accuracy || 'Inconnue'}`

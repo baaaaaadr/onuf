@@ -171,278 +171,279 @@
         Dernière sauvegarde : {{ lastSaved }}
       </v-alert>
     </v-container>
-  </div>
 
-  <!-- Dialog de debug mobile -->
-  <v-dialog v-model="showDebugDialog" max-width="90vw" max-height="80vh">
-    <v-card>
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span>🐛 Console Debug</span>
-        <div class="d-flex gap-2">
-          <v-btn icon="mdi-refresh" @click="refreshGeoInfo" size="small" color="primary"></v-btn>
-          <v-btn icon="mdi-content-copy" @click="copyDebugInfo" size="small" color="secondary"></v-btn>
-          <v-btn icon="mdi-close" @click="showDebugDialog = false" size="small"></v-btn>
-        </div>
-      </v-card-title>
-      
-      <v-card-text style="max-height: 60vh; overflow-y: auto;">
-        <!-- Console Debug Réorganisée -->
-        <v-expansion-panels multiple variant="accordion">
-          
-          <!-- Infos de localisation -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              🗺️ Infos de localisation
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info">
-                <!-- Position actuelle -->
-                <div class="mb-3">
-                  <strong>📍 Position GPS ({{ locationAccuracy ? locationAccuracy + 'm' : 'N/A' }})</strong>
-                  <div v-if="geoDetails.latitude">Latitude: {{ geoDetails.latitude }}</div>
-                  <div v-if="geoDetails.longitude">Longitude: {{ geoDetails.longitude }}</div>
-                  <div v-if="geoDetails.accuracy">Précision: {{ geoDetails.accuracy }}m</div>
-                  <div v-if="geoDetails.altitude">Altitude: {{ geoDetails.altitude }}m</div>
-                  <div v-if="geoDetails.altitudeAccuracy">Précision altitude: {{ geoDetails.altitudeAccuracy }}m</div>
-                  <div v-if="geoDetails.heading">Cap: {{ geoDetails.heading }}°</div>
-                  <div v-if="geoDetails.speed">Vitesse: {{ geoDetails.speed }}m/s</div>
-                  <div v-if="geoDetails.timestamp">Timestamp: {{ new Date(geoDetails.timestamp).toLocaleString() }}</div>
-                  <div v-if="geoDetails.nearbyInfo">Proximité: {{ geoDetails.nearbyInfo }}</div>
-                  
-                  <!-- Boutons Maps -->
-                  <div v-if="coordinates.lat && coordinates.lng" class="mt-3 d-flex gap-2">
-                    <v-btn 
-                      size="small" 
-                      color="primary" 
-                      :href="getGoogleMapsUrl()" 
-                      target="_blank"
-                      prepend-icon="mdi-map"
-                    >
-                      Google Maps
-                    </v-btn>
-                    <v-btn 
-                      size="small" 
-                      color="secondary" 
-                      :href="getOpenStreetMapUrl()" 
-                      target="_blank"
-                      prepend-icon="mdi-map-outline"
-                    >
-                      OpenStreetMap
-                    </v-btn>
-                  </div>
-                </div>
-                
-                <!-- Historique positions -->
-                <div class="mb-3">
-                  <strong>🗺️ Historique GPS ({{ geoHistory.length }})</strong>
-                  <div style="max-height: 150px; overflow-y: auto;">
-                    <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
-                      <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
-                      <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
-                    </div>
-                    <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
-                  </div>
-                </div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Réponses utilisateur -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              👤 Réponses Utilisateur ({{ userActions.length }})
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
-                <div v-for="(action, index) in userActions.slice().reverse()" :key="index" class="action-log">
-                  <span class="text-caption text-grey">{{ formatTime(action.timestamp) }}</span>
-                  <span class="ml-2">{{ action.message }}</span>
-                </div>
-                <div v-if="userActions.length === 0" class="text-grey text-caption">Aucune action enregistrée</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Infos de sauvegarde -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              💾 Infos Sauvegarde
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info">
-                <div><strong>Dernière sauvegarde:</strong> {{ lastSaved || 'Jamais' }}</div>
-                <div><strong>Progrès complet:</strong> {{ progressPercentage }}%</div>
-                <div><strong>Questions répondues:</strong> {{ getAnsweredQuestions() }}/10</div>
-                <div><strong>Photos ajoutées:</strong> {{ formData.photos.length }}</div>
-                <div v-if="formData.photos.length > 0"><strong>Taille totale photos:</strong> {{ getTotalPhotoSize() }}</div>
-                <div v-if="formData.photos.length > 0"><strong>Détail photos:</strong></div>
-                <div v-for="(photo, index) in formData.photos" :key="index" class="ml-3 text-caption" v-if="formData.photos.length > 0">
-                  • {{ photo.name }}: {{ photo.originalSize ? (photo.originalSize / 1024).toFixed(1) : '?' }}KB → {{ photo.compressedSize ? (photo.compressedSize / 1024).toFixed(1) : '?' }}KB
-                </div>
-                <div><strong>Formulaire valide:</strong> {{ isFormValid ? '✅ Oui' : '❌ Non' }}</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Capacités navigateur -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              📱 Capacités Navigateur
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info">
-                <div><strong>Géolocalisation:</strong> {{ navigator.geolocation ? '✅ Supporté' : '❌ Non supporté' }}</div>
-                <div><strong>HTTPS:</strong> {{ location.protocol === 'https:' ? '✅ Sécurisé' : '⚠️ Non sécurisé' }}</div>
-                <div><strong>User Agent:</strong> {{ navigator.userAgent.slice(0, 80) }}...</div>
-                <div><strong>Permissions API:</strong> {{ navigator.permissions ? '✅ Disponible' : '❌ Non disponible' }}</div>
-                <div v-if="permissionState"><strong>État permission:</strong> {{ permissionState }}</div>
-                <div><strong>Plateforme:</strong> {{ navigator.platform || 'Inconnue' }}</div>
-                <div><strong>Langue:</strong> {{ navigator.language || 'Inconnue' }}</div>
-                <div><strong>Cookies activés:</strong> {{ navigator.cookieEnabled ? '✅ Oui' : '❌ Non' }}</div>
-                <div><strong>En ligne:</strong> {{ navigator.onLine ? '✅ Connecté' : '❌ Hors ligne' }}</div>
-                <div><strong>Mémoire disponible:</strong> {{ navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'Inconnue' }}</div>
-                <div><strong>Connexion:</strong> {{ getConnectionInfo() }}</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Console logs -->
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              📜 Logs Console ({{ debugLogs.length }})
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
-                <div v-for="(log, index) in debugLogs.slice().reverse()" :key="index" class="log-entry" :class="log.type">
-                  <span class="text-caption">{{ formatTime(log.timestamp) }}</span>
-                  <span class="ml-2">{{ log.message }}</span>
-                </div>
-                <div v-if="debugLogs.length === 0" class="text-grey text-caption">Aucun log disponible</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-          <!-- Tous les logs mélangés -->  
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              📋 Tous les logs ({{ allLogsCount }})
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="debug-info" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
-                <div v-for="(log, index) in allLogsCombined.slice().reverse()" :key="index" class="log-entry" :class="log.category || log.type">
-                  <span class="text-caption">{{ formatTime(log.timestamp) }}</span>
-                  <span class="ml-1" :class="`log-category-${log.category || log.type}`">[{{ log.category?.toUpperCase() || log.type?.toUpperCase() }}]</span>
-                  <span class="ml-2">{{ log.message }}</span>
-                </div>
-                <div v-if="allLogsCount === 0" class="text-grey text-caption">Aucun log disponible</div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-          
-        </v-expansion-panels>
-      </v-card-text>
-      
-      <v-card-actions>
-        <v-btn @click="clearDebugLogs" color="orange" variant="text">Effacer logs</v-btn>
-        <v-spacer></v-spacer>
-        <v-btn @click="showDebugDialog = false" color="primary">Fermer</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-  <!-- Dialog photo en plein écran -->
-  <v-dialog v-model="showPhotoDialog" max-width="95vw" max-height="95vh">
-    <v-card v-if="selectedPhoto" class="photo-dialog">
-      <v-card-title class="d-flex justify-space-between align-center pa-2">
-        <span class="text-subtitle-1">📸 {{ selectedPhoto.name || `Photo ${selectedPhotoIndex + 1}` }}</span>
-        <v-btn icon="mdi-close" @click="showPhotoDialog = false" variant="text" size="small"></v-btn>
-      </v-card-title>
-      
-      <v-card-text class="pa-2">
-        <div class="photo-container">
-          <v-img
-            :src="selectedPhoto.data"
-            class="photo-full"
-            contain
-            max-height="75vh"
-            @click="showPhotoDialog = false"
-            style="cursor: pointer;"
-          >
-            <!-- Overlay avec bouton fermer accessible -->
-            <div class="photo-overlay-close">
-              <v-btn 
-                icon="mdi-close" 
-                @click.stop="showPhotoDialog = false" 
-                variant="elevated" 
-                color="white"
-                size="small"
-                class="close-btn-overlay"
-              ></v-btn>
-            </div>
-          </v-img>
-        </div>
-      </v-card-text>
-      
-      <v-card-text v-if="selectedPhoto.originalSize || selectedPhoto.compressedSize" class="pa-2">
-        <div class="d-flex justify-space-between text-caption text-grey">
-          <span v-if="selectedPhoto.originalSize">Original: {{ (selectedPhoto.originalSize / 1024).toFixed(1)}}KB</span>
-          <span v-if="selectedPhoto.compressedSize">Compressé: {{ (selectedPhoto.compressedSize / 1024).toFixed(1)}}KB</span>
-          <span v-if="selectedPhoto.timestamp">{{ formatTime(new Date(selectedPhoto.timestamp).getTime()) }}</span>
-        </div>
-      </v-card-text>
-      
-      <!-- Bouton fermer en bas pour accessibilité -->
-      <v-card-actions class="pa-2">
-        <v-spacer></v-spacer>
-        <v-btn @click="showPhotoDialog = false" color="primary">Fermer</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-  <!-- Dialog de confirmation -->
-  <v-dialog v-model="showSuccessDialog" max-width="400">
-    <v-card class="text-center pa-4">
-      <v-icon size="80" color="success" class="mb-4">mdi-check-circle</v-icon>
-      <v-card-title class="text-h5 mb-2">🎉 Audit Terminé !</v-card-title>
-      <v-card-text class="text-body-1">
-        Merci pour votre contribution à la sécurité urbaine.
-        <br>
-        Vos données ont été sauvegardées{{ isOnline ? ' et synchronisées' : ' localement' }}.
-      </v-card-text>
-      <v-card-actions class="justify-center flex-column gap-2">
-        <!-- ✅ NOUVEAU: Boutons améliorés -->
-        <v-btn 
-          color="primary" 
-          @click="startNewAudit"
-          size="large"
-          variant="elevated"
-        >
-          <v-icon start>mdi-plus</v-icon>
-          Nouvel audit
-        </v-btn>
+    <!-- ✅ FIX: Tous les dialogs maintenant dans le div principal -->
+    <!-- Dialog de debug mobile -->
+    <v-dialog v-model="showDebugDialog" max-width="90vw" max-height="80vh">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span>🐛 Console Debug</span>
+          <div class="d-flex gap-2">
+            <v-btn icon="mdi-refresh" @click="refreshGeoInfo" size="small" color="primary"></v-btn>
+            <v-btn icon="mdi-content-copy" @click="copyDebugInfo" size="small" color="secondary"></v-btn>
+            <v-btn icon="mdi-close" @click="showDebugDialog = false" size="small"></v-btn>
+          </div>
+        </v-card-title>
         
-        <div class="d-flex gap-2">
+        <v-card-text style="max-height: 60vh; overflow-y: auto;">
+          <!-- Console Debug Réorganisée -->
+          <v-expansion-panels multiple variant="accordion">
+            
+            <!-- Infos de localisation -->
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                🗺️ Infos de localisation
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info">
+                  <!-- Position actuelle -->
+                  <div class="mb-3">
+                    <strong>📍 Position GPS ({{ locationAccuracy ? locationAccuracy + 'm' : 'N/A' }})</strong>
+                    <div v-if="geoDetails.latitude">Latitude: {{ geoDetails.latitude }}</div>
+                    <div v-if="geoDetails.longitude">Longitude: {{ geoDetails.longitude }}</div>
+                    <div v-if="geoDetails.accuracy">Précision: {{ geoDetails.accuracy }}m</div>
+                    <div v-if="geoDetails.altitude">Altitude: {{ geoDetails.altitude }}m</div>
+                    <div v-if="geoDetails.altitudeAccuracy">Précision altitude: {{ geoDetails.altitudeAccuracy }}m</div>
+                    <div v-if="geoDetails.heading">Cap: {{ geoDetails.heading }}°</div>
+                    <div v-if="geoDetails.speed">Vitesse: {{ geoDetails.speed }}m/s</div>
+                    <div v-if="geoDetails.timestamp">Timestamp: {{ new Date(geoDetails.timestamp).toLocaleString() }}</div>
+                    <div v-if="geoDetails.nearbyInfo">Proximité: {{ geoDetails.nearbyInfo }}</div>
+                    
+                    <!-- Boutons Maps -->
+                    <div v-if="coordinates.lat && coordinates.lng" class="mt-3 d-flex gap-2">
+                      <v-btn 
+                        size="small" 
+                        color="primary" 
+                        :href="getGoogleMapsUrl()" 
+                        target="_blank"
+                        prepend-icon="mdi-map"
+                      >
+                        Google Maps
+                      </v-btn>
+                      <v-btn 
+                        size="small" 
+                        color="secondary" 
+                        :href="getOpenStreetMapUrl()" 
+                        target="_blank"
+                        prepend-icon="mdi-map-outline"
+                      >
+                        OpenStreetMap
+                      </v-btn>
+                    </div>
+                  </div>
+                  
+                  <!-- Historique positions -->
+                  <div class="mb-3">
+                    <strong>🗺️ Historique GPS ({{ geoHistory.length }})</strong>
+                    <div style="max-height: 150px; overflow-y: auto;">
+                      <div v-for="(pos, index) in geoHistory.slice().reverse()" :key="index" class="geo-history">
+                        <div class="text-caption text-grey">{{ formatTime(pos.timestamp) }}</div>
+                        <div>{{ pos.lat.toFixed(6) }}, {{ pos.lng.toFixed(6) }} (±{{ pos.accuracy }}m)</div>
+                      </div>
+                      <div v-if="geoHistory.length === 0" class="text-grey text-caption">Aucune position enregistrée</div>
+                    </div>
+                  </div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+            <!-- Réponses utilisateur -->
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                👤 Réponses Utilisateur ({{ userActions.length }})
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info" style="max-height: 200px; overflow-y: auto;">
+                  <div v-for="(action, index) in userActions.slice().reverse()" :key="index" class="action-log">
+                    <span class="text-caption text-grey">{{ formatTime(action.timestamp) }}</span>
+                    <span class="ml-2">{{ action.message }}</span>
+                  </div>
+                  <div v-if="userActions.length === 0" class="text-grey text-caption">Aucune action enregistrée</div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+            <!-- Infos de sauvegarde -->
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                💾 Infos Sauvegarde
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info">
+                  <div><strong>Dernière sauvegarde:</strong> {{ lastSaved || 'Jamais' }}</div>
+                  <div><strong>Progrès complet:</strong> {{ progressPercentage }}%</div>
+                  <div><strong>Questions répondues:</strong> {{ getAnsweredQuestions() }}/10</div>
+                  <div><strong>Photos ajoutées:</strong> {{ formData.photos.length }}</div>
+                  <div v-if="formData.photos.length > 0"><strong>Taille totale photos:</strong> {{ getTotalPhotoSize() }}</div>
+                  <div v-if="formData.photos.length > 0"><strong>Détail photos:</strong></div>
+                  <div v-for="(photo, index) in formData.photos" :key="index" class="ml-3 text-caption" v-if="formData.photos.length > 0">
+                    • {{ photo.name }}: {{ photo.originalSize ? (photo.originalSize / 1024).toFixed(1) : '?' }}KB → {{ photo.compressedSize ? (photo.compressedSize / 1024).toFixed(1) : '?' }}KB
+                  </div>
+                  <div><strong>Formulaire valide:</strong> {{ isFormValid ? '✅ Oui' : '❌ Non' }}</div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+            <!-- Capacités navigateur -->
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                📱 Capacités Navigateur
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info">
+                  <div><strong>Géolocalisation:</strong> {{ navigator.geolocation ? '✅ Supporté' : '❌ Non supporté' }}</div>
+                  <div><strong>HTTPS:</strong> {{ location.protocol === 'https:' ? '✅ Sécurisé' : '⚠️ Non sécurisé' }}</div>
+                  <div><strong>User Agent:</strong> {{ navigator.userAgent.slice(0, 80) }}...</div>
+                  <div><strong>Permissions API:</strong> {{ navigator.permissions ? '✅ Disponible' : '❌ Non disponible' }}</div>
+                  <div v-if="permissionState"><strong>État permission:</strong> {{ permissionState }}</div>
+                  <div><strong>Plateforme:</strong> {{ navigator.platform || 'Inconnue' }}</div>
+                  <div><strong>Langue:</strong> {{ navigator.language || 'Inconnue' }}</div>
+                  <div><strong>Cookies activés:</strong> {{ navigator.cookieEnabled ? '✅ Oui' : '❌ Non' }}</div>
+                  <div><strong>En ligne:</strong> {{ navigator.onLine ? '✅ Connecté' : '❌ Hors ligne' }}</div>
+                  <div><strong>Mémoire disponible:</strong> {{ navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'Inconnue' }}</div>
+                  <div><strong>Connexion:</strong> {{ getConnectionInfo() }}</div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+            <!-- Console logs -->
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                📜 Logs Console ({{ debugLogs.length }})
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                  <div v-for="(log, index) in debugLogs.slice().reverse()" :key="index" class="log-entry" :class="log.type">
+                    <span class="text-caption">{{ formatTime(log.timestamp) }}</span>
+                    <span class="ml-2">{{ log.message }}</span>
+                  </div>
+                  <div v-if="debugLogs.length === 0" class="text-grey text-caption">Aucun log disponible</div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+            <!-- Tous les logs mélangés -->  
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                📋 Tous les logs ({{ allLogsCount }})
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="debug-info" style="max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                  <div v-for="(log, index) in allLogsCombined.slice().reverse()" :key="index" class="log-entry" :class="log.category || log.type">
+                    <span class="text-caption">{{ formatTime(log.timestamp) }}</span>
+                    <span class="ml-1" :class="`log-category-${log.category || log.type}`">[{{ log.category?.toUpperCase() || log.type?.toUpperCase() }}]</span>
+                    <span class="ml-2">{{ log.message }}</span>
+                  </div>
+                  <div v-if="allLogsCount === 0" class="text-grey text-caption">Aucun log disponible</div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+            
+          </v-expansion-panels>
+        </v-card-text>
+        
+        <v-card-actions>
+          <v-btn @click="clearDebugLogs" color="orange" variant="text">Effacer logs</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn @click="showDebugDialog = false" color="primary">Fermer</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Dialog photo en plein écran -->
+    <v-dialog v-model="showPhotoDialog" max-width="95vw" max-height="95vh">
+      <v-card v-if="selectedPhoto" class="photo-dialog">
+        <v-card-title class="d-flex justify-space-between align-center pa-2">
+          <span class="text-subtitle-1">📸 {{ selectedPhoto.name || `Photo ${selectedPhotoIndex + 1}` }}</span>
+          <v-btn icon="mdi-close" @click="showPhotoDialog = false" variant="text" size="small"></v-btn>
+        </v-card-title>
+        
+        <v-card-text class="pa-2">
+          <div class="photo-container">
+            <v-img
+              :src="selectedPhoto.data"
+              class="photo-full"
+              contain
+              max-height="75vh"
+              @click="showPhotoDialog = false"
+              style="cursor: pointer;"
+            >
+              <!-- Overlay avec bouton fermer accessible -->
+              <div class="photo-overlay-close">
+                <v-btn 
+                  icon="mdi-close" 
+                  @click.stop="showPhotoDialog = false" 
+                  variant="elevated" 
+                  color="white"
+                  size="small"
+                  class="close-btn-overlay"
+                ></v-btn>
+              </div>
+            </v-img>
+          </div>
+        </v-card-text>
+        
+        <v-card-text v-if="selectedPhoto.originalSize || selectedPhoto.compressedSize" class="pa-2">
+          <div class="d-flex justify-space-between text-caption text-grey">
+            <span v-if="selectedPhoto.originalSize">Original: {{ (selectedPhoto.originalSize / 1024).toFixed(1)}}KB</span>
+            <span v-if="selectedPhoto.compressedSize">Compressé: {{ (selectedPhoto.compressedSize / 1024).toFixed(1)}}KB</span>
+            <span v-if="selectedPhoto.timestamp">{{ formatTime(new Date(selectedPhoto.timestamp).getTime()) }}</span>
+          </div>
+        </v-card-text>
+        
+        <!-- Bouton fermer en bas pour accessibilité -->
+        <v-card-actions class="pa-2">
+          <v-spacer></v-spacer>
+          <v-btn @click="showPhotoDialog = false" color="primary">Fermer</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Dialog de confirmation -->
+    <v-dialog v-model="showSuccessDialog" max-width="400">
+      <v-card class="text-center pa-4">
+        <v-icon size="80" color="success" class="mb-4">mdi-check-circle</v-icon>
+        <v-card-title class="text-h5 mb-2">🎉 Audit Terminé !</v-card-title>
+        <v-card-text class="text-body-1">
+          Merci pour votre contribution à la sécurité urbaine.
+          <br>
+          Vos données ont été sauvegardées{{ isOnline ? ' et synchronisées' : ' localement' }}.
+        </v-card-text>
+        <v-card-actions class="justify-center flex-column gap-2">
+          <!-- ✅ NOUVEAU: Boutons améliorés -->
           <v-btn 
-            color="secondary" 
-            @click="goToHistory"
-            variant="outlined"
+            color="primary" 
+            @click="startNewAudit"
+            size="large"
+            variant="elevated"
           >
-            <v-icon start>mdi-history</v-icon>
-            Mes audits
+            <v-icon start>mdi-plus</v-icon>
+            Nouvel audit
           </v-btn>
           
-          <v-btn 
-            color="grey" 
-            @click="goToHome"
-            variant="outlined"
-          >
-            <v-icon start>mdi-home</v-icon>
-            Accueil
-          </v-btn>
-        </div>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+          <div class="d-flex gap-2">
+            <v-btn 
+              color="secondary" 
+              @click="goToHistory"
+              variant="outlined"
+            >
+              <v-icon start>mdi-history</v-icon>
+              Mes audits
+            </v-btn>
+            
+            <v-btn 
+              color="grey" 
+              @click="goToHome"
+              variant="outlined"
+            >
+              <v-icon start>mdi-home</v-icon>
+              Accueil
+            </v-btn>
+          </div>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script setup>
@@ -575,7 +576,8 @@ const addUserAction = (action) => {
   userActions.value.unshift({
     action,
     timestamp,
-    formattedTime: formatTime(timestamp)
+    formattedTime: formatTime(timestamp),
+    message: action // ✅ FIX: Ajout du champ message manquant
   });
 
   // Limiter le nombre d'actions stockées

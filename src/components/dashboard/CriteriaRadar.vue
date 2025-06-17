@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 // Import Chart.js avec tous les composants nécessaires pour le radar
 import {
   Chart,
@@ -175,6 +175,7 @@ const updateChart = () => {
     return
   }
   
+  // ✅ FIX: Créer des copies simples des données pour éviter la récursion avec Vue's reactivity
   const labels = props.scores.map(s => s.criterion_label)
   const data = props.scores.map(s => (s.avg_score / s.max_score) * 100)
   
@@ -193,13 +194,15 @@ const updateChart = () => {
   } else {
     // Créer un nouveau graphique
     const ctx = chartCanvas.value.getContext('2d')
-    chart.value = new Chart(ctx, {
+    
+    // ✅ FIX: Créer le graphique avec des données non-réactives
+    const chartConfig = {
       type: 'radar',
       data: {
-        labels: labels,
+        labels: [...labels], // Copie superficielle
         datasets: [{
           label: 'Score moyen (%)',
-          data: data,
+          data: [...data], // Copie superficielle
           backgroundColor: backgroundColor,
           borderColor: borderColor,
           borderWidth: 2,
@@ -249,7 +252,9 @@ const updateChart = () => {
           }
         }
       }
-    })
+    }
+    
+    chart.value = new Chart(ctx, chartConfig)
   }
 }
 
@@ -267,19 +272,27 @@ const getTrendColor = (trend) => {
 }
 
 // Watchers
-watch(() => props.scores, async () => {
-  await nextTick()
-  updateChart()
+watch(() => props.scores, async (newScores) => {
+  if (newScores && newScores.length > 0) {
+    await nextTick()
+    updateChart()
+  }
 }, { deep: true })
 
 // Lifecycle
 onMounted(() => {
-  // Attendre que le DOM soit prêt
-  nextTick(() => {
-    setTimeout(() => {
-      updateChart()
-    }, 100)
-  })
+  // ✅ FIX: Utiliser un seul setTimeout au lieu de nextTick + setTimeout
+  setTimeout(() => {
+    updateChart()
+  }, 100)
+})
+
+// ✅ FIX: Nettoyer le graphique lors de la destruction du composant
+onBeforeUnmount(() => {
+  if (chart.value) {
+    chart.value.destroy()
+    chart.value = null
+  }
 })
 </script>
 
@@ -359,12 +372,9 @@ canvas {
 
 /* Responsive */
 @media (max-width: 600px) {
-
-  
   .radar-wrapper {
     height: 280px;
   }
-
   
   .trend-item {
     padding: 8px 12px;
@@ -385,6 +395,4 @@ canvas {
     height: 320px;
   }
 }
-
-
 </style>
