@@ -103,6 +103,8 @@
   --bottom-nav-height: 64px;
   --button-height: 48px;
   --touch-target-min: 44px;
+  --border-color: #E0E0E0;
+  --surface-light: var(--onuf-surface-light);
   
   /* === ANIMATIONS === */
   --animation-duration-short: 150ms;
