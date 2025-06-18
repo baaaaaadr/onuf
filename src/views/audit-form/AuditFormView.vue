@@ -1,117 +1,137 @@
 <template>
-  <v-container class="pa-4">
-    <v-card elevation="3" class="mx-auto" max-width="800">
-      <!-- Header -->
-      <v-card-title class="text-h5 primary white--text">
-        Formulaire d'Audit de Sécurité
-      </v-card-title>
+  <div class="audit-form-container">
+    <!-- Header avec design moderne -->
+    <div class="audit-header">
+      <div class="header-content">
+        <h1 class="header-title">
+          <span class="header-emoji">🛡️</span>
+          Audit de Sécurité
+        </h1>
+        <p class="header-subtitle">GPS ou quartier + au moins une question requis</p>
+      </div>
+    </div>
 
-      <!-- Progress Bar -->
-      <AuditProgress :form-data="formData" :total-questions="10" />
+    <!-- Progress Bar -->
+    <AuditProgress :form-data="formData" :total-questions="10" />
 
-      <!-- Form Content -->
-      <v-card-text>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <!-- Location Widget -->
-          <v-card class="mb-4" elevation="0">
-            <v-card-title class="text-h6 pb-2">
-              📍 Localisation GPS
-            </v-card-title>
-            <v-card-text>
-              <LocationWidget
-                v-model="formData.coordinates"
-                :auto-start="true"
-                :show-details="true"
-                map-height="200px"
-                @location-obtained="handleLocationObtained"
-                @error="handleLocationError"
-              />
-            </v-card-text>
-          </v-card>
-
-          <!-- Quartier Selection -->
-          <v-card class="mb-4" elevation="0">
-            <v-card-text>
-              <h3 class="text-h6 mb-3">🏘️ Quartier (optionnel)</h3>
-              <v-select
-                v-model="formData.location"
-                :items="availableLocations"
-                label="Sélectionner un quartier"
-                variant="outlined"
-                prepend-inner-icon="mdi-map-marker"
-                clearable
-              />
-            </v-card-text>
-          </v-card>
-
-          <!-- Questions Component -->
-          <AuditQuestions
-            :form-data="formData"
-            @update:form-data="updateFormData"
+    <!-- Form Content -->
+    <div class="form-content">
+      <!-- Location Widget -->
+      <div class="location-section">
+        <div class="section-header">
+          <span class="section-emoji">📍</span>
+          <h2 class="section-title">Localisation GPS</h2>
+        </div>
+        <div class="widget-container">
+          <LocationWidget
+            v-model="formData.coordinates"
+            :auto-start="true"
+            :show-details="true"
+            map-height="200px"
+            @location-obtained="handleLocationObtained"
+            @error="handleLocationError"
           />
-          
-          <!-- Photo Capture Section -->
-          <v-card class="mt-4" elevation="0">
-            <v-card-title class="text-h6 pb-2">
-              📸 Photos (optionnel)
-            </v-card-title>
-            <v-card-text>
-              <PhotoCapture
-                v-model="formData.photos"
-                :max-photos="5"
-                :max-size-kb="100"
-                :compression-quality="0.8"
-                @photo-added="handlePhotoAdded"
-                @photo-removed="handlePhotoRemoved"
-              />
-            </v-card-text>
-          </v-card>
-          
-          <!-- Comments Section -->
-          <v-card class="mt-4" elevation="0">
-            <v-card-text>
-              <h3 class="text-h6 mb-3">💬 Commentaires</h3>
-              <v-textarea
-                v-model="formData.comment"
-                label="Commentaires additionnels (optionnel)"
-                variant="outlined"
-                rows="3"
-                auto-grow
-              />
-            </v-card-text>
-          </v-card>
-        </v-form>
-      </v-card-text>
+        </div>
+      </div>
+
+      <!-- Quartier Selection -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-emoji">🏘️</span>
+          <h2 class="section-title">Quartier</h2>
+          <p class="section-description">Alternative si le GPS ne fonctionne pas</p>
+        </div>
+        <div class="input-container">
+          <v-select
+            v-model="formData.location"
+            :items="availableLocations"
+            label="Sélectionner un quartier"
+            variant="outlined"
+            prepend-inner-icon="mdi-map-marker"
+            clearable
+            color="primary"
+            density="comfortable"
+            class="custom-select"
+          />
+        </div>
+      </div>
+
+      <!-- Questions Component -->
+      <div class="questions-section">
+        <AuditQuestions
+          :form-data="formData"
+          @update:form-data="updateFormData"
+        />
+      </div>
+      
+      <!-- Photo Capture Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-emoji">📸</span>
+          <h2 class="section-title">Photos (optionnel)</h2>
+          <p class="section-description">Ajoutez des photos pour documenter vos observations</p>
+        </div>
+        <div class="widget-container">
+          <PhotoCapture
+            v-model="formData.photos"
+            :max-photos="5"
+            :max-size-kb="100"
+            :compression-quality="0.8"
+            @photo-added="handlePhotoAdded"
+            @photo-removed="handlePhotoRemoved"
+          />
+        </div>
+      </div>
+      
+      <!-- Comments Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-emoji">💬</span>
+          <h2 class="section-title">Commentaires</h2>
+          <p class="section-description">Partagez vos observations additionnelles</p>
+        </div>
+        <div class="input-container">
+          <v-textarea
+            v-model="formData.comment"
+            label="Commentaires additionnels (optionnel)"
+            variant="outlined"
+            rows="3"
+            auto-grow
+            color="primary"
+            density="comfortable"
+            class="custom-textarea"
+          />
+        </div>
+      </div>
 
       <!-- Actions -->
-      <v-card-actions class="pa-4">
-        <v-spacer></v-spacer>
-        <v-btn
-          color="success"
-          size="large"
+      <div class="actions-section">
+        <button
+          class="submit-btn"
           :disabled="!isFormValid"
-          :loading="loading"
+          :class="{ 'submit-btn--disabled': !isFormValid, 'submit-btn--loading': loading }"
           @click="submitForm"
         >
-          Soumettre l'audit
-          <v-icon right>mdi-check</v-icon>
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+          <span v-if="loading" class="btn-content">
+            <div class="loading-spinner"></div>
+            Envoi en cours...
+          </span>
+          <span v-else class="btn-content">
+            <span class="btn-emoji">✅</span>
+            Soumettre l'audit
+          </span>
+        </button>
+      </div>
+    </div>
 
     <!-- Debug Mode Button -->
-    <v-btn
+    <button
       v-if="debugMode"
-      fab
-      dark
-      fixed
-      bottom
-      right
-      color="info"
+      class="debug-fab"
       @click="showDebugDialog = true"
     >
-      <v-icon>mdi-bug</v-icon>
-    </v-btn>
+      <span>🐛</span>
+    </button>
 
     <!-- Dialogs -->
     <AuditDebugDialog
@@ -130,13 +150,16 @@
     />
 
     <!-- Snackbar for errors -->
-    <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="6000">
-      {{ snackbarText }}
-      <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false">Fermer</v-btn>
-      </template>
-    </v-snackbar>
-  </v-container>
+    <div v-if="snackbar" class="error-snackbar" :class="{ 'show': snackbar }">
+      <div class="snackbar-content">
+        <span class="snackbar-icon">❌</span>
+        <span class="snackbar-text">{{ snackbarText }}</span>
+        <button class="snackbar-close" @click="snackbar = false">
+          <span>✕</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -229,23 +252,29 @@ export default {
     
     // Check if form is valid
     const isFormValid = computed(() => {
-      // Check if all required questions are answered
-      const requiredFields = [
+      // 1. Vérifier la localisation : GPS OU quartier sélectionné
+      const hasGPS = formData.value.coordinates && 
+                     formData.value.coordinates.lat !== null && 
+                     formData.value.coordinates.lng !== null
+                     
+      const hasQuartier = formData.value.location && formData.value.location.trim() !== ''
+      
+      const hasLocation = hasGPS || hasQuartier
+      
+      // 2. Vérifier qu'au moins une question est répondue
+      const questionFields = [
         'lighting', 'walkpath', 'openness', 'feeling',
         'peoplePresence', 'cleanliness', 'naturalSurveillance',
         'spaceDiversity', 'transportAccess', 'formalSecurity'
       ]
       
-      const allFieldsFilled = requiredFields.every(field => 
-        formData.value[field] !== null && formData.value[field] !== undefined
-      )
+      const hasAtLeastOneAnswer = questionFields.some(field => {
+        const value = formData.value[field]
+        return value !== null && value !== undefined && value !== ''
+      })
       
-      // Check if GPS coordinates are available
-      const hasCoordinates = formData.value.coordinates && 
-                           formData.value.coordinates.lat !== null && 
-                           formData.value.coordinates.lng !== null
-      
-      return allFieldsFilled && hasCoordinates && valid.value
+      // Le formulaire est valide si : (GPS OU quartier) ET au moins une question
+      return hasLocation && hasAtLeastOneAnswer
     })
     
     // Initialize component
@@ -257,7 +286,30 @@ export default {
     // Methods
     const handleSubmit = async () => {
       if (!isFormValid.value) {
-        showError("Veuillez répondre à toutes les questions et obtenir votre position GPS")
+        // Message d'erreur contextuel
+        const hasGPS = formData.value.coordinates && 
+                       formData.value.coordinates.lat !== null && 
+                       formData.value.coordinates.lng !== null
+        const hasQuartier = formData.value.location && formData.value.location.trim() !== ''
+        const hasLocation = hasGPS || hasQuartier
+        
+        const questionFields = [
+          'lighting', 'walkpath', 'openness', 'feeling',
+          'peoplePresence', 'cleanliness', 'naturalSurveillance',
+          'spaceDiversity', 'transportAccess', 'formalSecurity'
+        ]
+        const hasAtLeastOneAnswer = questionFields.some(field => {
+          const value = formData.value[field]
+          return value !== null && value !== undefined && value !== ''
+        })
+        
+        if (!hasLocation && !hasAtLeastOneAnswer) {
+          showError("Veuillez obtenir votre position GPS ou choisir un quartier, et répondre à au moins une question")
+        } else if (!hasLocation) {
+          showError("Veuillez obtenir votre position GPS ou choisir un quartier")
+        } else if (!hasAtLeastOneAnswer) {
+          showError("Veuillez répondre à au moins une question")
+        }
         return
       }
       
@@ -318,27 +370,379 @@ export default {
 </script>
 
 <style scoped>
-.v-card {
-  margin-top: 20px;
+/* ==== Variables de la Charte Graphique ==== */
+:root {
+  --primary-gold: #F3C348;
+  --primary-gold-light: #F9D876;
+  --primary-gold-dark: #E5A716;
+  --background-main: #FFFFFF;
+  --surface-light: #F5F3F0;
+  --surface-lighter: #F8F7F5;
+  --text-primary: #181611;
+  --text-secondary: #837B67;
+  --text-disabled: #C4BFB3;
+  --border-light: #E6E3DB;
+  --success-green: #4CAF50;
+  --warning-orange: #FF9800;
+  --error-red: #F44336;
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-button: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-fab: 0 6px 12px rgba(0, 0, 0, 0.15);
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
 }
 
-.v-card-title {
-  background: linear-gradient(45deg, #1976d2 30%, #42a5f5 90%);
+/* ==== Container Principal ==== */
+.audit-form-container {
+  min-height: 100vh;
+  background: var(--background-main);
+  padding-bottom: 32px;
 }
 
-/* Animations pour le GPS */
-@keyframes pulse-gps {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
+/* ==== Header ==== */
+.audit-header {
+  background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.header-content {
+  max-width: 428px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.header-emoji {
+  font-size: 28px;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ==== Form Content ==== */
+.form-content {
+  max-width: 428px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* ==== Sections ==== */
+.section-card, .location-section {
+  background: var(--background-main);
+  border-radius: 12px;
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.location-section {
+  background: var(--surface-light);
+}
+
+.section-header {
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.section-emoji {
+  font-size: 20px;
+}
+
+.section-description {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ==== Widget Containers ==== */
+.widget-container {
+  padding: 0 var(--spacing-md) var(--spacing-md);
+}
+
+.input-container {
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+}
+
+/* ==== Questions Section ==== */
+.questions-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ==== Actions Section ==== */
+.actions-section {
+  margin-top: var(--spacing-xl);
+  padding: 0 var(--spacing-md);
+}
+
+/* ==== Submit Button ==== */
+.submit-btn {
+  width: 100%;
+  background: var(--primary-gold);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 9999px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-weight: 600;
+  font-size: 16px;
+  min-height: 48px;
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-gold-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: scale(0.98) translateY(0);
+  box-shadow: var(--shadow-button);
+}
+
+.submit-btn--disabled {
+  background: var(--text-disabled);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.submit-btn--loading {
+  background: var(--primary-gold-light);
+  cursor: wait;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-emoji {
+  font-size: 18px;
+}
+
+/* ==== Loading Spinner ==== */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--text-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==== Debug FAB ==== */
+.debug-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px 28px 8px 28px;
+  background: var(--primary-gold);
+  border: none;
+  box-shadow: var(--shadow-fab);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.debug-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.debug-fab:active {
+  transform: scale(0.95);
+}
+
+/* ==== Error Snackbar ==== */
+.error-snackbar {
+  position: fixed;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  z-index: 2000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.error-snackbar.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.snackbar-content {
+  background: var(--error-red);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-md);
+  border-radius: 12px;
+  box-shadow: var(--shadow-fab);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  max-width: 428px;
+  margin: 0 auto;
+}
+
+.snackbar-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.snackbar-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.snackbar-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.snackbar-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==== Custom Vuetify Overrides ==== */
+.custom-select :deep(.v-field) {
+  border-radius: 12px;
+}
+
+.custom-select :deep(.v-field__outline) {
+  --v-field-border-color: var(--border-light);
+}
+
+.custom-select :deep(.v-field--focused .v-field__outline) {
+  --v-field-border-color: var(--primary-gold);
+  border-width: 2px;
+}
+
+.custom-textarea :deep(.v-field) {
+  border-radius: 12px;
+}
+
+.custom-textarea :deep(.v-field__outline) {
+  --v-field-border-color: var(--border-light);
+}
+
+.custom-textarea :deep(.v-field--focused .v-field__outline) {
+  --v-field-border-color: var(--primary-gold);
+  border-width: 2px;
+}
+
+/* ==== Responsive ==== */
+@media (max-width: 375px) {
+  .header-title {
+    font-size: 20px;
   }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.3;
+  
+  .section-title {
+    font-size: 16px;
   }
-  100% {
-    transform: scale(2);
+  
+  .submit-btn {
+    font-size: 14px;
+    min-height: 44px;
+  }
+  
+  .form-content {
+    padding: 0 12px;
+  }
+}
+
+/* ==== Animations ==== */
+@keyframes fadeInUp {
+  from {
     opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-card, .location-section {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* ==== Accessibility ==== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus states pour l'accessibilité */
+.submit-btn:focus-visible {
+  outline: 2px solid var(--primary-gold-dark);
+  outline-offset: 2px;
+}
+
+.debug-fab:focus-visible {
+  outline: 2px solid var(--primary-gold-dark);
+  outline-offset: 2px;
 }
 </style>
