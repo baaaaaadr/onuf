@@ -102,7 +102,7 @@ export const useAudits = () => {
 
       // Préparer données pour la base
       const dbAudit = {
-        user_id: currentUser.value.user_id,
+        user_id: currentUser.value.id,
         latitude: latitude,
         longitude: longitude,
         location_text: auditData.location || 'Position non disponible',
@@ -276,7 +276,7 @@ export const useAudits = () => {
       // Préparer données locales enrichies
       const localAudit = {
         ...safeAuditData,
-        userId: currentUser.value.user_id,
+        userId: currentUser.value.id,
         localId: safeAuditData.id,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -334,7 +334,7 @@ export const useAudits = () => {
         
         // Générer nom de fichier
         const fileName = `${auditId}_${index + 1}_${Date.now()}.jpg`
-        const storagePath = `${currentUser.value.user_id}/${fileName}`
+        const storagePath = `${currentUser.value.id}/${fileName}`
         
         // Upload vers storage
         const { error: uploadError } = await supabase.storage
@@ -351,7 +351,7 @@ export const useAudits = () => {
           .from('audit_photos')
           .insert({
             audit_id: auditId,
-            user_id: currentUser.value.user_id,
+            user_id: currentUser.value.id,
             filename: photo.name || fileName,
             storage_path: storagePath,
             original_size: photo.originalSize,
@@ -383,7 +383,7 @@ export const useAudits = () => {
       
       // ✅ IMPORTANT: Filtrer par utilisateur connecté
       const localAudits = allLocalAudits.filter(audit => 
-        audit.userId === currentUser.value?.user_id
+        audit.userId === currentUser.value?.id
       )
       
       console.log(`📋 Local-First: ${localAudits.length} audits locaux de l'utilisateur (sur ${allLocalAudits.length} total)`)
@@ -415,7 +415,7 @@ export const useAudits = () => {
       try {
         const allLocalAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
         const localAudits = allLocalAudits.filter(audit => 
-          audit.userId === currentUser.value?.user_id
+          audit.userId === currentUser.value?.id
         )
         console.log('🚑 Fallback: utilisation local uniquement')
         return { success: true, audits: localAudits }
@@ -444,7 +444,7 @@ export const useAudits = () => {
             mime_type
           )
         `)
-        .eq('user_id', currentUser.value.user_id)
+        .eq('user_id', currentUser.value.id)
         .order('created_at', { ascending: false })
       
       if (fetchError) throw fetchError
@@ -540,7 +540,7 @@ export const useAudits = () => {
       // ✅ IMPORTANT: Vérifier que l'audit appartient à l'utilisateur avant de supprimer
       const auditToDelete = localAudits.find(a => 
         (a.id === auditId || a.localId === auditId) && 
-        a.userId === currentUser.value?.user_id
+        a.userId === currentUser.value?.id
       )
       
       if (!auditToDelete) {
@@ -557,7 +557,7 @@ export const useAudits = () => {
           .from('audits')
           .delete()
           .eq('id', auditId)
-          .eq('user_id', currentUser.value.user_id)
+          .eq('user_id', currentUser.value.id)
 
         if (deleteError && deleteError.code !== 'PGRST116') {
           console.warn('Erreur suppression cloud:', deleteError)
@@ -584,7 +584,7 @@ export const useAudits = () => {
         const { data, error: upsertError } = await supabase
           .from('audit_sessions')
           .upsert({
-            user_id: currentUser.value.user_id,
+            user_id: currentUser.value.id,
             latitude: formData.coordinates?.lat,
             longitude: formData.coordinates?.lng,
             location_text: formData.location,
@@ -615,7 +615,7 @@ export const useAudits = () => {
         const { data, error: fetchError } = await supabase
           .from('audit_sessions')
           .select('*')
-          .eq('user_id', currentUser.value.user_id)
+          .eq('user_id', currentUser.value.id)
           .single()
 
         if (!fetchError && data) {
@@ -657,7 +657,7 @@ export const useAudits = () => {
         const { error: deleteError } = await supabase
           .from('audit_sessions')
           .delete()
-          .eq('user_id', currentUser.value.user_id)
+          .eq('user_id', currentUser.value.id)
 
         if (deleteError && deleteError.code !== 'PGRST116') {
           console.warn('Erreur nettoyage progression cloud:', deleteError)
@@ -680,7 +680,7 @@ export const useAudits = () => {
       
       // ✅ IMPORTANT: Filtrer par utilisateur connecté
       const userAudits = allLocalAudits.filter(audit => 
-        audit.userId === currentUser.value?.user_id
+        audit.userId === currentUser.value?.id
       )
       
       const unsynced = userAudits.filter(audit => !audit.synced)
@@ -717,7 +717,7 @@ export const useAudits = () => {
     try {
       const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
       const userAudits = localAudits.filter(audit => 
-        audit.userId === currentUser.value?.user_id
+        audit.userId === currentUser.value?.id
       )
       
       const totalAudits = userAudits.length

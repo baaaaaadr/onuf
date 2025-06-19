@@ -24,9 +24,23 @@
       </div>
       
       <div v-else-if="scores.length > 0" class="radar-content">
+        <!-- Debug info -->
+        <div v-if="isDev" class="text-caption text-center pa-2 bg-light-blue-lighten-5">
+          📈 Debug: {{ scores.length }} scores | Canvas: {{ !!chartCanvas }}
+        </div>
+        
         <!-- Graphique radar avec hauteur flexible -->
         <div class="radar-wrapper pa-4">
-          <canvas ref="chartCanvas" />
+          <canvas 
+            ref="chartCanvas" 
+            style="max-width: 100%; max-height: 100%;"
+          />
+          
+          <!-- Fallback si le canvas ne fonctionne pas -->
+          <div v-if="showFallback" class="text-center pa-4">
+            <v-icon size="48" color="warning">mdi-chart-radar</v-icon>
+            <p class="text-body-2 mt-2">Graphique en cours de chargement...</p>
+          </div>
         </div>
         
         <!-- Indicateurs de tendance dans un conteneur scrollable si nécessaire -->
@@ -125,6 +139,8 @@ const props = defineProps({
 // Refs
 const chartCanvas = ref(null)
 const chart = ref(null)
+const showFallback = ref(false)
+const isDev = ref(import.meta.env.MODE === 'development')
 
 // Computed
 const totalAudits = computed(() => {
@@ -170,10 +186,27 @@ const getBorderColor = (score, maxScore) => {
 
 // Créer ou mettre à jour le graphique
 const updateChart = () => {
-  if (!chartCanvas.value || !props.scores.length) {
-    console.warn('📈 Canvas ou scores non disponibles')
+  console.log('📈 updateChart appelé:', {
+    canvas: !!chartCanvas.value,
+    scoresLength: props.scores.length,
+    scores: props.scores
+  })
+  
+  showFallback.value = false
+  
+  if (!chartCanvas.value) {
+    console.warn('📈 Canvas non disponible - retry dans 200ms')
+    showFallback.value = true
+    setTimeout(() => updateChart(), 200)
     return
   }
+  
+  if (!props.scores.length) {
+    console.warn('📈 Scores non disponibles')
+    return
+  }
+  
+  console.log('📈 Canvas disponible, création du graphique...')
   
   // ✅ FIX: Créer des copies simples des données pour éviter la récursion avec Vue's reactivity
   const labels = props.scores.map(s => s.criterion_label)
@@ -191,6 +224,8 @@ const updateChart = () => {
     chart.value.data.datasets[0].backgroundColor = backgroundColor
     chart.value.data.datasets[0].borderColor = borderColor
     chart.value.update('active')
+    console.log('✅ Graphique radar mis à jour!')
+    showFallback.value = false
   } else {
     // Créer un nouveau graphique
     const ctx = chartCanvas.value.getContext('2d')
@@ -255,6 +290,8 @@ const updateChart = () => {
     }
     
     chart.value = new Chart(ctx, chartConfig)
+    console.log('✅ Graphique radar créé avec succès!')
+    showFallback.value = false
   }
 }
 
@@ -273,18 +310,24 @@ const getTrendColor = (trend) => {
 
 // Watchers
 watch(() => props.scores, async (newScores) => {
+  console.log('📈 Watch scores changé:', newScores?.length)
   if (newScores && newScores.length > 0) {
     await nextTick()
-    updateChart()
+    // Attendre un peu plus pour être sûr que le canvas est prêt
+    setTimeout(() => {
+      updateChart()
+    }, 100)
   }
 }, { deep: true })
 
 // Lifecycle
 onMounted(() => {
-  // ✅ FIX: Utiliser un seul setTimeout au lieu de nextTick + setTimeout
+  console.log('📈 CriteriaRadar monté')
+  // ✅ FIX: Augmenter le délai et ajouter une vérification
   setTimeout(() => {
+    console.log('📈 onMounted setTimeout - canvas disponible:', !!chartCanvas.value)
     updateChart()
-  }, 100)
+  }, 300)
 })
 
 // ✅ FIX: Nettoyer le graphique lors de la destruction du composant

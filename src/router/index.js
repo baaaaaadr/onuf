@@ -1,88 +1,102 @@
-// src/router/index.js - Version redesign v2.0
+// src/router/index.js - Configuration du router pour ONUF PWA
 import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '../views/DashboardView.vue'
-import AuditFormView from '../views/AuditFormView.vue'
-import AuditsHistoryView from '../views/AuditsHistoryView.vue'
-// Garde l'ancienne IntroView pour migration en douceur
-import IntroView from '../views/IntroView.vue'
-import MobileTestView from '../views/MobileTestView.vue'
+import { useAuth } from '@/composables/useSupabase'
+
+// Import des vues (lazy loading)
+const DashboardView = () => import('@/views/DashboardView.vue')
+const AuditFormView = () => import('@/views/AuditFormView.vue')
+const AuditsHistoryView = () => import('@/views/AuditsHistoryView.vue')
+const MaVilleView = () => import('@/views/MaVilleView.vue')
+const CityHeatmapView = () => import('@/components/dashboard/CityHeatmap.vue')
+
+const routes = [
+  {
+    path: '/',
+    name: 'dashboard',
+    component: DashboardView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Accueil' 
+    }
+  },
+  {
+    path: '/audit',
+    name: 'audit',
+    component: AuditFormView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Nouvel Audit' 
+    }
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: AuditsHistoryView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Mes Audits' 
+    }
+  },
+  {
+    path: '/ma-ville',
+    name: 'ma-ville',
+    component: MaVilleView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Ma Ville' 
+    }
+  },
+  {
+    path: '/heatmap',
+    name: 'heatmap',
+    component: CityHeatmapView,
+    meta: { 
+      requiresAuth: true,
+      title: 'Ma Ville' 
+    }
+  },
+  // Redirections pour compatibilité
+  {
+    path: '/intro',
+    redirect: '/'
+  },
+  {
+    path: '/login',
+    redirect: '/'
+  },
+  // Catch all - redirection vers accueil
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'dashboard',
-      component: DashboardView,
-      meta: {
-        title: 'Accueil',
-        showBottomNav: true
-      }
-    },
-    {
-      path: '/audit',
-      name: 'audit',
-      component: AuditFormView,
-      meta: {
-        title: 'Nouvel Audit',
-        showBottomNav: true
-      }
-    },
-    {
-      path: '/history',
-      name: 'history',
-      component: AuditsHistoryView,
-      meta: {
-        title: 'Mes Audits',
-        showBottomNav: true
-      }
-    },
-    // Route de compatibilité pour l'ancienne intro
-    {
-      path: '/intro',
-      name: 'intro',
-      component: IntroView,
-      meta: {
-        title: 'Introduction',
-        showBottomNav: false
-      }
-    },
-    {
-      path: '/test-mobile',
-      name: 'MobileTest',
-      component: MobileTestView,
-      meta: {
-        title: 'Test Mobile',
-        showBottomNav: false,
-        requiresAuth: true
-      }
-    },
-    // Redirections pour compatibilité
-    {
-      path: '/audits',
-      redirect: '/history'
-    },
-    // Nouvelle route pour la page Ma Ville
-    {
-      path: '/ma-ville',
-      name: 'ma-ville',
-      component: () => import('@/views/MaVilleView.vue'),
-      meta: { 
-        title: 'Ma Ville',
-        showBottomNav: true,
-        requiresAuth: true 
-      }
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
     }
-  ]
+    return { top: 0 }
+  }
 })
 
-// Guard de navigation pour les meta titles
+// Guard de navigation pour l'authentification
 router.beforeEach((to, from, next) => {
+  const { isAuthenticated } = useAuth()
+  
+  // Si la route nécessite une authentification
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    console.log('🔒 Route protégée - utilisateur non authentifié')
+    // Rester sur la page actuelle et laisser App.vue gérer l'affichage du login
+    next(false)
+    return
+  }
+  
   // Mettre à jour le titre de la page
-  if (to.meta?.title) {
-    document.title = `${to.meta.title} - ONUF`
-  } else {
-    document.title = 'ONUF - Agadir Safety Audit'
+  if (to.meta.title) {
+    document.title = `${to.meta.title} | ONUF`
   }
   
   next()

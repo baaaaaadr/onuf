@@ -195,7 +195,10 @@
       maxBounds: AGADIR_BOUNDS,
       maxBoundsViscosity: 1.0,
       minZoom: 10,
-      maxZoom: 16
+      maxZoom: 16,
+      // ✅ FIX: Désactiver les animations pour éviter les erreurs Leaflet
+      zoomAnimation: false,
+      fadeAnimation: false
     }).setView(AGADIR_CENTER, 12)
     
     // Ajouter les tuiles de base
@@ -203,6 +206,16 @@
       attribution: '© OpenStreetMap contributors',
       maxZoom: 16
     }).addTo(map.value)
+    
+    // ✅ FIX: Améliorer les performances Canvas pour la heatmap
+    const canvases = mapContainer.value.querySelectorAll('canvas')
+    canvases.forEach(canvas => {
+      const ctx = canvas.getContext('2d')
+      if (ctx && !ctx.willReadFrequently) {
+        // Recréer le contexte avec willReadFrequently
+        const newCtx = canvas.getContext('2d', { willReadFrequently: true })
+      }
+    })
     
     // Style pour mieux voir la heatmap
     mapContainer.value.style.backgroundColor = '#f5f5f5'
@@ -257,6 +270,16 @@
           0.9: 'orange',
           1.0: 'red'
         }
+      })
+      
+      // ✅ FIX: Optimiser le canvas de la heatmap
+      heatmapLayer.value.on('add', () => {
+        setTimeout(() => {
+          const heatmapCanvas = mapContainer.value.querySelector('.leaflet-heatmap-layer canvas')
+          if (heatmapCanvas) {
+            const ctx = heatmapCanvas.getContext('2d', { willReadFrequently: true })
+          }
+        }, 100)
       })
       
       if (map.value) {

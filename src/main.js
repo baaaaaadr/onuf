@@ -1,7 +1,7 @@
 // src/main.js - Version mise à jour avec nouveaux composables
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './router/index.js'
 import vuetify from './plugins/vuetify'
 
 // Import des styles
@@ -16,6 +16,7 @@ import { globalGeolocation } from './composables/useGeolocation'
 import { getGlobalSyncQueue } from './composables/useSyncQueue'
 // ✅ NOUVEAU: Import des outils de debug
 import mobileDebugLogger from './utils/mobileDebug'
+import './utils/debug' // ← AJOUT pour charger __debugONUF
 
 console.log('🚀 Initialisation ONUF PWA...')
 

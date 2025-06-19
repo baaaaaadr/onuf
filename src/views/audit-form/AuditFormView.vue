@@ -335,7 +335,11 @@ export default {
     }
     
     const goToSubmissions = () => {
-      router.push('/submissions')
+      router.push('/history')
+    }
+    
+    const goToHome = () => {
+      router.push('/')
     }
     
     return {
@@ -371,8 +375,8 @@ export default {
 }
 </script>
 
-<style scoped>
-/* ==== Variables de la Charte Graphique ==== */
+<style>
+/* ==== Variables Globales de la Charte Graphique ==== */
 :root {
   --primary-gold: #F3C348;
   --primary-gold-light: #F9D876;
@@ -401,6 +405,9 @@ export default {
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
 }
+</style>
+
+<style scoped>
 
 /* ==== Container Principal ==== */
 .audit-form-container {
@@ -525,45 +532,67 @@ export default {
 }
 
 .submit-container {
-  background: var(--surface-light);
+  background: var(--background-main);
   border-radius: 12px;
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-card);
+  padding: var(--spacing-lg);
+  box-shadow: none;
+  border: none;
 }
 
-/* ==== Submit Button Renforcé ==== */
+/* ==== Submit Button CTA ==== */
 .submit-btn {
   width: 100%;
   background: var(--primary-gold);
   color: var(--text-primary);
-  border: 2px solid var(--primary-gold-dark);
+  border: none;
   border-radius: 9999px;
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-weight: 600;
-  font-size: 16px;
-  min-height: 48px;
-  box-shadow: var(--shadow-button);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-weight: 700;
+  font-size: 18px;
+  min-height: 56px;
+  box-shadow: 0 4px 16px rgba(243, 195, 72, 0.3);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
 }
 
 .submit-btn:active:not(:disabled) {
   transform: scale(0.98);
   background: var(--primary-gold-dark);
+  box-shadow: 0 2px 8px rgba(243, 195, 72, 0.4);
+}
+
+.submit-btn:active:not(:disabled)::before {
+  left: 100%;
 }
 
 .submit-btn--disabled {
   background: var(--text-disabled);
-  border-color: var(--border-light);
+  color: var(--text-secondary);
   cursor: not-allowed;
   box-shadow: none;
+  opacity: 0.6;
 }
 
 .submit-btn--loading {
   background: var(--primary-gold-light);
-  border-color: var(--primary-gold);
   cursor: wait;
+  box-shadow: 0 2px 8px rgba(243, 195, 72, 0.2);
 }
 
 .btn-content {
@@ -576,7 +605,8 @@ export default {
 }
 
 .btn-emoji {
-  font-size: 18px;
+  font-size: 20px;
+  margin-right: var(--spacing-xs);
 }
 
 /* ==== Loading Spinner ==== */

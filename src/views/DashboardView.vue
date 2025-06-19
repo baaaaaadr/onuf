@@ -181,7 +181,7 @@
                 size="x-small"
                 variant="tonal"
               >
-                {{ gpsAccuracyLevel.text }}
+                {{ safeGpsAccuracyLevel && safeGpsAccuracyLevel.value && safeGpsAccuracyLevel.value.text ? safeGpsAccuracyLevel.value.text : 'Inconnu' }}
               </v-chip>
               <v-icon color="grey-lighten-1">mdi-chevron-right</v-icon>
             </template>
@@ -234,16 +234,16 @@
               class="mb-3"
             >
               <v-icon start>{{ gpsStatusIcon }}</v-icon>
-              {{ gpsAccuracyLevel.text }}
+              {{ safeGpsAccuracyLevel && safeGpsAccuracyLevel.value && safeGpsAccuracyLevel.value.text ? safeGpsAccuracyLevel.value.text : 'Inconnu' }}
             </v-chip>
             
-            <div v-if="currentPosition" class="gps-details">
+            <div v-if="safeCurrentPosition && safeCurrentPosition.value" class="gps-details">
               <div class="text-body-2 mb-2">
                 <strong>Position actuelle :</strong><br>
-                {{ formattedPosition.lat }}, {{ formattedPosition.lng }}
+                {{ safeFormattedPosition && safeFormattedPosition.value && safeFormattedPosition.value.lat ? safeFormattedPosition.value.lat : '0' }}, {{ safeFormattedPosition && safeFormattedPosition.value && safeFormattedPosition.value.lng ? safeFormattedPosition.value.lng : '0' }}
               </div>
               <div class="text-body-2 mb-2">
-                <strong>Précision :</strong> {{ formattedPosition.accuracy }}
+                <strong>Précision :</strong> {{ safeFormattedPosition && safeFormattedPosition.value && safeFormattedPosition.value.accuracy ? safeFormattedPosition.value.accuracy : 'Inconnue' }}
               </div>
               <div class="text-caption text-secondary">
                 Dernière mise à jour : {{ formatLastUpdate }}
@@ -251,7 +251,7 @@
             </div>
             
             <div v-else class="text-body-2 text-secondary">
-              {{ error || 'Géolocalisation en cours d\'activation...' }}
+              {{ safeError && safeError.value ? safeError.value : 'Géolocalisation en cours d\'activation...' }}
             </div>
           </div>
           
@@ -289,7 +289,7 @@
           <v-btn
             color="primary"
             @click="refreshGps"
-            :loading="isTrackingGps"
+            :loading="safeIsTrackingGps && safeIsTrackingGps.value"
           >
             <v-icon start>mdi-refresh</v-icon>
             Actualiser
@@ -469,7 +469,15 @@ const {
   accuracyLevel: gpsAccuracyLevel,
   formattedPosition,
   getCurrentPosition
-} = globalGeolocation
+} = globalGeolocation || {}
+
+// Protection supplémentaire pour les refs GPS
+const safeCurrentPosition = currentPosition || ref(null)
+const safeIsTrackingGps = isTrackingGps || ref(false)
+const safeError = error || ref(null)
+const safeGpsAccuracyLevel = gpsAccuracyLevel || ref({ text: 'Inconnu', color: 'grey', icon: 'mdi-crosshairs-gps' })
+const safeFormattedPosition = formattedPosition || ref({ lat: '0', lng: '0', accuracy: 'Inconnue' })
+const safeGetCurrentPosition = getCurrentPosition || (() => Promise.resolve())
 
 // État local
 const stats = ref({
@@ -501,7 +509,16 @@ const userDisplayName = computed(() => {
 // ✅ CORRECTION: syncStats est un objet reactive, pas une ref
 const safeSyncStats = computed(() => {
   // S'assurer qu'on a toujours un objet valide
-  // syncStats est directement accessible, pas besoin de .value
+  // syncStats peut être undefined au démarrage
+  if (!syncStats) {
+    return {
+      pending: 0,
+      syncing: 0,
+      failed: 0,
+      success: 0
+    }
+  }
+  
   return {
     pending: syncStats.pending || 0,
     syncing: syncStats.syncing || 0,
@@ -539,13 +556,27 @@ const hasSyncIssues = computed(() => {
 const isSyncing = computed(() => safeSyncStats.value.syncing > 0)
 
 // Statut GPS
-const gpsStatusColor = computed(() => gpsAccuracyLevel.value?.color || 'grey')
-const gpsStatusIcon = computed(() => gpsAccuracyLevel.value?.icon || 'mdi-crosshairs-gps')
-const gpsStatusText = computed(() => {
-  if (currentPosition.value) {
-    return `Précision: ${formattedPosition.value?.accuracy || 'Inconnue'}`
+const gpsStatusColor = computed(() => {
+  if (!safeGpsAccuracyLevel || !safeGpsAccuracyLevel.value) {
+    return 'grey'
   }
-  return error.value || 'Activation en cours...'
+  return safeGpsAccuracyLevel.value.color || 'grey'
+})
+
+const gpsStatusIcon = computed(() => {
+  if (!safeGpsAccuracyLevel || !safeGpsAccuracyLevel.value) {
+    return 'mdi-crosshairs-gps'
+  }
+  return safeGpsAccuracyLevel.value.icon || 'mdi-crosshairs-gps'
+})
+
+const gpsStatusText = computed(() => {
+  if (safeCurrentPosition && safeCurrentPosition.value) {
+    const accuracy = safeFormattedPosition && safeFormattedPosition.value ? safeFormattedPosition.value.accuracy : 'Inconnue'
+    return `Précision: ${accuracy}`
+  }
+  const errorText = safeError && safeError.value ? safeError.value : 'Activation en cours...'
+  return errorText
 })
 
 const formatLastUpdate = computed(() => {
@@ -605,7 +636,7 @@ const viewHistory = () => {
 
 const refreshGps = async () => {
   try {
-    await getCurrentPosition()
+    await safeGetCurrentPosition()
   } catch (error) {
     console.error('Erreur actualisation GPS:', error)
   }

@@ -13,10 +13,10 @@
                   🛡️
                 </div>
                 <div class="text-h4 font-weight-bold text-primary mb-2">
-                  ONUF
+                  MANARA
                 </div>
                 <div class="text-subtitle-1 text-secondary">
-                  Agadir Safety Audit
+                  Audit genré des quartiers d'Agadir
                 </div>
               </v-card-title>
               
@@ -357,6 +357,7 @@ const {
   currentUser, 
   isAuthenticated, 
   login, 
+  loginDirect,
   logout: authLogout
 } = useAuth()
 
@@ -403,7 +404,8 @@ const pageTitle = computed(() => {
     'intro': 'Accueil',
     'dashboard': 'Accueil', 
     'audit': 'Nouvel Audit',
-    'history': 'Mes Audits'
+    'history': 'Mes Audits',
+    'ma-ville': 'Ma Ville'
   }
   return titles[route.name] || 'ONUF'
 })
@@ -472,10 +474,34 @@ const handleLogin = async () => {
   loginError.value = ''
   
   try {
+    console.log('🔐 Tentative de connexion (méthode principale)...', { username: loginForm.value.username })
     const result = await login(loginForm.value.username, loginForm.value.password)
     
+    // Si la méthode principale échoue avec "Identifiants incorrects" (RPC retourne tableau vide)
+    // on essaie la méthode fallback
+    if (!result.success && result.error === 'Identifiants incorrects') {
+      console.log('🔄 Méthode principale échouée, tentative fallback...')
+      
+      const fallbackResult = await loginDirect(loginForm.value.username, loginForm.value.password)
+      
+      if (fallbackResult.success) {
+        console.log('✅ Connexion réussie (fallback):', fallbackResult.user)
+        
+        // Connexion réussie avec fallback - forcer rechargement pour éviter les problèmes d'état
+        localStorage.setItem('onuf_user', JSON.stringify(fallbackResult.user))
+        localStorage.setItem('onuf_token', fallbackResult.user.token)
+        localStorage.setItem('onuf_login_success', 'true') // Marquer le succès
+        
+        console.log('🔄 Rechargement de la page après authentification fallback...')
+        window.location.reload()
+      } else {
+        loginError.value = fallbackResult.error
+        return
+      }
+    }
+    
     if (result.success) {
-      console.log('✅ Connexion réussie:', result.user)
+      console.log('✅ Connexion réussie (méthode principale):', result.user)
       showWelcomeMessage.value = true
       
       // Vérifier progression sauvegardée
@@ -488,8 +514,10 @@ const handleLogin = async () => {
       // Vérifier PWA
       checkInstallPrompt()
       
-      // Rediriger vers accueil
-      router.push('/')
+      // Rediriger vers dashboard
+      nextTick(() => {
+        router.replace({ name: 'dashboard' })
+      })
       
     } else {
       loginError.value = result.error
@@ -503,12 +531,18 @@ const handleLogin = async () => {
 }
 
 const logout = async () => {
-  await authLogout()
-  loginForm.value = { username: '', password: '' }
-  loginError.value = ''
-  showWelcomeMessage.value = false
-  showProgressNotification.value = false
-  router.push('/login')
+  try {
+    await authLogout()
+    loginForm.value = { username: '', password: '' }
+    loginError.value = ''
+    showWelcomeMessage.value = false
+    showProgressNotification.value = false
+    
+    // Forcer le rechargement de la page pour éviter les problèmes de state
+    window.location.reload()
+  } catch (error) {
+    console.error('❌ Erreur de déconnexion:', error)
+  }
 }
 
 const goBack = () => {
@@ -586,6 +620,27 @@ const onPageLeave = (el) => {
 onMounted(async () => {
   console.log('🚀 App.vue monté')
   
+  // Vérifier si on arrive après un login fallback réussi
+  const loginSuccess = localStorage.getItem('onuf_login_success')
+  if (loginSuccess === 'true') {
+    localStorage.removeItem('onuf_login_success')
+    showWelcomeMessage.value = true
+    
+    // Vérifier progression sauvegardée
+    try {
+      const progressResult = await loadProgress()
+      if (progressResult.hasProgress) {
+        savedProgressData.value = progressResult.progress
+        showProgressNotification.value = true
+      }
+    } catch (error) {
+      console.error('Erreur chargement progression:', error)
+    }
+    
+    // Vérifier PWA
+    checkInstallPrompt()
+  }
+  
   // Charger compteurs
   try {
     pendingAuditsCount.value = await getPendingAuditsCount()
@@ -597,7 +652,7 @@ onMounted(async () => {
 // Watchers
 watch(() => route.name, (newRoute, oldRoute) => {
   // Déterminer direction de transition
-  const routes = ['intro', 'audit', 'history']
+  const routes = ['dashboard', 'audit', 'history', 'ma-ville']
   const newIndex = routes.indexOf(newRoute)
   const oldIndex = routes.indexOf(oldRoute)
   
@@ -608,7 +663,19 @@ watch(() => route.name, (newRoute, oldRoute) => {
   } else {
     pageTransition.value = 'fade-slide'
   }
-})
+}, { immediate: false })
+
+// Watch pour l'authentification (sans déclenchement immédiat)
+watch(isAuthenticated, (authenticated) => {
+  if (authenticated && route.path === '/') {
+    // Utilisateur connecté et sur la page racine, rediriger vers dashboard
+    nextTick(() => {
+      if (route.name !== 'dashboard') {
+        router.replace({ name: 'dashboard' })
+      }
+    })
+  }
+}, { immediate: false })
 </script>
 
 <style scoped>
