@@ -149,15 +149,26 @@
       </div>
     </div>
 
-    <!-- Input file caché -->
+    <!-- INPUTS FILE SÉPARÉS POUR ÉVITER LES CONFLITS -->
+    <!-- Input pour appareil photo -->
     <input
-      ref="fileInput"
+      ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      multiple
+      style="display: none"
+      @change="handleCameraSelect"
+    />
+
+    <!-- Input pour galerie -->
+    <input
+      ref="galleryInput"
       type="file"
       accept="image/*"
       multiple
-      :capture="captureMode"
       style="display: none"
-      @change="handleFileSelect"
+      @change="handleGallerySelect"
     />
 
     <!-- Menu d'ajout -->
@@ -300,29 +311,65 @@ const showAddMenu = ref(false)
 const showViewer = ref(false)
 const selectedPhoto = ref(null)
 const selectedIndex = ref(0)
-const fileInput = ref(null)
-const captureMode = ref(null)
+
+// REFS SÉPARÉS POUR LES DEUX TYPES D'INPUT
+const cameraInput = ref(null)
+const galleryInput = ref(null)
 
 // Snackbar
 const snackbar = ref(false)
 const snackbarText = ref('')
 const snackbarColor = ref('info')
 
-// Méthodes
+// Méthodes SÉPARÉES pour éviter les conflits
 const openCamera = () => {
   showAddMenu.value = false
-  captureMode.value = 'environment'
-  fileInput.value.click()
+  
+  // Réinitialiser l'input pour éviter tout cache
+  if (cameraInput.value) {
+    cameraInput.value.value = ''
+  }
+  
+  // Déclencher l'input appareil photo
+  setTimeout(() => {
+    cameraInput.value?.click()
+  }, 100) // Petit délai pour s'assurer que le menu est fermé
 }
 
 const openGallery = () => {
   showAddMenu.value = false
-  captureMode.value = null
-  fileInput.value.click()
+  
+  // Réinitialiser l'input pour éviter tout cache
+  if (galleryInput.value) {
+    galleryInput.value.value = ''
+  }
+  
+  // Déclencher l'input galerie
+  setTimeout(() => {
+    galleryInput.value?.click()
+  }, 100) // Petit délai pour s'assurer que le menu est fermé
 }
 
-const handleFileSelect = async (event) => {
+// Handlers SÉPARÉS pour chaque type d'input
+const handleCameraSelect = async (event) => {
+  console.log('📸 Appareil photo déclenché')
+  await handleFileSelect(event, 'camera')
+}
+
+const handleGallerySelect = async (event) => {
+  console.log('🖼️ Galerie déclenchée')
+  await handleFileSelect(event, 'gallery')
+}
+
+const handleFileSelect = async (event, source) => {
   const files = Array.from(event.target.files)
+  
+  if (files.length === 0) {
+    console.log(`Aucun fichier sélectionné depuis ${source}`)
+    return
+  }
+  
+  console.log(`${files.length} fichier(s) sélectionné(s) depuis ${source}`)
   
   if (photos.value.length + files.length > props.maxPhotos) {
     showError(`Maximum ${props.maxPhotos} photos autorisées`)
@@ -335,11 +382,9 @@ const handleFileSelect = async (event) => {
     }
   }
   
-  // Reset input
+  // Reset input pour permettre la sélection du même fichier
   event.target.value = ''
 }
-
-
 
 const processPhoto = async (file) => {
   const photoId = Date.now() + Math.random()
@@ -605,8 +650,6 @@ watch(() => props.modelValue, (newValue) => {
 .empty-icon {
   margin-bottom: var(--spacing-md);
 }
-
-
 
 .action-buttons {
   display: flex;

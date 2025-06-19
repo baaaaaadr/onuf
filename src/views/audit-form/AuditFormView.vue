@@ -64,8 +64,8 @@
         />
       </div>
       
-      <!-- Photo Capture Section -->
-      <div class="section-card">
+      <!-- Photo Capture Section - Cadre distinct renforcé -->
+      <div class="section-card photo-section">
         <div class="section-header">
           <span class="section-emoji">📸</span>
           <h2 class="section-title">Photos (optionnel)</h2>
@@ -83,11 +83,11 @@
         </div>
       </div>
       
-      <!-- Comments Section -->
-      <div class="section-card">
+      <!-- Comments Section - Cadre distinct renforcé -->
+      <div class="section-card comments-section">
         <div class="section-header">
           <span class="section-emoji">💬</span>
-          <h2 class="section-title">Commentaires</h2>
+          <h2 class="section-title">Commentaires (optionnel)</h2>
           <p class="section-description">Partagez vos observations additionnelles</p>
         </div>
         <div class="input-container">
@@ -104,23 +104,25 @@
         </div>
       </div>
 
-      <!-- Actions -->
+      <!-- Actions Section - Bouton avec cadre distinct -->
       <div class="actions-section">
-        <button
-          class="submit-btn"
-          :disabled="!isFormValid"
-          :class="{ 'submit-btn--disabled': !isFormValid, 'submit-btn--loading': loading }"
-          @click="submitForm"
-        >
-          <span v-if="loading" class="btn-content">
-            <div class="loading-spinner"></div>
-            Envoi en cours...
-          </span>
-          <span v-else class="btn-content">
-            <span class="btn-emoji">✅</span>
-            Soumettre l'audit
-          </span>
-        </button>
+        <div class="submit-container">
+          <button
+            class="submit-btn"
+            :disabled="!isFormValid"
+            :class="{ 'submit-btn--disabled': !isFormValid, 'submit-btn--loading': loading }"
+            @click="submitForm"
+          >
+            <span v-if="loading" class="btn-content">
+              <div class="loading-spinner"></div>
+              Envoi en cours...
+            </span>
+            <span v-else class="btn-content">
+              <span class="btn-emoji">✅</span>
+              Soumettre l'audit
+            </span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -382,11 +384,15 @@ export default {
   --text-secondary: #837B67;
   --text-disabled: #C4BFB3;
   --border-light: #E6E3DB;
+  --border-medium: #D1CCC0;
+  --border-strong: #B8B0A0;
   --success-green: #4CAF50;
   --warning-orange: #FF9800;
   --error-red: #F44336;
   --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-card-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-button: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-button-strong: 0 6px 16px rgba(0, 0, 0, 0.15);
   --shadow-fab: 0 6px 12px rgba(0, 0, 0, 0.15);
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -461,6 +467,12 @@ export default {
   background: var(--surface-light);
 }
 
+/* ==== Sections Spéciales avec Fond Gris ==== */
+.photo-section,
+.comments-section {
+  background: var(--surface-light);
+}
+
 .section-header {
   padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
 }
@@ -493,9 +505,13 @@ export default {
   padding: 0 var(--spacing-md) var(--spacing-md);
 }
 
+
+
 .input-container {
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
 }
+
+
 
 /* ==== Questions Section ==== */
 .questions-section {
@@ -505,15 +521,22 @@ export default {
 /* ==== Actions Section ==== */
 .actions-section {
   margin-top: var(--spacing-xl);
-  padding: 0 var(--spacing-md);
+  padding: 0;
 }
 
-/* ==== Submit Button ==== */
+.submit-container {
+  background: var(--surface-light);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ==== Submit Button Renforcé ==== */
 .submit-btn {
   width: 100%;
   background: var(--primary-gold);
   color: var(--text-primary);
-  border: none;
+  border: 2px solid var(--primary-gold-dark);
   border-radius: 9999px;
   padding: var(--spacing-md) var(--spacing-xl);
   font-weight: 600;
@@ -525,25 +548,21 @@ export default {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.submit-btn:hover:not(:disabled) {
-  background: var(--primary-gold-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
 .submit-btn:active:not(:disabled) {
-  transform: scale(0.98) translateY(0);
-  box-shadow: var(--shadow-button);
+  transform: scale(0.98);
+  background: var(--primary-gold-dark);
 }
 
 .submit-btn--disabled {
   background: var(--text-disabled);
+  border-color: var(--border-light);
   cursor: not-allowed;
   box-shadow: none;
 }
 
 .submit-btn--loading {
   background: var(--primary-gold-light);
+  border-color: var(--primary-gold);
   cursor: wait;
 }
 
@@ -552,6 +571,8 @@ export default {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  position: relative;
+  z-index: 1;
 }
 
 .btn-emoji {
@@ -708,6 +729,10 @@ export default {
   .form-content {
     padding: 0 12px;
   }
+  
+  .submit-container {
+    padding: var(--spacing-md);
+  }
 }
 
 /* ==== Animations ==== */
@@ -726,6 +751,14 @@ export default {
   animation: fadeInUp 0.3s ease-out;
 }
 
+.photo-section, .comments-section {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.submit-container {
+  animation: fadeInUp 0.5s ease-out;
+}
+
 /* ==== Accessibility ==== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -737,12 +770,14 @@ export default {
 
 /* Focus states pour l'accessibilité */
 .submit-btn:focus-visible {
-  outline: 2px solid var(--primary-gold-dark);
-  outline-offset: 2px;
+  outline: 3px solid var(--primary-gold-dark);
+  outline-offset: 3px;
 }
 
 .debug-fab:focus-visible {
   outline: 2px solid var(--primary-gold-dark);
   outline-offset: 2px;
 }
+
+
 </style>

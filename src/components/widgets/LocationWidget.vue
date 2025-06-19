@@ -31,7 +31,7 @@
         <v-icon size="48" color="primary" class="rotating">mdi-loading</v-icon>
         <div class="pulse-ring active"></div>
       </div>
-      <p class="text-body-1 mt-3">Recherche de votre position...</p>
+      <p class="text-body-1 mt-3">{{ loadingMessage }}</p>
       <v-progress-linear
         indeterminate
         color="primary"
@@ -198,8 +198,32 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['update:modelValue', 'location-obtained', 'error'])
 
+// ===== CONFIGURATION GÉOGRAPHIQUE AGADIR =====
+// Centre d'Agadir (coordonnées officielles)
+const AGADIR_CENTER = {
+  lat: 30.4278,
+  lng: -9.5981
+}
+
+// Rayon de restriction en kilomètres
+const RESTRICTION_RADIUS_KM = 10
+
+// Calcul des bounds (limites géographiques)
+// 1 degré ≈ 111 km
+const DEGREE_TO_KM = 111
+const latDelta = RESTRICTION_RADIUS_KM / DEGREE_TO_KM
+const lngDelta = RESTRICTION_RADIUS_KM / (DEGREE_TO_KM * Math.cos(AGADIR_CENTER.lat * Math.PI / 180))
+
+const AGADIR_BOUNDS = {
+  north: AGADIR_CENTER.lat + latDelta,
+  south: AGADIR_CENTER.lat - latDelta,
+  east: AGADIR_CENTER.lng + lngDelta,
+  west: AGADIR_CENTER.lng - lngDelta
+}
+
 // État
 const loading = ref(false)
+const loadingMessage = ref('Recherche de votre position...') // Message dynamique pour le feedback progressif
 const refreshing = ref(false)
 const coordinates = ref({ lat: null, lng: null })
 const accuracy = ref(null)
@@ -232,6 +256,14 @@ const accuracyColor = computed(() => {
   return 'error'
 })
 
+// Fonction pour vérifier si les coordonnées sont dans la zone autorisée
+const isWithinAllowedArea = (lat, lng) => {
+  return lat >= AGADIR_BOUNDS.south && 
+         lat <= AGADIR_BOUNDS.north && 
+         lng >= AGADIR_BOUNDS.west && 
+         lng <= AGADIR_BOUNDS.east
+}
+
 // Méthodes
 const requestLocation = async () => {
   if (!navigator.geolocation) {
@@ -240,11 +272,30 @@ const requestLocation = async () => {
   }
 
   loading.value = true
+  // Message initial
+  loadingMessage.value = 'Recherche de votre position...'
+  
+  // Mettre en place un minuteur pour changer le message après 10 secondes
+  const feedbackTimeout = setTimeout(() => {
+    loadingMessage.value = 'La recherche GPS peut prendre plus de temps en mode hors-ligne. Veuillez patienter...'
+  }, 10000) // 10 secondes
   
   const options = {
     enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 0
+    timeout: 60000, // 1 minute pour permettre le "cold start" GPS en mode offline
+    maximumAge: 0   // On veut toujours une position fraîche
+  }
+
+  // Wrapper la fonction de succès pour nettoyer le minuteur
+  const successCallback = (position) => {
+    clearTimeout(feedbackTimeout) // Annuler le changement de message si succès rapide
+    handleSuccess(position)
+  }
+
+  // Wrapper la fonction d'erreur pour nettoyer le minuteur  
+  const errorCallback = (error) => {
+    clearTimeout(feedbackTimeout) // Annuler le changement de message en cas d'erreur
+    handleError(error)
   }
 
   try {
@@ -252,6 +303,7 @@ const requestLocation = async () => {
     if (navigator.permissions) {
       const result = await navigator.permissions.query({ name: 'geolocation' })
       if (result.state === 'denied') {
+        clearTimeout(feedbackTimeout)
         showError('Permission de géolocalisation refusée')
         loading.value = false
         return
@@ -260,26 +312,34 @@ const requestLocation = async () => {
 
     // Obtenir position
     navigator.geolocation.getCurrentPosition(
-      handleSuccess,
-      handleError,
+      successCallback,
+      errorCallback,
       options
     )
 
     // Démarrer le suivi en temps réel
     if (!watchId.value) {
       watchId.value = navigator.geolocation.watchPosition(
-        handleSuccess,
-        handleError,
+        successCallback, // Utiliser le wrapper ici aussi
+        errorCallback,   // Et ici
         options
       )
     }
   } catch (error) {
-    handleError(error)
+    errorCallback(error) // Utiliser le wrapper
   }
 }
 
 const handleSuccess = async (position) => {
   const { latitude, longitude } = position.coords
+  
+  // ===== VÉRIFICATION DE LA ZONE GÉOGRAPHIQUE =====
+  if (!isWithinAllowedArea(latitude, longitude)) {
+    showError('Position en dehors de la zone d\'audit autorisée (Agadir)')
+    loading.value = false
+    refreshing.value = false
+    return
+  }
   
   coordinates.value = { lat: latitude, lng: longitude }
   accuracy.value = position.coords.accuracy
@@ -381,7 +441,15 @@ const updateMap = async () => {
     const { lat, lng } = coordinates.value
 
     if (!map.value) {
-      // Créer la carte
+      // ===== CRÉER LA CARTE AVEC RESTRICTIONS GÉOGRAPHIQUES =====
+      
+      // Définir les bounds Leaflet pour Agadir
+      const bounds = window.L.latLngBounds(
+        [AGADIR_BOUNDS.south, AGADIR_BOUNDS.west], // coin sud-ouest
+        [AGADIR_BOUNDS.north, AGADIR_BOUNDS.east]  // coin nord-est
+      )
+
+      // Créer la carte avec restrictions
       map.value = window.L.map(mapContainer.value, {
         zoomControl: false,
         attributionControl: false,
@@ -390,11 +458,27 @@ const updateMap = async () => {
         doubleClickZoom: true,
         scrollWheelZoom: true,
         boxZoom: false,
-        keyboard: false
+        keyboard: false,
+        // ===== RESTRICTIONS GÉOGRAPHIQUES =====
+        maxBounds: bounds,           // Limite la zone de déplacement
+        maxBoundsViscosity: 1.0,     // Rend les limites "collantes" (1.0 = impossible de sortir)
+        minZoom: 12,                 // Zoom minimum pour ne pas voir trop loin
+        maxZoom: 18                  // Zoom maximum
       }).setView([lat, lng], 16)
 
       // Ajouter les tuiles
       window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map.value)
+
+      // ===== AJOUTER OVERLAY VISUEL DES LIMITES (OPTIONNEL) =====
+      // Cercle de 10km autour d'Agadir pour visualiser la zone
+      const restrictionCircle = window.L.circle([AGADIR_CENTER.lat, AGADIR_CENTER.lng], {
+        radius: RESTRICTION_RADIUS_KM * 1000, // Rayon en mètres
+        color: '#F3C348',
+        fillColor: 'transparent',
+        weight: 2,
+        opacity: 0.3,
+        dashArray: '5, 10'
+      }).addTo(map.value)
 
       // Ajouter le marqueur avec animation
       const pulsingIcon = window.L.divIcon({
@@ -414,8 +498,19 @@ const updateMap = async () => {
         fillOpacity: 0.1,
         weight: 2
       }).addTo(map.value)
+
+      // ===== ÉVÉNEMENTS DE CONTRÔLE =====
+      // Empêcher de sortir de la zone en interceptant les mouvements
+      map.value.on('drag', function() {
+        map.value.panInsideBounds(bounds, { animate: false })
+      })
+
+      map.value.on('zoom', function() {
+        map.value.panInsideBounds(bounds, { animate: false })
+      })
+
     } else {
-      // Mettre à jour position
+      // Mettre à jour position existante
       map.value.setView([lat, lng], 16)
       marker.value.setLatLng([lat, lng])
       accuracyCircle.value.setLatLng([lat, lng])
@@ -428,6 +523,8 @@ const updateMap = async () => {
 
 const refreshLocation = () => {
   refreshing.value = true
+  // Réinitialiser le message pour le refresh
+  loadingMessage.value = 'Actualisation de votre position...'
   requestLocation()
 }
 
