@@ -347,6 +347,7 @@ import BottomNav from '@/components/navigation/BottomNav.vue'
 import PageTransition from '@/components/transitions/PageTransition.vue'
 import SwipeNavigation from '@/components/navigation/SwipeNavigation.vue'
 import MobileDebugViewer from '@/components/debug/MobileDebugViewer.vue'
+import { performStartupCleanup } from '@/utils/cleanupUtils'
 
 // Router
 const route = useRoute()
@@ -619,6 +620,14 @@ const onPageLeave = (el) => {
 // Lifecycle
 onMounted(async () => {
   console.log('🚀 App.vue monté')
+  
+  // Effectuer le nettoyage au démarrage
+  try {
+    const userId = currentUser.value?.id || currentUser.value?.user_id
+    performStartupCleanup(userId)
+  } catch (error) {
+    console.error('Erreur nettoyage au démarrage:', error)
+  }
   
   // Vérifier si on arrive après un login fallback réussi
   const loginSuccess = localStorage.getItem('onuf_login_success')

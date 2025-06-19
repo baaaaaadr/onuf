@@ -4,10 +4,17 @@
       <!-- Icône de succès animée -->
       <div class="success-icon-container">
         <div class="success-circle">
-          <div class="success-checkmark">
-            <div class="checkmark-stem"></div>
-            <div class="checkmark-kick"></div>
-          </div>
+          <svg class="success-checkmark" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              class="checkmark-path"
+              d="M4.5 12.75l6 6 9-13.5"
+              stroke="white"
+              stroke-width="2.5"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </div>
       </div>
       
@@ -214,52 +221,21 @@ const closeDialog = () => {
 
 /* ==== Checkmark Animation ==== */
 .success-checkmark {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   position: relative;
 }
 
-.checkmark-stem,
-.checkmark-kick {
-  position: absolute;
-  background: white;
-  border-radius: 2px;
-  animation: checkmarkDraw 0.4s ease-out 0.6s both;
-}
-
-.checkmark-stem {
-  width: 3px;
-  height: 14px;
-  top: 12px;
-  left: 14px;
-  transform: rotate(45deg);
-  transform-origin: bottom;
-}
-
-.checkmark-kick {
-  width: 3px;
-  height: 8px;
-  top: 16px;
-  left: 8px;
-  transform: rotate(-45deg);
-  transform-origin: bottom;
+.checkmark-path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: checkmarkDraw 0.5s ease-out 0.6s forwards;
 }
 
 @keyframes checkmarkDraw {
-  0% {
-    height: 0;
+  to {
+    stroke-dashoffset: 0;
   }
-  100% {
-    height: var(--checkmark-height);
-  }
-}
-
-.checkmark-stem {
-  --checkmark-height: 14px;
-}
-
-.checkmark-kick {
-  --checkmark-height: 8px;
 }
 
 /* ==== Contenu ==== */

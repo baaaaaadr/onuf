@@ -31,6 +31,8 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ **GÉOCODAGE INVERSE** : Intégration complète avec nearby_info + affichage enrichi
 - ✅ **CORRECTIONS 20/01** : Erreur DashboardView.vue (syncStats.value) corrigée
 - ✅ **NAVIGATION SWIPE** : Navigation par gestes swipe entre les 4 écrans principaux
+- ✅ **CORRIGÉ 19/06** : Erreur "null user_id" lors de la synchronisation
+- ✅ **CORRIGÉ 19/06** : Interface audit (boutons dialogue, réinitialisation formulaire, icône check, messages snackbar)
 
 ## 🏗️ **Architecture**
 - **Frontend** : Vue.js 3 + Vuetify + PWA
@@ -48,6 +50,17 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - **✅ Navigation par swipe** : Ajout de la navigation par gestes tactiles entre les 4 écrans principaux (Accueil, Audit, Historique, Ma Ville)
 - **✅ SwipeNavigation.vue créé** : Composant pour gérer les swipes avec indicateur visuel et support clavier
 - **✅ Intégration dans App.vue** : SwipeNavigation encapsule maintenant le router-view
+
+## 🛠️ **Dernières Réalisations (19 Juin 2025)**
+- **✅ Correction erreur synchronisation** : Correction de l'erreur `null value in column "user_id"` lors de la synchronisation des audits
+- **✅ Validation user_id** : Ajout de validation pour s'assurer que le user_id est toujours présent lors de la sync
+- **✅ Gestion contexte utilisateur** : Utilisation du userId stocké localement au lieu de dépendre du contexte currentUser
+- **✅ Corrections interface audit** : 
+  - Boutons "Mes audits" et "Accueil" fonctionnels dans le dialogue de succès
+  - Réinitialisation du formulaire à la fermeture du dialogue
+  - Icône de check SVG animée correctement affichée
+  - Messages snackbar avec styles appropriés (vert/rouge)
+  - Gestion dynamique de l'état online/offline
 
 ## 📁 **Fichiers Importants**
 - `src/composables/useAudits.js` : Gestion CRUD + stratégie Local-First
@@ -107,7 +120,9 @@ __debugONUF.reloadAudits()       // Forcer reload interface
 - **✅ CORRIGÉ** : Problème d'initialisation de la sync
 - **✅ CORRIGÉ** : Avertissements Vue.js répétés
 - **✅ CORRIGÉ** : Erreur syncStats.value dans DashboardView
-- Voir `FIX_RECURSIVE_ERRORS.md` et `APPLY_FIXES.md`
+- **✅ CORRIGÉ** : Erreur "null user_id" lors de la synchronisation
+- **✅ CORRIGÉ** : Problèmes interface audit (boutons, messages, icônes)
+- Voir `FIX_RECURSIVE_ERRORS.md`, `APPLY_FIXES.md`, `FIX_USER_ID_NULL_ERROR.md` et `FIX_AUDIT_INTERFACE_ISSUES.md`
 
 ## 🚨 **Points d'attention**
 - **Canvas warning dans CityHeatmap** : Avertissement Canvas2D sur willReadFrequently (performance)

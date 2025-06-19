@@ -101,8 +101,17 @@ export const useAudits = () => {
       }
 
       // Préparer données pour la base
+      // CORRIGÉ: Utiliser userId stocké dans auditData au lieu de currentUser.value
+      const userId = auditData.userId || currentUser.value?.id
+      
+      // Validation: s'assurer que user_id n'est jamais null
+      if (!userId) {
+        console.error('❌ Erreur: user_id manquant pour la synchronisation')
+        return { success: false, error: 'user_id manquant' }
+      }
+      
       const dbAudit = {
-        user_id: currentUser.value.id,
+        user_id: userId,
         latitude: latitude,
         longitude: longitude,
         location_text: auditData.location || 'Position non disponible',
@@ -430,6 +439,12 @@ export const useAudits = () => {
   // Récupérer audits utilisateur depuis le cloud avec photos
   const getUserAudits = async () => {
     try {
+      // CORRIGÉ: Vérifier que currentUser existe avant l'appel
+      if (!currentUser.value || !currentUser.value.id) {
+        console.warn('⚠️ getUserAudits: Utilisateur non connecté')
+        return { success: false, error: 'Utilisateur non connecté', audits: [] }
+      }
+      
       const { data, error: fetchError } = await supabase
         .from('audits')
         .select(`

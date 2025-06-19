@@ -75,13 +75,8 @@ export function useAuditSubmission() {
         submissionId.value = result.audit?.id || result.data?.id || auditData.id
         showSuccessDialog.value = true
         
-        if (result.synced) {
-          showSuccess('Audit sauvegardé et synchronisé avec succès')
-        } else if (result.offline) {
-          showSuccess('Audit sauvegardé localement (mode hors ligne)')
-        } else {
-          showSuccess('Audit sauvegardé avec succès')
-        }
+        // Ne pas afficher de snackbar quand on affiche le dialogue de succès
+        // Le statut de synchronisation est déjà affiché dans le dialogue
         
         // Clear progress from localStorage
         localStorage.removeItem('audit_progress')

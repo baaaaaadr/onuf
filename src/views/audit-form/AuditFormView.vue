@@ -147,14 +147,20 @@
     <AuditSuccessDialog
       v-model="showSuccessDialog"
       :submission-id="submissionId"
+      :is-online="isOnline"
       @new-audit="startNewAudit"
-      @view-submissions="goToSubmissions"
+      @go-history="goToSubmissions"
+      @go-home="goToHome"
+      @update:modelValue="handleSuccessDialogClose"
     />
 
-    <!-- Snackbar for errors -->
-    <div v-if="snackbar" class="error-snackbar" :class="{ 'show': snackbar }">
+    <!-- Snackbar for messages -->
+    <div v-if="snackbar" class="snackbar" :class="{ 'show': snackbar, 'snackbar--error': snackbarColor === 'error', 'snackbar--success': snackbarColor === 'success' }">
       <div class="snackbar-content">
-        <span class="snackbar-icon">❌</span>
+        <span class="snackbar-icon">
+          <span v-if="snackbarColor === 'error'">❌</span>
+          <span v-else-if="snackbarColor === 'success'">✅</span>
+        </span>
         <span class="snackbar-text">{{ snackbarText }}</span>
         <button class="snackbar-close" @click="snackbar = false">
           <span>✕</span>
@@ -190,6 +196,16 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const isOnline = ref(navigator.onLine)
+    
+    // Écouter les changements de connexion
+    window.addEventListener('online', () => {
+      isOnline.value = true
+    })
+    
+    window.addEventListener('offline', () => {
+      isOnline.value = false
+    })
     
     // Debug mode
     const { debugMode, showDebugDialog, addDebugLog, addUserAction } = useDebugMode()
@@ -334,6 +350,14 @@ export default {
       initializeFormData()
     }
     
+    const handleSuccessDialogClose = (value) => {
+      showSuccessDialog.value = value
+      if (!value) {
+        // Réinitialiser le formulaire quand on ferme le dialogue
+        initializeFormData()
+      }
+    }
+    
     const goToSubmissions = () => {
       router.push('/history')
     }
@@ -356,6 +380,7 @@ export default {
       snackbar,
       snackbarText,
       snackbarColor,
+      isOnline,
       
       // Computed
       isFormValid,
@@ -366,10 +391,12 @@ export default {
       fillTestData,
       startNewAudit,
       goToSubmissions,
+      goToHome,
       handleLocationObtained,
       handleLocationError,
       handlePhotoAdded,
-      handlePhotoRemoved
+      handlePhotoRemoved,
+      handleSuccessDialogClose
     }
   }
 }
@@ -653,8 +680,8 @@ export default {
   transform: scale(0.95);
 }
 
-/* ==== Error Snackbar ==== */
-.error-snackbar {
+/* ==== Snackbar ==== */
+.snackbar {
   position: fixed;
   bottom: 24px;
   left: 16px;
@@ -665,14 +692,12 @@ export default {
   transition: all 0.3s ease;
 }
 
-.error-snackbar.show {
+.snackbar.show {
   transform: translateY(0);
   opacity: 1;
 }
 
 .snackbar-content {
-  background: var(--error-red);
-  color: white;
   padding: var(--spacing-md) var(--spacing-md);
   border-radius: 12px;
   box-shadow: var(--shadow-fab);
@@ -681,6 +706,19 @@ export default {
   gap: var(--spacing-sm);
   max-width: 428px;
   margin: 0 auto;
+  transition: background-color 0.3s ease;
+}
+
+/* Error variant */
+.snackbar--error .snackbar-content {
+  background: var(--error-red);
+  color: white;
+}
+
+/* Success variant */
+.snackbar--success .snackbar-content {
+  background: var(--success-green);
+  color: white;
 }
 
 .snackbar-icon {
