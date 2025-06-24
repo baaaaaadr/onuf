@@ -654,7 +654,7 @@ export default {
 /* ==== Debug FAB ==== */
 .debug-fab {
   position: fixed;
-  bottom: 24px;
+  bottom: 90px; /* Ajusté pour être au-dessus de la navigation du bas */
   right: 24px;
   width: 56px;
   height: 56px;
@@ -668,7 +668,7 @@ export default {
   justify-content: center;
   font-size: 24px;
   transition: all 0.2s ease;
-  z-index: 1000;
+  z-index: 999; /* Réduit pour rester sous le menu principal */
 }
 
 .debug-fab:hover {

@@ -107,79 +107,11 @@
     
     <!-- Application principale (authentifiée) -->
     <div v-else class="main-app">
-      <!-- Header moderne -->
-      <v-app-bar 
-        flat 
-        color="background"
-        height="56"
-        class="onuf-header"
-        :class="{ 'onuf-header--with-back': showBackButton }"
-      >
-        <!-- Bouton retour -->
-        <template v-if="showBackButton" #prepend>
-          <v-btn 
-            icon="mdi-arrow-left" 
-            @click="goBack"
-            class="mr-2"
-          />
-        </template>
-        
-        <!-- Titre de la page -->
-        <v-app-bar-title class="text-center font-weight-medium">
-          {{ pageTitle }}
-        </v-app-bar-title>
-        
-        <!-- Actions header -->
-        <template #append>
-          <!-- Statut sync -->
-          <v-btn
-            icon
-            size="small"
-            @click="showSyncDialog = true"
-            class="mr-2"
-          >
-            <v-icon :color="syncStatusColor" size="20">{{ syncStatusIcon }}</v-icon>
-            <v-badge
-              v-if="hasSyncIssues"
-              dot
-              color="warning"
-              offset-x="-2"
-              offset-y="-2"
-            />
-          </v-btn>
-          
-          <!-- Menu utilisateur -->
-          <v-menu offset-y>
-            <template v-slot:activator="{ props }">
-              <v-btn icon v-bind="props">
-                <v-avatar size="32" color="primary">
-                  <span class="text-white font-weight-medium">
-                    {{ userInitials }}
-                  </span>
-                </v-avatar>
-              </v-btn>
-            </template>
-            
-            <v-list density="compact" rounded="lg" class="user-menu">
-              <v-list-item>
-                <v-list-item-title class="font-weight-medium">
-                  {{ currentUser?.display_name || 'Utilisateur' }}
-                </v-list-item-title>
-                <v-list-item-subtitle>{{ currentUser?.username }}</v-list-item-subtitle>
-              </v-list-item>
-              
-              <v-divider class="my-1" />
-              
-              <v-list-item @click="logout" class="text-error">
-                <template v-slot:prepend>
-                  <v-icon>mdi-logout</v-icon>
-                </template>
-                <v-list-item-title>Déconnexion</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-      </v-app-bar>
+      <!-- StatusBar avec menu hamburger -->
+      <StatusBar 
+        :page-title="pageTitle" 
+        :show-back-button="showBackButton"
+      />
 
       <!-- Contenu principal avec transitions et swipe navigation -->
       <v-main class="onuf-main">
@@ -261,76 +193,6 @@
         </template>
       </v-snackbar>
 
-      <!-- Dialog synchronisation -->
-      <v-dialog v-model="showSyncDialog" max-width="400" rounded="lg">
-        <v-card rounded="lg">
-          <v-card-title class="d-flex align-center pa-6">
-            <v-icon class="mr-3" :color="syncStatusColor">{{ syncStatusIcon }}</v-icon>
-            <span>Synchronisation</span>
-          </v-card-title>
-          
-          <v-card-text class="px-6 pb-6">
-            <!-- Stats rapides -->
-            <div class="sync-stats-grid mb-4">
-              <div class="sync-stat">
-                <div class="sync-stat-value text-success">{{ safeSyncStats.success }}</div>
-                <div class="sync-stat-label">Synchronisés</div>
-              </div>
-              <div class="sync-stat">
-                <div class="sync-stat-value text-warning">{{ safeSyncStats.pending }}</div>
-                <div class="sync-stat-label">En attente</div>
-              </div>
-              <div class="sync-stat">
-                <div class="sync-stat-value text-error">{{ safeSyncStats.failed }}</div>
-                <div class="sync-stat-label">Échoués</div>
-              </div>
-            </div>
-
-            <!-- Statut -->
-            <v-chip
-              :color="isOnline ? 'success' : 'error'"
-              variant="tonal"
-              size="small"
-              class="mb-4"
-            >
-              <v-icon start>{{ isOnline ? 'mdi-wifi' : 'mdi-wifi-off' }}</v-icon>
-              {{ isOnline ? 'En ligne' : 'Hors ligne' }}
-            </v-chip>
-
-            <!-- Actions -->
-            <div class="d-flex gap-2">
-              <v-btn
-                color="primary"
-                size="small"
-                @click="manualSync"
-                :loading="isSyncing"
-                :disabled="!isOnline"
-              >
-                <v-icon start>mdi-cloud-sync</v-icon>
-                Synchroniser
-              </v-btn>
-              
-              <v-btn
-                v-if="safeSyncStats.failed > 0"
-                color="warning"
-                variant="tonal"
-                size="small"
-                @click="retryFailed"
-                :disabled="!isOnline"
-              >
-                <v-icon start>mdi-refresh</v-icon>
-                Réessayer
-              </v-btn>
-            </div>
-          </v-card-text>
-          
-          <v-card-actions class="px-6 pb-6">
-            <v-spacer />
-            <v-btn variant="text" @click="showSyncDialog = false">Fermer</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
       <!-- Mobile Debug Viewer -->
       <MobileDebugViewer />
     </div>
@@ -343,6 +205,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useSupabase'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
+import StatusBar from '@/components/StatusBar.vue'
 import BottomNav from '@/components/navigation/BottomNav.vue'
 import PageTransition from '@/components/transitions/PageTransition.vue'
 import SwipeNavigation from '@/components/navigation/SwipeNavigation.vue'
@@ -365,9 +228,7 @@ const {
 const { loadProgress, getPendingAuditsCount } = useAudits()
 const { 
   syncStats, 
-  isOnline, 
-  processQueue,
-  retryAllFailed
+  isOnline
 } = getGlobalSyncQueue()
 
 // ✅ CORRECTION: syncStats est un objet reactive, pas une ref
@@ -382,7 +243,6 @@ const safeSyncStats = computed(() => syncStats || {
 const showWelcomeMessage = ref(false)
 const showProgressNotification = ref(false)
 const showInstallPrompt = ref(false)
-const showSyncDialog = ref(false)
 const savedProgressData = ref(null)
 const pageTransition = ref('fade-slide')
 
@@ -436,27 +296,6 @@ const userInitials = computed(() => {
   const name = currentUser.value?.display_name || currentUser.value?.username || 'U'
   return name.substring(0, 2).toUpperCase()
 })
-
-// Synchronisation
-const syncStatusColor = computed(() => {
-  if (safeSyncStats.value.syncing > 0) return 'info'
-  if (safeSyncStats.value.failed > 0) return 'error'
-  if (safeSyncStats.value.pending > 0) return 'warning'
-  return 'success'
-})
-
-const syncStatusIcon = computed(() => {
-  if (safeSyncStats.value.syncing > 0) return 'mdi-cloud-sync'
-  if (safeSyncStats.value.failed > 0) return 'mdi-cloud-alert'
-  if (safeSyncStats.value.pending > 0) return 'mdi-cloud-clock'
-  return 'mdi-cloud-check'
-})
-
-const hasSyncIssues = computed(() => {
-  return safeSyncStats.value.failed > 0 || safeSyncStats.value.pending > 5
-})
-
-const isSyncing = computed(() => safeSyncStats.value.syncing > 0)
 
 // Compteurs pour badges
 const pendingAuditsCount = ref(0)
@@ -546,18 +385,6 @@ const logout = async () => {
   }
 }
 
-const goBack = () => {
-  if (window.history.length > 1) {
-    router.go(-1)
-  } else {
-    router.push('/')
-  }
-}
-
-const createNewAudit = () => {
-  router.push('/audit')
-}
-
 const loadSavedProgress = () => {
   if (savedProgressData.value) {
     router.push({
@@ -588,14 +415,6 @@ const installPWA = async () => {
     }
   }
   showInstallPrompt.value = false
-}
-
-const manualSync = async () => {
-  await processQueue()
-}
-
-const retryFailed = async () => {
-  await retryAllFailed()
 }
 
 const handleNavigation = (path) => {

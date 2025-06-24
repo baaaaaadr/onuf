@@ -5,8 +5,9 @@
     app
     color="primary"
     dark
-    prominent
     class="status-bar"
+    height="56"
+    elevation="2"
   >
     <!-- Ligne principale -->
     <div class="d-flex align-center justify-space-between w-100">
@@ -30,15 +31,6 @@
 
       <!-- Droite: Boutons Navigation + Indicateurs -->
       <div class="d-flex align-center gap-2">
-        <!-- ✅ NOUVEAU: Bouton Home -->
-        <v-btn
-          icon
-          @click="goHome"
-          class="mr-1"
-          v-if="!isHomePage"
-        >
-          <v-icon size="22">mdi-home</v-icon>
-        </v-btn>
         
         <!-- ✅ NOUVEAU: Bouton Nouvel Audit -->
         <v-btn
@@ -51,85 +43,65 @@
           <v-icon size="24">mdi-plus</v-icon>
         </v-btn>
         
-        <!-- Indicateur de sync -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ props }">
-            <v-btn
-              icon
-              small
-              v-bind="props"
-              @click="showSyncDialog = true"
-              :color="syncIndicatorColor"
-            >
-              <v-icon size="20">{{ syncIcon }}</v-icon>
-              <v-badge
-                v-if="syncStats.pending > 0 || syncStats.failed > 0"
-                :content="syncStats.pending + syncStats.failed"
-                color="error"
-                overlap
-                offset-x="10"
-                offset-y="10"
-              />
-            </v-btn>
-          </template>
-          <span>{{ syncTooltip }}</span>
-        </v-tooltip>
-
-        <!-- Indicateur réseau -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ props }">
-            <v-icon
-              v-bind="props"
-              :color="networkColor"
-              size="20"
-            >
-              {{ networkIcon }}
-            </v-icon>
-          </template>
-          <span>{{ isOnline ? 'En ligne' : 'Hors ligne' }}</span>
-        </v-tooltip>
-
-        <!-- Indicateur GPS -->
-        <v-tooltip bottom>
-          <template v-slot:activator="{ props }">
-            <v-btn
-              icon
-              small
-              v-bind="props"
-              @click="toggleGpsDetails"
-              :color="gpsAccuracyLevel.color"
-            >
-              <v-icon size="20">{{ gpsAccuracyLevel.icon }}</v-icon>
-            </v-btn>
-          </template>
-          <span>
-            GPS: {{ gpsAccuracyLevel.text }}
-            <span v-if="formattedPosition">
-              ({{ formattedPosition.accuracy }})
-            </span>
-          </span>
-        </v-tooltip>
-
-        <!-- Menu utilisateur -->
+        <!-- Menu principal -->
         <v-menu offset-y>
           <template v-slot:activator="{ props }">
             <v-btn
               icon
               v-bind="props"
             >
-              <v-avatar size="32" color="secondary">
-                <v-icon>mdi-account</v-icon>
-              </v-avatar>
+              <v-icon>mdi-menu</v-icon>
             </v-btn>
           </template>
           
           <v-list>
-            <v-list-item>
-              <v-list-item-title>{{ currentUser?.display_name || 'Utilisateur' }}</v-list-item-title>
-              <v-list-item-subtitle>{{ currentUser?.username }}</v-list-item-subtitle>
+            <!-- Section Statut Système -->
+            <v-list-subheader>Statut Système</v-list-subheader>
+            
+            <v-list-item @click="showSyncDialog = true">
+              <template v-slot:prepend>
+                <v-icon :color="syncIndicatorColor">{{ syncIcon }}</v-icon>
+              </template>
+              <v-list-item-title>Synchronisation Cloud</v-list-item-title>
+              <v-list-item-subtitle>{{ syncStatusText }}</v-list-item-subtitle>
             </v-list-item>
             
-            <v-divider />
+            <v-list-item>
+              <template v-slot:prepend>
+                <v-icon :color="isOnline ? 'success' : 'error'">
+                  {{ isOnline ? 'mdi-wifi' : 'mdi-wifi-off' }}
+                </v-icon>
+              </template>
+              <v-list-item-title>Connectivité Réseau</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ isOnline ? 'En ligne' : 'Hors ligne' }}
+              </v-list-item-subtitle>
+            </v-list-item>
+            
+            <v-list-item @click="toggleGpsDetails">
+              <template v-slot:prepend>
+                <v-icon :color="gpsAccuracyLevel.color">{{ gpsAccuracyLevel.icon }}</v-icon>
+              </template>
+              <v-list-item-title>Géolocalisation GPS</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ gpsStatusText }}
+              </v-list-item-subtitle>
+            </v-list-item>
+            
+            <v-divider class="my-2" />
+            
+            <!-- Guide de démarrage -->
+            <v-list-item @click="showOnboarding = true">
+              <template v-slot:prepend>
+                <v-icon>mdi-play-circle-outline</v-icon>
+              </template>
+              <v-list-item-title>Guide de démarrage</v-list-item-title>
+            </v-list-item>
+            
+            <v-divider class="my-2" />
+            
+            <!-- Section Utilisateur -->
+            <v-list-subheader>{{ currentUser?.display_name || currentUser?.username || 'Utilisateur' }}</v-list-subheader>
             
             <v-list-item @click="$router.push('/profile')">
               <template v-slot:prepend>
@@ -351,6 +323,75 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Dialog onboarding -->
+  <v-dialog v-model="showOnboarding" max-width="600" rounded="lg">
+    <v-card rounded="lg">
+      <v-card-title class="pa-6 text-center">
+        <div class="onboarding-icon mb-3">🎯</div>
+        <div class="text-h5 font-weight-bold">
+          Bienvenue dans ONUF !
+        </div>
+      </v-card-title>
+      
+      <v-card-text class="px-6">
+        <div class="onboarding-steps">
+          <div class="onboarding-step mb-4">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3 class="text-h6 font-weight-semibold mb-2">📍 Activez votre GPS</h3>
+              <p class="text-body-2">
+                Pour contextualiser vos audits de sécurité, l'application a besoin de votre position.
+              </p>
+            </div>
+          </div>
+          
+          <div class="onboarding-step mb-4">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3 class="text-h6 font-weight-semibold mb-2">🔍 Observez votre environnement</h3>
+              <p class="text-body-2">
+                Évaluez les aspects de sécurité : éclairage, cheminement, ouverture, ressenti...
+              </p>
+            </div>
+          </div>
+          
+          <div class="onboarding-step mb-4">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3 class="text-h6 font-weight-semibold mb-2">📱 Répondez aux questions</h3>
+              <p class="text-body-2">
+                Interface simple avec emojis et choix visuels. Prise de photos optionnelle.
+              </p>
+            </div>
+          </div>
+          
+          <div class="onboarding-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h3 class="text-h6 font-weight-semibold mb-2">☁️ Synchronisation automatique</h3>
+              <p class="text-body-2">
+                Vos données sont sauvegardées localement et synchronisées quand possible.
+              </p>
+            </div>
+          </div>
+        </div>
+      </v-card-text>
+      
+      <v-card-actions class="px-6 pb-6">
+        <v-btn
+          color="primary"
+          size="large"
+          rounded="pill"
+          block
+          @click="startFirstAudit"
+        >
+          <v-icon start>mdi-rocket-launch</v-icon>
+          Commencer mon premier audit !
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -403,6 +444,7 @@ export default {
     // État local
     const showSyncDialog = ref(false)
     const showGpsDetails = ref(false)
+    const showOnboarding = ref(false)
     
     // ✅ NOUVEAU: Variables pour la carte GPS
     const mapContainer = ref(null)
@@ -437,6 +479,20 @@ export default {
       return 'Tous les audits sont synchronisés'
     })
     
+    const syncStatusText = computed(() => {
+      if (syncStats.syncing > 0) return 'Synchronisation en cours...'
+      if (syncStats.failed > 0) return `${syncStats.failed} audit(s) échoué(s)`
+      if (syncStats.pending > 0) return `${syncStats.pending} audit(s) en attente`
+      return 'Tous les audits sont synchronisés'
+    })
+    
+    const gpsStatusText = computed(() => {
+      if (currentPosition.value) {
+        return `Précision: ${formattedPosition.value?.accuracy || 'Inconnue'}`
+      }
+      return error.value || 'Activation en cours...'
+    })
+    
     const networkColor = computed(() => {
       return isOnline.value ? 'success' : 'error'
     })
@@ -450,10 +506,6 @@ export default {
       return formatTime(lastUpdate.value)
     })
     
-    // ✅ NOUVEAU: Déterminer si on est sur la page d'accueil
-    const isHomePage = computed(() => {
-      return route.name === 'AuditsHistory' || route.path === '/' || route.path === '/audits'
-    })
     
     // ✅ NOUVEAU: Hauteur de la carte (plein écran moins header)
     const mapHeight = computed(() => {
@@ -477,13 +529,14 @@ export default {
       }
     }
     
-    // ✅ NOUVEAU: Navigation vers accueil
-    const goHome = () => {
-      router.push('/audits')
-    }
     
     // ✅ NOUVEAU: Navigation vers nouvel audit
     const createNewAudit = () => {
+      router.push('/audit')
+    }
+    
+    const startFirstAudit = () => {
+      showOnboarding.value = false
       router.push('/audit')
     }
     
@@ -743,6 +796,7 @@ export default {
       currentUser,
       showSyncDialog,
       showGpsDetails,
+      showOnboarding,
       mapContainer,
       mapInstance,
       mapLoading,
@@ -764,19 +818,20 @@ export default {
       
       // Computed
       appTitle,
-      isHomePage,
       mapHeight,
       syncIndicatorColor,
       syncIcon,
       syncTooltip,
+      syncStatusText,
+      gpsStatusText,
       networkColor,
       networkIcon,
       formatLastUpdate,
       
       // Methods
       goBack,
-      goHome,
       createNewAudit,
+      startFirstAudit,
       logout,
       toggleGpsDetails,
       refreshGps,
@@ -790,7 +845,7 @@ export default {
 
 <style scoped>
 .status-bar {
-  position: relative;
+  z-index: 1100 !important;
 }
 
 .sync-progress {
@@ -851,5 +906,41 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* === ONBOARDING === */
+.onboarding-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.onboarding-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.onboarding-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1976d2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
 }
 </style>

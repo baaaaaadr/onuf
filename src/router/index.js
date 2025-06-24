@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '@/composables/useSupabase'
 
 // Import des vues (lazy loading)
-const DashboardView = () => import('@/views/DashboardView.vue')
 const AuditFormView = () => import('@/views/AuditFormView.vue')
 const AuditsHistoryView = () => import('@/views/AuditsHistoryView.vue')
 const MaVilleView = () => import('@/views/MaVilleView.vue')
@@ -12,12 +11,7 @@ const CityHeatmapView = () => import('@/components/dashboard/CityHeatmap.vue')
 const routes = [
   {
     path: '/',
-    name: 'dashboard',
-    component: DashboardView,
-    meta: { 
-      requiresAuth: true,
-      title: 'Accueil' 
-    }
+    redirect: '/audit'
   },
   {
     path: '/audit',

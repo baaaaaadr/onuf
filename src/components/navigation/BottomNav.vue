@@ -6,22 +6,6 @@
     :height="navHeight"
     grow
   >
-    <!-- Onglet Accueil -->
-    <v-btn 
-      :value="homeValue"
-      class="nav-btn"
-      :class="{ 'nav-btn--active': isActive(homeValue) }"
-      @click="navigateTo('/')"
-    >
-      <div class="nav-content">
-        <v-icon :size="iconSize">
-          {{ isActive(homeValue) ? 'mdi-home' : 'mdi-home-outline' }}
-        </v-icon>
-        <span class="nav-label">{{ homeLabel }}</span>
-        <div v-if="isActive(homeValue)" class="nav-indicator"></div>
-      </div>
-    </v-btn>
-
     <!-- Onglet Audit -->
     <v-btn 
       :value="auditValue"
@@ -65,6 +49,7 @@
     </v-btn>
 
     <!-- Onglet Ma Ville -->
+    <!--
     <v-btn 
       value="ma-ville"
       class="nav-btn"
@@ -79,6 +64,7 @@
         <div v-if="isActive('ma-ville')" class="nav-indicator"></div>
       </div>
     </v-btn>
+    -->
   </v-bottom-navigation>
 </template>
 
@@ -88,10 +74,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   // Labels personnalisés
-  homeLabel: {
-    type: String,
-    default: 'Accueil'
-  },
   auditLabel: {
     type: String,
     default: 'Audit'
@@ -102,10 +84,6 @@ const props = defineProps({
   },
   
   // Valeurs des onglets
-  homeValue: {
-    type: String,
-    default: 'home'
-  },
   auditValue: {
     type: String,
     default: 'audit'
@@ -151,10 +129,7 @@ const router = useRouter()
 // Onglet actif basé sur la route
 const activeTab = computed(() => {
   const path = route.path
-  if (path === '/' || path.includes('/intro') || path.includes('/dashboard')) {
-    return props.homeValue
-  }
-  if (path.includes('/audit')) {
+  if (path === '/' || path.includes('/audit')) {
     return props.auditValue
   }
   if (path.includes('/history')) {
@@ -163,7 +138,7 @@ const activeTab = computed(() => {
   if (path.includes('/ma-ville')) {
     return props.cityValue
   }
-  return props.homeValue
+  return props.auditValue
 })
 
 // Classes CSS dynamiques
@@ -200,7 +175,7 @@ const navigateTo = (path) => {
 
 // Gestion du changement d'onglet
 const handleTabChange = (newValue) => {
-  let targetPath = '/'
+  let targetPath = '/audit'
   
   switch (newValue) {
     case props.auditValue:
@@ -213,7 +188,7 @@ const handleTabChange = (newValue) => {
       targetPath = '/ma-ville'
       break
     default:
-      targetPath = '/'
+      targetPath = '/audit'
   }
   
   navigateTo(targetPath)
