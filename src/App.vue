@@ -160,7 +160,6 @@
       <v-dialog 
         v-model="showIntroDialog" 
         max-width="500" 
-        persistent
         rounded="lg"
       >
         <v-card rounded="lg">
@@ -229,10 +228,21 @@
               rounded="pill"
               block
               @click="startFirstAudit"
-              class="cta-button"
+              class="cta-button mb-3"
+              style="background-color: #F3C348 !important; color: #181611 !important;"
             >
               <v-icon start>mdi-play-circle</v-icon>
               Faire un audit
+            </v-btn>
+            
+            <v-btn
+              variant="text"
+              size="small"
+              block
+              @click="skipIntroForever"
+              class="skip-button"
+            >
+              Ne plus afficher cette introduction
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -426,11 +436,10 @@ const handleLogin = async () => {
     if (result.success) {
       console.log('✅ Connexion réussie (méthode principale):', result.user)
       
-      // Vérifier si c'est la première connexion pour afficher l'intro
-      const hasSeenIntro = localStorage.getItem('manara_intro_seen')
-      if (!hasSeenIntro) {
+      // Vérifier si l'utilisateur veut voir l'intro
+      const skipIntro = localStorage.getItem('manara_skip_intro')
+      if (skipIntro !== 'true') {
         showIntroDialog.value = true
-        localStorage.setItem('manara_intro_seen', 'true')
       } else {
         showWelcomeMessage.value = true
       }
@@ -522,6 +531,13 @@ const startFirstAudit = () => {
   router.push({ name: 'audit' })
 }
 
+const skipIntroForever = () => {
+  localStorage.setItem('manara_skip_intro', 'true')
+  showIntroDialog.value = false
+  showWelcomeMessage.value = true
+  router.push({ name: 'audit' })
+}
+
 // Transitions
 const onPageEnter = (el) => {
   el.style.opacity = '0'
@@ -549,7 +565,14 @@ onMounted(async () => {
   const loginSuccess = localStorage.getItem('onuf_login_success')
   if (loginSuccess === 'true') {
     localStorage.removeItem('onuf_login_success')
-    showWelcomeMessage.value = true
+    
+    // Vérifier si l'utilisateur veut voir l'intro
+    const skipIntro = localStorage.getItem('manara_skip_intro')
+    if (skipIntro !== 'true') {
+      showIntroDialog.value = true
+    } else {
+      showWelcomeMessage.value = true
+    }
     
     // Vérifier progression sauvegardée
     try {
@@ -791,12 +814,24 @@ watch(isAuthenticated, (authenticated) => {
   height: 56px !important;
   font-weight: 600 !important;
   font-size: 16px !important;
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3) !important;
+  box-shadow: 0 4px 12px rgba(243, 195, 72, 0.3) !important;
 }
 
 .cta-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4) !important;
+  box-shadow: 0 6px 16px rgba(243, 195, 72, 0.4) !important;
+}
+
+.skip-button {
+  color: #837B67 !important;
+  font-size: 12px !important;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.skip-button:hover {
+  opacity: 1;
+  background-color: rgba(131, 123, 103, 0.1) !important;
 }
 
 /* === ACCESSIBILITY === */

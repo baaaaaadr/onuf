@@ -395,6 +395,23 @@ export default {
 </script>
 
 <style>
+/* Classe globale pour forcer les couleurs sur toute l'application */
+* {
+  --onuf-text-primary: #181611;
+  --onuf-text-secondary: #837B67;
+}
+
+/* Corrections spécifiques pour les titres */
+.v-app .section-title,
+.v-app h1, .v-app h2, .v-app h3, .v-app h4, .v-app h5, .v-app h6 {
+  color: #181611 !important;
+}
+
+.v-app .section-description,
+.v-app .text-secondary {
+  color: #837B67 !important;
+}
+
 /* ==== Variables Globales de la Charte Graphique ==== */
 :root {
   --primary-gold: #F3C348;

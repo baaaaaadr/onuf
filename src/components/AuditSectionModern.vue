@@ -115,12 +115,12 @@ const getSelectedOption = computed(() => {
 }
 
 .section-title {
-  color: var(--onuf-text-primary);
+  color: #181611 !important;
   line-height: 1.3;
 }
 
 .section-description {
-  color: var(--onuf-text-secondary);
+  color: #837B67 !important;
   line-height: 1.5;
 }
 

@@ -322,12 +322,48 @@ const handleSelect = (event) => {
   object-fit: contain;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  
+  /* ✨ CORRECTION CENTRAGE: Forcer le centrage et l'ajustement pour les SVG mal exportés */
+  object-position: center center;
+  transform-origin: center center;
+  
+  /* Correction spécifique pour les SVG des premiers groupes (lumi, walk) */
+  max-width: 90%;
+  max-height: 90%;
+  margin: auto;
+  display: block;
+}
+
+/* 🔧 CORRECTION SPECIFIQUE: SVG mal centrés depuis Illustrator */
+.svg-icon[src*="lumi"],
+.svg-icon[src*="walk"] {
+  /* Ajuster la taille pour compenser le mauvais centrage */
+  max-width: 85%;
+  max-height: 85%;
+  transform: translateY(-2px); /* Léger décalage vers le haut */
+}
+
+/* Alternative: Si les noms des fichiers changent, utiliser cette classe sur les conteneurs */
+.option-svg--fix-centering .svg-icon {
+  max-width: 85%;
+  max-height: 85%;
+  transform: translateY(-2px);
 }
 
 /* Animation SVG lorsque sélectionné - SANS glow pour éviter confusion éclairage */
 .option-svg--selected .svg-icon {
   transform: scale(1.15);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) contrast(1.1) saturate(1.2);
+}
+
+/* Correction pour les SVG mal centrés quand sélectionnés */
+.option-svg--selected .svg-icon[src*="lumi"],
+.option-svg--selected .svg-icon[src*="walk"] {
+  transform: scale(1.15) translateY(-2px); /* Combiner l'animation et le centrage */
+}
+
+.option-svg--selected .option-svg--fix-centering .svg-icon {
+  transform: scale(1.15) translateY(-2px);
 }
 
 /* Animation au tap/touch pour mobile */
@@ -339,6 +375,17 @@ const handleSelect = (event) => {
 .option-card:active .option-svg--selected .svg-icon {
   transform: scale(1.05);
   transition: all 0.1s ease;
+}
+
+/* Correction pour les SVG mal centrés pendant les interactions */
+.option-card:active .option-svg--clean .svg-icon[src*="lumi"],
+.option-card:active .option-svg--clean .svg-icon[src*="walk"] {
+  transform: scale(0.95) translateY(-2px);
+}
+
+.option-card:active .option-svg--selected .svg-icon[src*="lumi"],
+.option-card:active .option-svg--selected .svg-icon[src*="walk"] {
+  transform: scale(1.05) translateY(-2px);
 }
 
 .option-placeholder {
