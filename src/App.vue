@@ -156,6 +156,88 @@
         </template>
       </v-snackbar>
 
+      <!-- Pop-up d'introduction pour les observatrices -->
+      <v-dialog 
+        v-model="showIntroDialog" 
+        max-width="500" 
+        persistent
+        rounded="lg"
+      >
+        <v-card rounded="lg">
+          <v-card-title class="pa-6 text-center">
+            <div class="intro-icon mb-3">
+              <v-icon size="64" color="primary">mdi-map-marker-check</v-icon>
+            </div>
+            <div class="text-h5 font-weight-bold">
+              Bienvenue dans MANARA !
+            </div>
+            <div class="text-subtitle-1 text-secondary mt-2">
+              Application d'audit de sécurité des quartiers
+            </div>
+          </v-card-title>
+          
+          <v-card-text class="px-6">
+            <div class="intro-content">
+              <p class="text-body-1 mb-4">
+                En tant qu'observatrice, vous allez évaluer la sécurité et l'accessibilité de votre quartier selon différents critères.
+              </p>
+              
+              <div class="intro-features mb-4">
+                <div class="feature-item d-flex align-center mb-3">
+                  <v-icon class="mr-3" color="primary">mdi-crosshairs-gps</v-icon>
+                  <div>
+                    <div class="font-weight-medium">Localisation automatique</div>
+                    <div class="text-caption text-secondary">Votre position GPS sera détectée automatiquement</div>
+                  </div>
+                </div>
+                
+                <div class="feature-item d-flex align-center mb-3">
+                  <v-icon class="mr-3" color="primary">mdi-clipboard-list</v-icon>
+                  <div>
+                    <div class="font-weight-medium">Questions simples</div>
+                    <div class="text-caption text-secondary">Évaluez l'éclairage, la propreté, le ressenti, etc.</div>
+                  </div>
+                </div>
+                
+                <div class="feature-item d-flex align-center mb-3">
+                  <v-icon class="mr-3" color="primary">mdi-camera</v-icon>
+                  <div>
+                    <div class="font-weight-medium">Photos optionnelles</div>
+                    <div class="text-caption text-secondary">Documentez vos observations si vous le souhaitez</div>
+                  </div>
+                </div>
+              </div>
+              
+              <v-alert
+                type="info"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+              >
+                <div class="text-body-2">
+                  <v-icon class="mr-2">mdi-information</v-icon>
+                  Vos données sont sauvegardées localement et synchronisées de manière sécurisée.
+                </div>
+              </v-alert>
+            </div>
+          </v-card-text>
+          
+          <v-card-actions class="px-6 pb-6">
+            <v-btn
+              color="primary"
+              size="large"
+              rounded="pill"
+              block
+              @click="startFirstAudit"
+              class="cta-button"
+            >
+              <v-icon start>mdi-play-circle</v-icon>
+              Faire un audit
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- Progression retrouvée -->
       <v-snackbar
         v-model="showProgressNotification"
@@ -243,6 +325,7 @@ const safeSyncStats = computed(() => syncStats || {
 const showWelcomeMessage = ref(false)
 const showProgressNotification = ref(false)
 const showInstallPrompt = ref(false)
+const showIntroDialog = ref(false)
 const savedProgressData = ref(null)
 const pageTransition = ref('fade-slide')
 
@@ -342,7 +425,15 @@ const handleLogin = async () => {
     
     if (result.success) {
       console.log('✅ Connexion réussie (méthode principale):', result.user)
-      showWelcomeMessage.value = true
+      
+      // Vérifier si c'est la première connexion pour afficher l'intro
+      const hasSeenIntro = localStorage.getItem('manara_intro_seen')
+      if (!hasSeenIntro) {
+        showIntroDialog.value = true
+        localStorage.setItem('manara_intro_seen', 'true')
+      } else {
+        showWelcomeMessage.value = true
+      }
       
       // Vérifier progression sauvegardée
       const progressResult = await loadProgress()
@@ -354,9 +445,9 @@ const handleLogin = async () => {
       // Vérifier PWA
       checkInstallPrompt()
       
-      // Rediriger vers dashboard
+      // Rediriger vers audit directement
       nextTick(() => {
-        router.replace({ name: 'dashboard' })
+        router.replace({ name: 'audit' })
       })
       
     } else {
@@ -423,6 +514,12 @@ const handleNavigation = (path) => {
 
 const handleTabChange = (tab) => {
   console.log('Onglet changé:', tab)
+}
+
+const startFirstAudit = () => {
+  showIntroDialog.value = false
+  showWelcomeMessage.value = true
+  router.push({ name: 'audit' })
 }
 
 // Transitions
@@ -673,6 +770,35 @@ watch(isAuthenticated, (authenticated) => {
   }
 }
 
+/* === INTRO DIALOG === */
+.intro-icon {
+  display: flex;
+  justify-content: center;
+}
+
+.intro-content {
+  text-align: left;
+}
+
+.feature-item {
+  background: rgba(25, 118, 210, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 3px solid var(--v-theme-primary);
+}
+
+.cta-button {
+  height: 56px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3) !important;
+}
+
+.cta-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4) !important;
+}
+
 /* === ACCESSIBILITY === */
 @media (prefers-reduced-motion: reduce) {
   .fade-slide-enter-active,
@@ -683,6 +809,10 @@ watch(isAuthenticated, (authenticated) => {
   .slide-right-leave-active,
   .onuf-fab {
     transition: none !important;
+  }
+  
+  .cta-button:hover {
+    transform: none;
   }
 }
 

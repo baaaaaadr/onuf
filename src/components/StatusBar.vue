@@ -22,7 +22,7 @@
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
         
-        <v-icon class="mr-2" size="28">mdi-shield-check</v-icon>
+        <v-icon class="mr-2" size="28">mdi-map-marker-check</v-icon>
         <div>
           <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
           <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
@@ -32,16 +32,7 @@
       <!-- Droite: Boutons Navigation + Indicateurs -->
       <div class="d-flex align-center gap-2">
         
-        <!-- ✅ NOUVEAU: Bouton Nouvel Audit -->
-        <v-btn
-          icon
-          color="success"
-          @click="createNewAudit"
-          size="large"
-          class="mr-2"
-        >
-          <v-icon size="24">mdi-plus</v-icon>
-        </v-btn>
+
         
         <!-- Menu principal -->
         <v-menu offset-y>
@@ -455,7 +446,7 @@ export default {
     
     // Computed
     const appTitle = computed(() => {
-      return import.meta.env.VITE_APP_TITLE || 'ONUF - Agadir'
+      return 'MANARA'
     })
     
     const syncIndicatorColor = computed(() => {
@@ -527,12 +518,6 @@ export default {
       } else {
         router.push('/')
       }
-    }
-    
-    
-    // ✅ NOUVEAU: Navigation vers nouvel audit
-    const createNewAudit = () => {
-      router.push('/audit')
     }
     
     const startFirstAudit = () => {
@@ -830,7 +815,6 @@ export default {
       
       // Methods
       goBack,
-      createNewAudit,
       startFirstAudit,
       logout,
       toggleGpsDetails,

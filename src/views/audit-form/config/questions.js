@@ -44,7 +44,7 @@ import police4 from '@/assets/icons/police4.svg'
 export const questions = [
   {
     id: 'lighting',
-    title: '💡 Éclairage',
+    title: 'Éclairage',
     description: 'Disponibilité de suffisamment de lumière pour voir tout autour de vous.',
     options: [
       { 
@@ -87,7 +87,7 @@ export const questions = [
   },
   {
     id: 'walkpath',
-    title: '🚶 Cheminement',
+    title: 'Cheminement',
     description: 'Soit un trottoir, soit une route avec de l\'espace pour marcher.',
     options: [
       { 
@@ -130,7 +130,7 @@ export const questions = [
   },
   {
     id: 'openness',
-    title: '👁️ Ouverture',
+    title: 'Ouverture',
     description: 'Capacité de voir et de se déplacer dans toutes les directions.',
     options: [
       { 
@@ -169,7 +169,7 @@ export const questions = [
   },
   {
     id: 'feeling',
-    title: '😊 Ressenti',
+    title: 'Ressenti',
     description: 'Comment vous sentez-vous dans cet endroit en ce moment ?',
     options: [
       { 
@@ -208,7 +208,7 @@ export const questions = [
   },
   {
     id: 'peoplePresence',
-    title: '👥 Présence humaine',
+    title: 'Présence humaine',
     description: 'Y a-t-il d\'autres personnes autour de vous ?',
     options: [
       { 
@@ -247,7 +247,7 @@ export const questions = [
   },
   {
     id: 'cleanliness',
-    title: '🧹 Propreté',
+    title: 'Propreté',
     description: 'État général de propreté et d\'entretien du lieu.',
     options: [
       { 
@@ -286,7 +286,7 @@ export const questions = [
   },
   {
     id: 'naturalSurveillance',
-    title: '👁️‍🗨️ Surveillance Naturelle',
+    title: 'Surveillance Naturelle',
     description: 'Le sentiment d\'être visible depuis les bâtiments (Yeux sur la rue).',
     options: [
       { 
@@ -325,7 +325,7 @@ export const questions = [
   },
   {
     id: 'spaceDiversity',
-    title: '👨‍👩‍👧‍👦 Mixité de l\'Espace',
+    title: 'Mixité de l\'Espace',
     description: 'La présence et la diversité des genres et des âges (femmes, enfants).',
     options: [
       { 
@@ -364,7 +364,7 @@ export const questions = [
   },
   {
     id: 'transportAccess',
-    title: '🚌 Accès aux Transports',
+    title: 'Accès aux Transports',
     description: 'La proximité et la facilité d\'accès aux transports en commun.',
     options: [
       { 
@@ -403,7 +403,7 @@ export const questions = [
   },
   {
     id: 'formalSecurity',
-    title: '👮 Sécurité Formelle',
+    title: 'Sécurité Formelle',
     description: 'La présence visible de la police ou de gardiens de sécurité.',
     options: [
       { 

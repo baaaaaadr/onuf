@@ -4,22 +4,21 @@
     <div class="audit-header">
       <div class="header-content">
         <h1 class="header-title">
-          <span class="header-emoji">🛡️</span>
+          <v-icon size="28" class="mr-2">mdi-security</v-icon>
           Audit de Sécurité
         </h1>
-        <p class="header-subtitle">GPS ou quartier + au moins une question requis</p>
+        <p class="header-subtitle">Si vous n'êtes pas localisés automatiquement, alors choisissez votre quartier</p>
       </div>
     </div>
 
-    <!-- Progress Bar -->
-    <AuditProgress :form-data="formData" :total-questions="10" />
+
 
     <!-- Form Content -->
     <div class="form-content">
       <!-- Location Widget -->
       <div class="location-section">
         <div class="section-header">
-          <span class="section-emoji">📍</span>
+          <v-icon class="section-icon">mdi-crosshairs-gps</v-icon>
           <h2 class="section-title">Localisation GPS</h2>
         </div>
         <div class="widget-container">
@@ -37,7 +36,7 @@
       <!-- Quartier Selection -->
       <div class="section-card">
         <div class="section-header">
-          <span class="section-emoji">🏘️</span>
+          <v-icon class="section-icon">mdi-home-group</v-icon>
           <h2 class="section-title">Quartier</h2>
           <p class="section-description">Alternative si le GPS ne fonctionne pas</p>
         </div>
@@ -67,7 +66,7 @@
       <!-- Photo Capture Section - Cadre distinct renforcé -->
       <div class="section-card photo-section">
         <div class="section-header">
-          <span class="section-emoji">📸</span>
+          <v-icon class="section-icon">mdi-camera</v-icon>
           <h2 class="section-title">Photos (optionnel)</h2>
           <p class="section-description">Ajoutez des photos pour documenter vos observations</p>
         </div>
@@ -86,7 +85,7 @@
       <!-- Comments Section - Cadre distinct renforcé -->
       <div class="section-card comments-section">
         <div class="section-header">
-          <span class="section-emoji">💬</span>
+          <v-icon class="section-icon">mdi-comment-text</v-icon>
           <h2 class="section-title">Commentaires (optionnel)</h2>
           <p class="section-description">Partagez vos observations additionnelles</p>
         </div>
@@ -118,7 +117,7 @@
               Envoi en cours...
             </span>
             <span v-else class="btn-content">
-              <span class="btn-emoji">✅</span>
+              <v-icon class="mr-2">mdi-check-circle</v-icon>
               Soumettre l'audit
             </span>
           </button>
@@ -126,14 +125,7 @@
       </div>
     </div>
 
-    <!-- Debug Mode Button -->
-    <button
-      v-if="debugMode"
-      class="debug-fab"
-      @click="showDebugDialog = true"
-    >
-      <span>🐛</span>
-    </button>
+
 
     <!-- Dialogs -->
     <AuditDebugDialog
@@ -174,7 +166,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AuditQuestions from './components/AuditQuestions.vue'
-import AuditProgress from './components/AuditProgress.vue'
+
 import AuditDebugDialog from './components/AuditDebugDialog.vue'
 import AuditSuccessDialog from './components/AuditSuccessDialog.vue'
 import LocationWidget from '@/components/widgets/LocationWidget.vue'
@@ -188,7 +180,7 @@ export default {
   name: 'AuditFormView',
   components: {
     AuditQuestions,
-    AuditProgress,
+
     AuditDebugDialog,
     AuditSuccessDialog,
     LocationWidget,
@@ -468,9 +460,7 @@ export default {
   gap: var(--spacing-sm);
 }
 
-.header-emoji {
-  font-size: 28px;
-}
+
 
 .header-subtitle {
   font-size: 14px;
@@ -515,15 +505,16 @@ export default {
   font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
   margin: 0 0 var(--spacing-xs);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
 }
 
-.section-emoji {
-  font-size: 20px;
+.section-icon {
+  margin-right: 8px !important;
+  color: var(--primary-gold) !important;
 }
 
 .section-description {
@@ -631,10 +622,7 @@ export default {
   z-index: 1;
 }
 
-.btn-emoji {
-  font-size: 20px;
-  margin-right: var(--spacing-xs);
-}
+
 
 /* ==== Loading Spinner ==== */
 .loading-spinner {

@@ -53,7 +53,7 @@
                   {{ safeSyncStats.failed > 0 ? 'mdi-cloud-alert' : 'mdi-cloud-check' }}
                 </v-icon>
                 <div class="text-h6">{{ safeSyncStats.success }}</div>
-                <div class="text-caption">Sync</div>
+                <div class="text-caption">Synchronisés</div>
               </v-card-text>
             </v-card>
           </v-col>
