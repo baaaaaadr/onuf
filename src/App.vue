@@ -159,79 +159,112 @@
       <!-- Pop-up d'introduction pour les observatrices -->
       <v-dialog 
         v-model="showIntroDialog" 
-        max-width="500" 
-        rounded="lg"
+        max-width="500"
+        :fullscreen="$vuetify.display.mobile"
         scrollable
         class="intro-dialog"
+        :class="{ 'intro-dialog--mobile': $vuetify.display.mobile }"
       >
-        <v-card rounded="lg" class="intro-card">
-          <v-card-title class="intro-header pa-4 text-center">
-            <!-- Bouton fermer sur mobile -->
-            <v-btn 
-              icon="mdi-close" 
-              variant="text" 
-              size="small" 
-              class="close-btn d-md-none"
+        <v-card class="intro-card" :class="{ 'intro-card--mobile': $vuetify.display.mobile }">
+          <!-- Header -->
+          <v-toolbar 
+            v-if="$vuetify.display.mobile"
+            color="transparent" 
+            flat 
+            class="intro-toolbar"
+          >
+            <v-toolbar-title class="text-h6 font-weight-bold text-center w-100">
+              Bienvenue dans MANARA !
+            </v-toolbar-title>
+            <v-btn
+              icon="mdi-close"
               @click="showIntroDialog = false"
-            />
-            
-            <div class="intro-icon mb-2">
+            ></v-btn>
+          </v-toolbar>
+          
+          <!-- Desktop Header -->
+          <v-card-title v-if="!$vuetify.display.mobile" class="intro-header text-center pa-6">
+            <div class="intro-icon mb-3">
               <v-icon size="48" color="primary">mdi-map-marker-check</v-icon>
             </div>
-            <div class="text-h5 font-weight-bold">
+            <div class="text-h5 font-weight-bold mb-2">
               Bienvenue dans MANARA !
             </div>
-            <div class="text-subtitle-1 text-secondary mt-1">
+            <div class="text-subtitle-1 text-secondary">
               Application d'audit de sécurité des quartiers
             </div>
           </v-card-title>
           
-          <v-card-text class="intro-body px-4 pb-4">
-            <div class="intro-content">
-              <p class="text-body-1 mb-3">
-                En tant qu'observatrice, vous allez évaluer la sécurité et l'accessibilité de votre quartier selon différents critères.
-              </p>
-              
-              <div class="intro-features mb-3">
-                <div class="feature-item d-flex align-center mb-2">
-                  <v-icon class="mr-3" color="primary" size="20">mdi-crosshairs-gps</v-icon>
-                  <div>
-                    <div class="font-weight-medium text-body-2">Localisation automatique</div>
+          <!-- Content -->
+          <v-card-text class="intro-content" :class="{ 'intro-content--mobile': $vuetify.display.mobile }">
+            <!-- Mobile Icon -->
+            <div v-if="$vuetify.display.mobile" class="text-center mb-4">
+              <v-icon size="64" color="primary">mdi-map-marker-check</v-icon>
+              <div class="text-subtitle-1 text-secondary mt-2">
+                Application d'audit de sécurité des quartiers
+              </div>
+            </div>
+            
+            <p class="text-body-1 mb-4">
+              En tant qu'observatrice, vous allez évaluer la sécurité et l'accessibilité de votre quartier selon différents critères.
+            </p>
+            
+            <div class="intro-features mb-4">
+              <div class="feature-item mb-3">
+                <div class="d-flex align-center">
+                  <div class="feature-icon mr-3">
+                    <v-icon color="primary" size="24">mdi-crosshairs-gps</v-icon>
+                  </div>
+                  <div class="feature-content">
+                    <div class="font-weight-medium mb-1">Localisation automatique</div>
                     <div class="text-caption text-secondary">Votre position GPS sera détectée automatiquement</div>
-                  </div>
-                </div>
-                
-                <div class="feature-item d-flex align-center mb-2">
-                  <v-icon class="mr-3" color="primary" size="20">mdi-clipboard-list</v-icon>
-                  <div>
-                    <div class="font-weight-medium text-body-2">Questions simples</div>
-                    <div class="text-caption text-secondary">Évaluez l'éclairage, la propreté, le ressenti, etc.</div>
-                  </div>
-                </div>
-                
-                <div class="feature-item d-flex align-center mb-2">
-                  <v-icon class="mr-3" color="primary" size="20">mdi-camera</v-icon>
-                  <div>
-                    <div class="font-weight-medium text-body-2">Photos optionnelles</div>
-                    <div class="text-caption text-secondary">Documentez vos observations si vous le souhaitez</div>
                   </div>
                 </div>
               </div>
               
-              <v-alert
-                type="info"
-                variant="tonal"
-                rounded="lg"
-                class="mb-3 text-body-2"
-                density="compact"
-              >
-                <v-icon class="mr-2" size="16">mdi-information</v-icon>
-                Vos données sont sauvegardées localement et synchronisées de manière sécurisée.
-              </v-alert>
+              <div class="feature-item mb-3">
+                <div class="d-flex align-center">
+                  <div class="feature-icon mr-3">
+                    <v-icon color="primary" size="24">mdi-clipboard-list</v-icon>
+                  </div>
+                  <div class="feature-content">
+                    <div class="font-weight-medium mb-1">Questions simples</div>
+                    <div class="text-caption text-secondary">Évaluez l'éclairage, la propreté, le ressenti, etc.</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="feature-item mb-3">
+                <div class="d-flex align-center">
+                  <div class="feature-icon mr-3">
+                    <v-icon color="primary" size="24">mdi-camera</v-icon>
+                  </div>
+                  <div class="feature-content">
+                    <div class="font-weight-medium mb-1">Photos optionnelles</div>
+                    <div class="text-caption text-secondary">Documentez vos observations si vous le souhaitez</div>
+                  </div>
+                </div>
+              </div>
             </div>
+            
+            <v-alert
+              type="info"
+              variant="tonal"
+              rounded="lg"
+              density="compact"
+              class="mb-4"
+            >
+              <template v-slot:prepend>
+                <v-icon size="20">mdi-information</v-icon>
+              </template>
+              <div class="text-body-2">
+                Vos données sont sauvegardées localement et synchronisées de manière sécurisée.
+              </div>
+            </v-alert>
           </v-card-text>
           
-          <v-card-actions class="intro-footer px-4 pb-4">
+          <!-- Actions -->
+          <v-card-actions class="intro-actions" :class="{ 'intro-actions--mobile': $vuetify.display.mobile }">
             <div class="w-100">
               <v-btn
                 color="primary"
@@ -239,7 +272,7 @@
                 rounded="pill"
                 block
                 @click="startFirstAudit"
-                class="cta-button mb-2"
+                class="cta-button mb-3"
                 style="background-color: #F3C348 !important; color: #181611 !important;"
               >
                 <v-icon start size="20">mdi-play-circle</v-icon>
@@ -838,33 +871,58 @@ watch(isAuthenticated, (authenticated) => {
   /* Desktop: Dialog centré normal */
 }
 
+.intro-dialog--mobile {
+  /* Mobile: Fullscreen */
+}
+
 .intro-card {
+  display: flex;
+  flex-direction: column;
   max-height: 90vh;
-  overflow-y: auto;
-  margin: auto;
+}
+
+.intro-card--mobile {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+}
+
+.intro-toolbar {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .intro-header {
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  position: relative;
 }
 
-.close-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-}
-
-.intro-body {
+.intro-content {
   flex: 1;
   overflow-y: auto;
+  padding: 24px !important;
 }
 
-.intro-footer {
+.intro-content--mobile {
+  padding: 16px !important;
+  flex: 1;
+  overflow-y: auto;
+  /* Assurer que le contenu peut scroller */
+  max-height: calc(100vh - 120px); /* 100vh - toolbar - actions */
+}
+
+.intro-actions {
   flex-shrink: 0;
+  padding: 24px !important;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.intro-actions--mobile {
+  padding: 16px !important;
+  /* Position fixe en bas sur mobile */
+  position: sticky;
+  bottom: 0;
+  background: white;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .intro-icon {
@@ -872,19 +930,36 @@ watch(isAuthenticated, (authenticated) => {
   justify-content: center;
 }
 
-.intro-content {
-  text-align: left;
+.intro-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .feature-item {
-  background: rgba(25, 118, 210, 0.05);
-  border-radius: 8px;
-  padding: 10px;
-  border-left: 3px solid var(--v-theme-primary);
+  background: rgba(243, 195, 72, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid #F3C348;
+}
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(243, 195, 72, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
 }
 
 .cta-button {
-  height: 48px !important;
+  height: 56px !important;
   font-weight: 600 !important;
   font-size: 16px !important;
   box-shadow: 0 4px 12px rgba(243, 195, 72, 0.3) !important;
@@ -900,6 +975,7 @@ watch(isAuthenticated, (authenticated) => {
   font-size: 12px !important;
   text-decoration: underline;
   opacity: 0.8;
+  height: 36px !important;
 }
 
 .skip-button:hover {
@@ -907,44 +983,46 @@ watch(isAuthenticated, (authenticated) => {
   background-color: rgba(131, 123, 103, 0.1) !important;
 }
 
-/* Responsive Mobile */
+/* Mobile Responsive */
 @media (max-width: 599px) {
-  .intro-dialog .v-overlay__content {
-    margin: 0 !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    border-radius: 0 !important;
+  .feature-item {
+    padding: 12px;
   }
   
-  .intro-card {
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    display: flex;
-    flex-direction: column;
+  .feature-icon {
+    width: 36px;
+    height: 36px;
   }
   
-  .intro-header {
-    padding: 16px 16px 12px !important;
+  .cta-button {
+    height: 48px !important;
+    font-size: 15px !important;
   }
   
-  .intro-body {
-    padding: 12px 16px !important;
-    flex: 1;
-    overflow-y: auto;
+  .intro-content--mobile {
+    /* Ajustement pour très petits écrans */
+    max-height: calc(100vh - 140px);
+  }
+}
+
+/* Très petits écrans */
+@media (max-width: 374px) {
+  .intro-content--mobile {
+    padding: 12px !important;
+    max-height: calc(100vh - 130px);
   }
   
-  .intro-footer {
-    padding: 12px 16px 16px !important;
-  }
-  
-  .intro-icon v-icon {
-    font-size: 40px !important;
+  .intro-actions--mobile {
+    padding: 12px !important;
   }
   
   .feature-item {
-    padding: 8px;
-    margin-bottom: 8px !important;
+    padding: 10px;
+  }
+  
+  .feature-icon {
+    width: 32px;
+    height: 32px;
   }
   
   .cta-button {
@@ -953,51 +1031,17 @@ watch(isAuthenticated, (authenticated) => {
   }
 }
 
-/* Très petits écrans */
-@media (max-width: 374px) {
-  .intro-header {
-    padding: 12px !important;
-  }
-  
-  .intro-body {
-    padding: 8px 12px !important;
-  }
-  
-  .intro-footer {
-    padding: 8px 12px 12px !important;
-  }
-  
-  .feature-item {
-    padding: 6px;
-  }
-  
-  .text-h5 {
-    font-size: 1.25rem !important;
-  }
-}
-
 /* Desktop - Dialog normal */
 @media (min-width: 600px) {
   .intro-dialog .v-overlay__content {
-    margin: 24px !important;
-    max-width: 500px !important;
-    max-height: calc(100vh - 48px) !important;
+    margin: 24px;
+    max-width: 500px;
+    max-height: calc(100vh - 48px);
   }
   
   .intro-card {
-    border-radius: 12px !important;
-  }
-  
-  .intro-header {
-    padding: 24px 24px 16px !important;
-  }
-  
-  .intro-body {
-    padding: 0 24px 16px !important;
-  }
-  
-  .intro-footer {
-    padding: 16px 24px 24px !important;
+    border-radius: 16px !important;
+    max-height: calc(100vh - 48px);
   }
 }
 
