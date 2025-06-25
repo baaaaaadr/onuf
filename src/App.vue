@@ -161,47 +161,58 @@
         v-model="showIntroDialog" 
         max-width="500" 
         rounded="lg"
+        scrollable
+        class="intro-dialog"
       >
-        <v-card rounded="lg">
-          <v-card-title class="pa-6 text-center">
-            <div class="intro-icon mb-3">
-              <v-icon size="64" color="primary">mdi-map-marker-check</v-icon>
+        <v-card rounded="lg" class="intro-card">
+          <v-card-title class="intro-header pa-4 text-center">
+            <!-- Bouton fermer sur mobile -->
+            <v-btn 
+              icon="mdi-close" 
+              variant="text" 
+              size="small" 
+              class="close-btn d-md-none"
+              @click="showIntroDialog = false"
+            />
+            
+            <div class="intro-icon mb-2">
+              <v-icon size="48" color="primary">mdi-map-marker-check</v-icon>
             </div>
             <div class="text-h5 font-weight-bold">
               Bienvenue dans MANARA !
             </div>
-            <div class="text-subtitle-1 text-secondary mt-2">
+            <div class="text-subtitle-1 text-secondary mt-1">
               Application d'audit de sécurité des quartiers
             </div>
           </v-card-title>
           
-          <v-card-text class="px-6">
+          <v-card-text class="intro-body px-4 pb-4">
             <div class="intro-content">
-              <p class="text-body-1 mb-4">
+              <p class="text-body-1 mb-3">
                 En tant qu'observatrice, vous allez évaluer la sécurité et l'accessibilité de votre quartier selon différents critères.
               </p>
               
-              <div class="intro-features mb-4">
-                <div class="feature-item d-flex align-center mb-3">
-                  <v-icon class="mr-3" color="primary">mdi-crosshairs-gps</v-icon>
+              <div class="intro-features mb-3">
+                <div class="feature-item d-flex align-center mb-2">
+                  <v-icon class="mr-3" color="primary" size="20">mdi-crosshairs-gps</v-icon>
                   <div>
-                    <div class="font-weight-medium">Localisation automatique</div>
+                    <div class="font-weight-medium text-body-2">Localisation automatique</div>
                     <div class="text-caption text-secondary">Votre position GPS sera détectée automatiquement</div>
                   </div>
                 </div>
                 
-                <div class="feature-item d-flex align-center mb-3">
-                  <v-icon class="mr-3" color="primary">mdi-clipboard-list</v-icon>
+                <div class="feature-item d-flex align-center mb-2">
+                  <v-icon class="mr-3" color="primary" size="20">mdi-clipboard-list</v-icon>
                   <div>
-                    <div class="font-weight-medium">Questions simples</div>
+                    <div class="font-weight-medium text-body-2">Questions simples</div>
                     <div class="text-caption text-secondary">Évaluez l'éclairage, la propreté, le ressenti, etc.</div>
                   </div>
                 </div>
                 
-                <div class="feature-item d-flex align-center mb-3">
-                  <v-icon class="mr-3" color="primary">mdi-camera</v-icon>
+                <div class="feature-item d-flex align-center mb-2">
+                  <v-icon class="mr-3" color="primary" size="20">mdi-camera</v-icon>
                   <div>
-                    <div class="font-weight-medium">Photos optionnelles</div>
+                    <div class="font-weight-medium text-body-2">Photos optionnelles</div>
                     <div class="text-caption text-secondary">Documentez vos observations si vous le souhaitez</div>
                   </div>
                 </div>
@@ -211,39 +222,40 @@
                 type="info"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-3 text-body-2"
+                density="compact"
               >
-                <div class="text-body-2">
-                  <v-icon class="mr-2">mdi-information</v-icon>
-                  Vos données sont sauvegardées localement et synchronisées de manière sécurisée.
-                </div>
+                <v-icon class="mr-2" size="16">mdi-information</v-icon>
+                Vos données sont sauvegardées localement et synchronisées de manière sécurisée.
               </v-alert>
             </div>
           </v-card-text>
           
-          <v-card-actions class="px-6 pb-6">
-            <v-btn
-              color="primary"
-              size="large"
-              rounded="pill"
-              block
-              @click="startFirstAudit"
-              class="cta-button mb-3"
-              style="background-color: #F3C348 !important; color: #181611 !important;"
-            >
-              <v-icon start>mdi-play-circle</v-icon>
-              Faire un audit
-            </v-btn>
-            
-            <v-btn
-              variant="text"
-              size="small"
-              block
-              @click="skipIntroForever"
-              class="skip-button"
-            >
-              Ne plus afficher cette introduction
-            </v-btn>
+          <v-card-actions class="intro-footer px-4 pb-4">
+            <div class="w-100">
+              <v-btn
+                color="primary"
+                size="large"
+                rounded="pill"
+                block
+                @click="startFirstAudit"
+                class="cta-button mb-2"
+                style="background-color: #F3C348 !important; color: #181611 !important;"
+              >
+                <v-icon start size="20">mdi-play-circle</v-icon>
+                Faire un audit
+              </v-btn>
+              
+              <v-btn
+                variant="text"
+                size="small"
+                block
+                @click="skipIntroForever"
+                class="skip-button"
+              >
+                Ne plus afficher cette introduction
+              </v-btn>
+            </div>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -629,19 +641,52 @@ watch(isAuthenticated, (authenticated) => {
 <style scoped>
 .onuf-app {
   font-family: var(--font-family-primary) !important;
+  
+  /* Variables CSS pour éviter les incohérences entre dev et prod */
+  --onuf-primary: #F3C348;
+  --onuf-secondary: #F9D876;
+  --onuf-surface-variant: #E6E3DB;
+  --onuf-background: #FFFFFF;
+  --onuf-surface-light: #F5F3F0;
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --spacing-lg: 24px;
+  --spacing-md: 16px;
+  --font-weight-semibold: 600;
+  --transition-normal: 0.3s ease;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* === LOGIN === */
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--onuf-primary) 0%, var(--onuf-secondary) 100%);
-  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #F3C348 0%, #F9D876 100%) !important;
+  padding: 24px;
 }
 
 .login-card {
-  border-radius: var(--radius-xl) !important;
+  border-radius: 24px !important;
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force le texte à être sombre sur fond blanc */
+.login-card .v-card-title,
+.login-card .v-card-text,
+.login-card .v-card-actions {
+  color: #181611 !important;
+}
+
+.login-card .text-primary {
+  color: #F3C348 !important;
+}
+
+.login-card .text-secondary {
+  color: #837B67 !important;
 }
 
 .login-logo {
@@ -651,8 +696,10 @@ watch(isAuthenticated, (authenticated) => {
 
 .login-btn {
   height: 56px !important;
-  font-weight: var(--font-weight-semibold) !important;
+  font-weight: 600 !important;
   letter-spacing: 0.5px !important;
+  background-color: #F3C348 !important;
+  color: #181611 !important;
 }
 
 /* === HEADER === */
@@ -786,14 +833,40 @@ watch(isAuthenticated, (authenticated) => {
   }
 }
 
-/* === DARK MODE PREPARATION === */
-@media (prefers-color-scheme: dark) {
-  .login-card {
-    background: rgba(30, 30, 30, 0.95) !important;
-  }
+/* === INTRO DIALOG === */
+.intro-dialog {
+  /* Desktop: Dialog centré normal */
 }
 
-/* === INTRO DIALOG === */
+.intro-card {
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+}
+
+.intro-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.intro-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.intro-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 .intro-icon {
   display: flex;
   justify-content: center;
@@ -806,12 +879,12 @@ watch(isAuthenticated, (authenticated) => {
 .feature-item {
   background: rgba(25, 118, 210, 0.05);
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px;
   border-left: 3px solid var(--v-theme-primary);
 }
 
 .cta-button {
-  height: 56px !important;
+  height: 48px !important;
   font-weight: 600 !important;
   font-size: 16px !important;
   box-shadow: 0 4px 12px rgba(243, 195, 72, 0.3) !important;
@@ -832,6 +905,100 @@ watch(isAuthenticated, (authenticated) => {
 .skip-button:hover {
   opacity: 1;
   background-color: rgba(131, 123, 103, 0.1) !important;
+}
+
+/* Responsive Mobile */
+@media (max-width: 599px) {
+  .intro-dialog .v-overlay__content {
+    margin: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+  
+  .intro-card {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .intro-header {
+    padding: 16px 16px 12px !important;
+  }
+  
+  .intro-body {
+    padding: 12px 16px !important;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .intro-footer {
+    padding: 12px 16px 16px !important;
+  }
+  
+  .intro-icon v-icon {
+    font-size: 40px !important;
+  }
+  
+  .feature-item {
+    padding: 8px;
+    margin-bottom: 8px !important;
+  }
+  
+  .cta-button {
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Très petits écrans */
+@media (max-width: 374px) {
+  .intro-header {
+    padding: 12px !important;
+  }
+  
+  .intro-body {
+    padding: 8px 12px !important;
+  }
+  
+  .intro-footer {
+    padding: 8px 12px 12px !important;
+  }
+  
+  .feature-item {
+    padding: 6px;
+  }
+  
+  .text-h5 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Desktop - Dialog normal */
+@media (min-width: 600px) {
+  .intro-dialog .v-overlay__content {
+    margin: 24px !important;
+    max-width: 500px !important;
+    max-height: calc(100vh - 48px) !important;
+  }
+  
+  .intro-card {
+    border-radius: 12px !important;
+  }
+  
+  .intro-header {
+    padding: 24px 24px 16px !important;
+  }
+  
+  .intro-body {
+    padding: 0 24px 16px !important;
+  }
+  
+  .intro-footer {
+    padding: 16px 24px 24px !important;
+  }
 }
 
 /* === ACCESSIBILITY === */
