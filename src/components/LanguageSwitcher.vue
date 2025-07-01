@@ -9,7 +9,7 @@
         :active="currentLanguage === language.code"
         prepend-icon="mdi-translate"
       >
-        <v-list-item-title>
+        <v-list-item-title class="d-flex align-center">
           <span class="language-flag">{{ language.flag }}</span>
           <span class="language-name">{{ language.name }}</span>
         </v-list-item-title>
@@ -58,7 +58,7 @@
             @click="changeLanguage(language.code)"
             :active="currentLanguage === language.code"
           >
-            <v-list-item-title>
+            <v-list-item-title class="d-flex align-center">
               <span class="language-flag">{{ language.flag }}</span>
               <span class="language-name">{{ language.name }}</span>
             </v-list-item-title>
@@ -160,11 +160,16 @@ const showLanguageChangeNotification = (langCode) => {
 
 .language-flag {
   font-size: 1.2em;
-  margin-right: 8px;
+  margin-right: 12px;
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
 }
 
 .language-name {
   font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .language-btn {
@@ -187,6 +192,8 @@ const showLanguageChangeNotification = (langCode) => {
 .language-switcher .v-list-item {
   border-radius: 8px;
   margin: 2px 0;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .language-switcher .v-list-item--active {

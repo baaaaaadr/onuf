@@ -20,17 +20,7 @@
       "select": "Select a neighborhood"
     },
     "sections": {
-      "lighting": "Lighting",
-      "walkpath": "Walkways",
-      "openness": "Openness", 
-      "feeling": "Feeling",
-      "peoplePresence": "Human Presence",
-      "cleanliness": "Cleanliness",
-      "naturalSurveillance": "Natural Surveillance",
-      "spaceDiversity": "Space Diversity",
-      "transportAccess": "Transport Access",
-      "formalSecurity": "Formal Security",
-      "lighting_detailed": {
+      "lighting": {
         "title": "Lighting",
         "description": "Availability of sufficient light to see all around you.",
         "options": {

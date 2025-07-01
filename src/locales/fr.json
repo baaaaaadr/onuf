@@ -20,17 +20,7 @@
       "select": "Sélectionner un quartier"
     },
     "sections": {
-      "lighting": "Éclairage",
-      "walkpath": "Cheminement",
-      "openness": "Ouverture", 
-      "feeling": "Ressenti",
-      "peoplePresence": "Présence",
-      "cleanliness": "Propreté",
-      "naturalSurveillance": "Surveillance",
-      "spaceDiversity": "Mixité",
-      "transportAccess": "Transports",
-      "formalSecurity": "Sécurité",
-      "lighting_detailed": {
+      "lighting": {
         "title": "Éclairage",
         "description": "Disponibilité de suffisamment de lumière pour voir tout autour de vous.",
         "options": {

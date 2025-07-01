@@ -20,17 +20,7 @@
       "select": "اختر حياً"
     },
     "sections": {
-      "lighting": "الإنارة",
-      "walkpath": "الممرات",
-      "openness": "الانفتاح", 
-      "feeling": "الإحساس",
-      "peoplePresence": "التواجد البشري",
-      "cleanliness": "النظافة",
-      "naturalSurveillance": "المراقبة الطبيعية",
-      "spaceDiversity": "تنوع الفضاء",
-      "transportAccess": "الوصول إلى النقل",
-      "formalSecurity": "الأمن الرسمي",
-      "lighting_detailed": {
+      "lighting": {
         "title": "الإنارة",
         "description": "توفر إضاءة كافية للرؤية في جميع الاتجاهات.",
         "options": {

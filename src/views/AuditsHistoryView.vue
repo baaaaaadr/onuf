@@ -864,16 +864,16 @@ const getScoreColor = (score) => {
 
 const getScoreItems = (audit) => {
   return [
-    { key: 'lighting', icon: '💡', label: t('audit.sections.lighting'), value: audit.lighting || 0, color: getScoreColor(audit.lighting) },
-    { key: 'walkpath', icon: '🚶', label: t('audit.sections.walkpath'), value: audit.walkpath || 0, color: getScoreColor(audit.walkpath) },
-    { key: 'openness', icon: '👁️', label: t('audit.sections.openness'), value: audit.openness || 0, color: getScoreColor(audit.openness) },
-    { key: 'feeling', icon: '😊', label: t('audit.sections.feeling'), value: audit.feeling || 0, color: getScoreColor(audit.feeling) },
-    { key: 'people_presence', icon: '👥', label: t('audit.sections.peoplePresence'), value: audit.people_presence || audit.peoplePresence || 0, color: getScoreColor(audit.people_presence || audit.peoplePresence) },
-    { key: 'cleanliness', icon: '🧹', label: t('audit.sections.cleanliness'), value: audit.cleanliness || 0, color: getScoreColor(audit.cleanliness) },
-    { key: 'natural_surveillance', icon: '👁️‍🗨️', label: t('audit.sections.naturalSurveillance'), value: audit.natural_surveillance || audit.naturalSurveillance || 0, color: getScoreColor(audit.natural_surveillance || audit.naturalSurveillance) },
-    { key: 'space_diversity', icon: '👨‍👩‍👧‍👦', label: t('audit.sections.spaceDiversity'), value: audit.space_diversity || audit.spaceDiversity || 0, color: getScoreColor(audit.space_diversity || audit.spaceDiversity) },
-    { key: 'transport_access', icon: '🚌', label: t('audit.sections.transportAccess'), value: audit.transport_access || audit.transportAccess || 0, color: getScoreColor(audit.transport_access || audit.transportAccess) },
-    { key: 'formal_security', icon: '👮', label: t('audit.sections.formalSecurity'), value: audit.formal_security || audit.formalSecurity || 0, color: getScoreColor(audit.formal_security || audit.formalSecurity) }
+    { key: 'lighting', icon: '💡', label: t('audit.sections.lighting.title'), value: audit.lighting || 0, color: getScoreColor(audit.lighting) },
+    { key: 'walkpath', icon: '🚶', label: t('audit.sections.walkways.title'), value: audit.walkpath || 0, color: getScoreColor(audit.walkpath) },
+    { key: 'openness', icon: '👁️', label: t('audit.sections.openness.title'), value: audit.openness || 0, color: getScoreColor(audit.openness) },
+    { key: 'feeling', icon: '😊', label: t('audit.sections.feeling.title'), value: audit.feeling || 0, color: getScoreColor(audit.feeling) },
+    { key: 'people_presence', icon: '👥', label: t('audit.sections.humanPresence.title'), value: audit.people_presence || audit.peoplePresence || 0, color: getScoreColor(audit.people_presence || audit.peoplePresence) },
+    { key: 'cleanliness', icon: '🧹', label: t('audit.sections.cleanliness.title'), value: audit.cleanliness || 0, color: getScoreColor(audit.cleanliness) },
+    { key: 'natural_surveillance', icon: '👁️‍🗨️', label: t('audit.sections.naturalSurveillance.title'), value: audit.natural_surveillance || audit.naturalSurveillance || 0, color: getScoreColor(audit.natural_surveillance || audit.naturalSurveillance) },
+    { key: 'space_diversity', icon: '👨‍👩‍👧‍👦', label: t('audit.sections.spaceDiversity.title'), value: audit.space_diversity || audit.spaceDiversity || 0, color: getScoreColor(audit.space_diversity || audit.spaceDiversity) },
+    { key: 'transport_access', icon: '🚌', label: t('audit.sections.transportAccess.title'), value: audit.transport_access || audit.transportAccess || 0, color: getScoreColor(audit.transport_access || audit.transportAccess) },
+    { key: 'formal_security', icon: '👮', label: t('audit.sections.formalSecurity.title'), value: audit.formal_security || audit.formalSecurity || 0, color: getScoreColor(audit.formal_security || audit.formalSecurity) }
   ]
 }
 

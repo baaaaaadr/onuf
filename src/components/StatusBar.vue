@@ -495,10 +495,10 @@ export default {
     })
     
     const gpsStatusText = computed(() => {
-      if (currentPosition.value) {
-        return `Précision: ${formattedPosition.value?.accuracy || 'Inconnue'}`
+      if (currentPosition?.value) {
+        return `Précision: ${formattedPosition?.value?.accuracy || 'Inconnue'}`
       }
-      return error.value || 'Activation en cours...'
+      return error?.value || 'Activation en cours...'
     })
     
     const networkColor = computed(() => {
@@ -510,7 +510,7 @@ export default {
     })
     
     const formatLastUpdate = computed(() => {
-      if (!lastUpdate.value) return 'Jamais'
+      if (!lastUpdate?.value) return 'Jamais'
       return formatTime(lastUpdate.value)
     })
     
@@ -520,13 +520,17 @@ export default {
       return 'calc(100vh - 120px)' // 64px toolbar + 56px infos GPS
     })
     
-    // ✅ NOUVEAU: Watcher pour mise à jour temps réel de la carte
-    watch(currentPosition, (newPosition) => {
-      if (newPosition && showGpsDetails.value && mapInstance.value) {
-        console.log('📍 Position GPS changée - Mise à jour carte')
-        updateMapPosition()
-      }
-    }, { deep: true })
+    // ✅ CORRIGÉ: Watcher défensif pour mise à jour temps réel de la carte
+    watch(
+      () => currentPosition?.value, 
+      (newPosition) => {
+        if (newPosition && showGpsDetails?.value && mapInstance?.value) {
+          console.log('📍 Position GPS changée - Mise à jour carte')
+          updateMapPosition()
+        }
+      }, 
+      { deep: true }
+    )
     
     // Méthodes
     const goBack = () => {
@@ -549,11 +553,11 @@ export default {
     
     // ✅ MODIFIÉ: Afficher carte plein écran avec position GPS
     const toggleGpsDetails = async () => {
-      if (!showGpsDetails.value) {
+      if (!showGpsDetails?.value) {
         // Ouvrir la carte
         showGpsDetails.value = true
         
-        if (currentPosition.value) {
+        if (currentPosition?.value) {
           // Attendre que le DOM soit mis à jour
           await nextTick()
           mapLoading.value = true
@@ -569,7 +573,7 @@ export default {
         mapLoading.value = false
         
         // Nettoyer la carte
-        if (mapInstance.value) {
+        if (mapInstance?.value) {
           mapInstance.value.remove()
           mapInstance.value = null
           mapMarker.value = null
@@ -580,7 +584,7 @@ export default {
     
     // ✅ NOUVEAU: Initialiser la carte Leaflet
     const initializeMap = async () => {
-      if (!mapContainer.value || !currentPosition.value) return
+      if (!mapContainer?.value || !currentPosition?.value) return
       
       try {
         // ✅ CORRIGÉ: Charger Leaflet avec script tag classique
@@ -594,7 +598,7 @@ export default {
         const acc = currentPosition.value.accuracy || 1000
         
         // Détruire l'ancienne carte si elle existe
-        if (mapInstance.value) {
+        if (mapInstance?.value) {
           mapInstance.value.remove()
         }
         
@@ -648,9 +652,9 @@ export default {
             <div style="font-weight: 500; margin-bottom: 8px;">📍 Ma Position</div>
             <div style="font-size: 12px; color: #666;">
               <strong>Coordonnées:</strong><br>
-              ${formattedPosition.value.lat}, ${formattedPosition.value.lng}<br><br>
-              <strong>Précision réelle:</strong> ${formattedPosition.value.accuracy}<br>
-              <strong>Cercle affiché:</strong> ${displayRadius < acc ? (displayRadius/1000).toFixed(1) + 'km (limité)' : formattedPosition.value.accuracy}<br>
+              ${formattedPosition?.value?.lat || lat.toFixed(6)}, ${formattedPosition?.value?.lng || lng.toFixed(6)}<br><br>
+              <strong>Précision réelle:</strong> ${formattedPosition?.value?.accuracy || (acc + ' m')}<br>
+              <strong>Cercle affiché:</strong> ${displayRadius < acc ? (displayRadius/1000).toFixed(1) + 'km (limité)' : (formattedPosition?.value?.accuracy || (acc + ' m'))}<br>
               <strong>Qualité:</strong> <span style="color: ${gpsAccuracyLevel.value.color};">${gpsAccuracyLevel.value.text}</span>
             </div>
           </div>
@@ -699,7 +703,7 @@ export default {
         await getCurrentPosition()
         
         // Mettre à jour la carte si elle est affichée
-        if (showGpsDetails.value && mapInstance.value && currentPosition.value) {
+        if (showGpsDetails?.value && mapInstance?.value && currentPosition?.value) {
           updateMapPosition()
         }
       } catch (error) {
@@ -709,7 +713,7 @@ export default {
     
     // ✅ NOUVEAU: Mettre à jour la position sur la carte
     const updateMapPosition = () => {
-      if (!mapInstance.value || !currentPosition.value) return
+      if (!mapInstance?.value || !currentPosition?.value) return
       
       const lat = currentPosition.value.latitude
       const lng = currentPosition.value.longitude
@@ -719,12 +723,12 @@ export default {
              gpsAccuracyLevel.value.color === 'warning' ? '#FF9800' : '#F44336'
       
       // Mettre à jour marqueur
-      if (mapMarker.value) {
+      if (mapMarker?.value) {
         mapMarker.value.setLatLng([lat, lng])
       }
       
       // Mettre à jour cercle
-      if (accuracyCircle.value) {
+      if (accuracyCircle?.value) {
         accuracyCircle.value.setLatLng([lat, lng])
         accuracyCircle.value.setRadius(displayRadius)
         accuracyCircle.value.setStyle({
@@ -736,15 +740,15 @@ export default {
       }
       
       // Mettre à jour popup
-      if (mapMarker.value) {
+      if (mapMarker?.value) {
         const popupContent = `
           <div style="text-align: center; font-family: Roboto, sans-serif;">
             <div style="font-weight: 500; margin-bottom: 8px;">📍 Ma Position</div>
             <div style="font-size: 12px; color: #666;">
               <strong>Coordonnées:</strong><br>
-              ${formattedPosition.value.lat}, ${formattedPosition.value.lng}<br><br>
-              <strong>Précision réelle:</strong> ${formattedPosition.value.accuracy}<br>
-              <strong>Cercle affiché:</strong> ${displayRadius < acc ? (displayRadius/1000).toFixed(1) + 'km (limité)' : formattedPosition.value.accuracy}<br>
+              ${formattedPosition?.value?.lat || lat.toFixed(6)}, ${formattedPosition?.value?.lng || lng.toFixed(6)}<br><br>
+              <strong>Précision réelle:</strong> ${formattedPosition?.value?.accuracy || (acc + ' m')}<br>
+              <strong>Cercle affiché:</strong> ${displayRadius < acc ? (displayRadius/1000).toFixed(1) + 'km (limité)' : (formattedPosition?.value?.accuracy || (acc + ' m'))}<br>
               <strong>Qualité:</strong> <span style="color: ${gpsAccuracyLevel.value.color};">${gpsAccuracyLevel.value.text}</span>
             </div>
           </div>
@@ -753,12 +757,12 @@ export default {
       }
       
       // Centrer la carte si nécessaire (zoom adaptatif)
-      const currentZoom = mapInstance.value.getZoom()
+      const currentZoom = mapInstance?.value?.getZoom()
       const idealZoom = acc < 100 ? 16 : acc < 500 ? 14 : 12
       
-      if (Math.abs(currentZoom - idealZoom) > 2) {
+      if (currentZoom && Math.abs(currentZoom - idealZoom) > 2) {
         mapInstance.value.setView([lat, lng], idealZoom)
-      } else {
+      } else if (mapInstance?.value) {
         mapInstance.value.panTo([lat, lng])
       }
       
