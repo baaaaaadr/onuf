@@ -45,12 +45,12 @@ import police4 from '@/assets/icons/police4.svg'
 export const questionsConfig = [
   {
     id: 'lighting',
-    titleKey: 'audit.sections.lighting_detailed.title',
-    descriptionKey: 'audit.sections.lighting_detailed.description',
+    titleKey: 'audit.sections.lighting.title',
+    descriptionKey: 'audit.sections.lighting.description',
     options: [
       { 
         value: 1, 
-        textKey: 'audit.sections.lighting_detailed.options.none',
+        textKey: 'audit.sections.lighting.options.none',
         svgPath: lumi1,
         emoji: '🌑', 
         icon: 'mdi-lightbulb-off-outline', 
@@ -58,7 +58,7 @@ export const questionsConfig = [
       },
       { 
         value: 2, 
-        textKey: 'audit.sections.lighting_detailed.options.weak',
+        textKey: 'audit.sections.lighting.options.weak',
         svgPath: lumi2,
         emoji: '🌒', 
         icon: 'mdi-lightbulb-outline', 
@@ -66,7 +66,7 @@ export const questionsConfig = [
       },
       { 
         value: 3, 
-        textKey: 'audit.sections.lighting_detailed.options.sufficient',
+        textKey: 'audit.sections.lighting.options.sufficient',
         svgPath: lumi3,
         emoji: '🌕', 
         icon: 'mdi-lightbulb-on-outline', 
@@ -74,7 +74,7 @@ export const questionsConfig = [
       },
       { 
         value: 4, 
-        textKey: 'audit.sections.lighting_detailed.options.excellent',
+        textKey: 'audit.sections.lighting.options.excellent',
         svgPath: lumi4,
         emoji: '☀️', 
         icon: 'mdi-lightbulb-on', 
