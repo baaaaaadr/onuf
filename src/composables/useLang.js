@@ -1,151 +1,125 @@
 // src/composables/useLang.js
-// Composable pour la gestion des langues et du support RTL
-
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useTheme } from 'vuetify'
 
-// ✅ CORRECTION: État global simple sans composables
+// État global pour la langue
 const currentLanguage = ref('fr')
 
-// Liste des langues supportées
+// ✅ CORRIGÉ: Configuration des langues supportées
 const supportedLanguages = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷', rtl: false },
-  { code: 'en', name: 'English', flag: '🇺🇸', rtl: false },
-  { code: 'ar', name: 'العربية', flag: '🇲🇦', rtl: true }
+  {
+    code: 'fr',
+    name: 'Français',
+    flag: '🇫🇷',
+    direction: 'ltr'
+  },
+  {
+    code: 'en', 
+    name: 'English',
+    flag: '🇺🇸',
+    direction: 'ltr'
+  },
+  {
+    code: 'ar',
+    name: 'العربية',
+    flag: '🇲🇦',
+    direction: 'rtl'
+  }
 ]
 
-// ✅ NOUVEAU: Fonctions utilitaires sans composables
-const getStoredLanguage = () => {
-  return localStorage.getItem('user-lang') || 'fr'
-}
-
-const setStoredLanguage = (lang) => {
-  localStorage.setItem('user-lang', lang)
-}
-
-const applyHtmlDirection = (langCode) => {
-  const isRTL = langCode === 'ar'
-  document.body.dir = isRTL ? 'rtl' : 'ltr'
-  document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
-  document.querySelector('html').setAttribute('lang', langCode)
-}
-
 export function useLang() {
-  const { locale } = useI18n()
-  const theme = useTheme()
+  // ✅ CORRIGÉ: Utilisation conditionnelle de useI18n
+  let i18n = null
+  try {
+    i18n = useI18n()
+  } catch (error) {
+    console.warn('useI18n not available in this context')
+  }
 
-  // Initialiser la langue depuis le localStorage
+  // Charger la langue sauvegardée au démarrage
   const initializeLanguage = () => {
-    const storedLang = getStoredLanguage()
-    currentLanguage.value = storedLang
-    
-    // Synchroniser avec i18n
-    locale.value = storedLang
-    
-    // Appliquer la direction HTML
-    applyHtmlDirection(storedLang)
-    
-    // Appliquer le thème approprié
-    applyTheme(storedLang)
-    
-    console.log(`🌍 Langue initialisée: ${storedLang}`)
-  }
-
-  // Appliquer le thème basé sur la langue
-  const applyTheme = (langCode) => {
-    const isRTL = langCode === 'ar'
-    
-    // Changer le thème
-    theme.global.name.value = isRTL ? 'onufLightRTL' : 'onufLight'
-    
-    // ✅ NOUVEAU: Changer la configuration RTL de Vuetify
-    if (theme.global.current) {
-      theme.global.current.rtl = isRTL
+    try {
+      const savedLang = localStorage.getItem('onuf-language')
+      if (savedLang && supportedLanguages.find(lang => lang.code === savedLang)) {
+        currentLanguage.value = savedLang
+        if (i18n) {
+          i18n.locale.value = savedLang
+        }
+      }
+    } catch (error) {
+      console.error('Erreur chargement langue:', error)
     }
-    
-    console.log(`🎨 Thème appliqué: ${theme.global.name.value} (RTL: ${isRTL})`)
   }
 
-  // Changer de langue
-  const setLanguage = (langCode) => {
-    if (!supportedLanguages.find(lang => lang.code === langCode)) {
-      console.error(`❌ Langue non supportée: ${langCode}`)
-      return
-    }
-
-    // 1. Mettre à jour l'état local
-    currentLanguage.value = langCode
-    
-    // 2. Mettre à jour i18n
-    locale.value = langCode
-    
-    // 3. Appliquer la direction HTML
-    applyHtmlDirection(langCode)
-    
-    // 4. Appliquer le thème approprié (RTL/LTR)
-    applyTheme(langCode)
-    
-    // 5. Sauvegarder dans localStorage
-    setStoredLanguage(langCode)
-    
-    console.log(`🌍 Langue changée vers: ${langCode}`)
-  }
-
-  // Obtenir les informations de la langue actuelle
+  // Computed pour obtenir les infos de la langue actuelle
   const getCurrentLanguageInfo = computed(() => {
     return supportedLanguages.find(lang => lang.code === currentLanguage.value) || supportedLanguages[0]
   })
 
-  // Vérifier si la langue actuelle est RTL
-  const isRTL = computed(() => {
-    return getCurrentLanguageInfo.value.rtl
-  })
+  // Fonction pour changer de langue
+  const setLanguage = async (langCode) => {
+    try {
+      if (!supportedLanguages.find(lang => lang.code === langCode)) {
+        console.error(`Langue non supportée: ${langCode}`)
+        return
+      }
 
-  // Obtenir la langue suivante dans la liste (pour un bouton de cycle)
-  const getNextLanguage = () => {
+      console.log(`🌍 Changement de langue vers: ${langCode}`)
+      
+      // Mettre à jour l'état global
+      currentLanguage.value = langCode
+      
+      // Mettre à jour vue-i18n si disponible
+      if (i18n) {
+        i18n.locale.value = langCode
+      }
+      
+      // Sauvegarder dans localStorage
+      localStorage.setItem('onuf-language', langCode)
+      
+      // ✅ CORRIGÉ: Gérer la direction RTL/LTR
+      const languageInfo = getCurrentLanguageInfo.value
+      document.documentElement.setAttribute('dir', languageInfo.direction)
+      document.documentElement.setAttribute('lang', langCode)
+      
+      // Mettre à jour Vuetify RTL si possible
+      try {
+        const vuetify = window.__vuetify || document.querySelector('#app').__vue__?.$vuetify
+        if (vuetify && vuetify.theme) {
+          vuetify.rtl = languageInfo.direction === 'rtl'
+        }
+      } catch (error) {
+        console.warn('Impossible de mettre à jour Vuetify RTL:', error)
+      }
+
+    } catch (error) {
+      console.error('Erreur changement langue:', error)
+    }
+  }
+
+  // Fonction pour faire défiler les langues
+  const cycleLanguage = () => {
     const currentIndex = supportedLanguages.findIndex(lang => lang.code === currentLanguage.value)
     const nextIndex = (currentIndex + 1) % supportedLanguages.length
-    return supportedLanguages[nextIndex].code
+    setLanguage(supportedLanguages[nextIndex].code)
   }
 
-  // Cycler vers la langue suivante
-  const cycleLanguage = () => {
-    const nextLang = getNextLanguage()
-    setLanguage(nextLang)
-  }
+  // Watcher pour les changements de langue
+  watch(currentLanguage, (newLang) => {
+    console.log(`👁️ Langue changée observée: ${newLang}`)
+  })
 
-  // Obtenir les traductions pour les labels de langue
-  const getLanguageLabel = (langCode) => {
-    const lang = supportedLanguages.find(l => l.code === langCode)
-    return lang ? `${lang.flag} ${lang.name}` : langCode
+  // Initialiser au premier chargement
+  if (typeof window !== 'undefined') {
+    initializeLanguage()
   }
 
   return {
-    // État
-    currentLanguage: computed(() => currentLanguage.value),
+    currentLanguage,
     supportedLanguages,
-    
-    // Informations calculées
     getCurrentLanguageInfo,
-    isRTL,
-    
-    // Méthodes
-    initializeLanguage,
     setLanguage,
     cycleLanguage,
-    getNextLanguage,
-    getLanguageLabel,
-    applyTheme
+    initializeLanguage
   }
-}
-
-// ✅ CORRECTION: Initialisation côté client sans composables
-if (typeof window !== 'undefined') {
-  // Initialiser la langue et la direction au chargement de la page
-  const storedLang = getStoredLanguage()
-  currentLanguage.value = storedLang
-  applyHtmlDirection(storedLang)
-  
-  console.log(`🌍 Langue initialisée globalement: ${storedLang}`)
 }
