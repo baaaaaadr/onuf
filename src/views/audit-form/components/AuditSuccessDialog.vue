@@ -22,27 +22,27 @@
       <div class="success-content">
         <h2 class="success-title">
           <span class="title-emoji">🎉</span>
-          Audit Terminé !
+          {{ t('audit.success.title') }}
         </h2>
         
         <p class="success-message">
-          Merci pour votre contribution à la sécurité urbaine.
+          {{ t('audit.success.message') }}
           <br>
           <span class="sync-status">
             <span v-if="isOnline" class="status-online">
               <span class="status-emoji">☁️</span>
-              Données synchronisées
+              {{ t('audit.success.statusOnline') }}
             </span>
             <span v-else class="status-offline">
               <span class="status-emoji">💾</span>
-              Sauvegardé localement
+              {{ t('audit.success.statusOffline') }}
             </span>
           </span>
         </p>
         
         <!-- ID de soumission si disponible -->
         <div v-if="submissionId" class="submission-info">
-          <span class="submission-label">ID d'audit :</span>
+          <span class="submission-label">{{ t('audit.success.auditId') }}</span>
           <span class="submission-id">#{{ submissionId }}</span>
         </div>
       </div>
@@ -55,7 +55,7 @@
           @click="$emit('new-audit')"
         >
           <span class="btn-emoji">➕</span>
-          <span class="btn-text">Nouvel audit</span>
+          <span class="btn-text">{{ t('audit.success.actions.newAudit') }}</span>
         </button>
         
         <!-- Boutons secondaires -->
@@ -65,7 +65,7 @@
             @click="$emit('go-history')"
           >
             <span class="btn-emoji">📋</span>
-            <span class="btn-text">Mes audits</span>
+            <span class="btn-text">{{ t('audit.success.actions.myAudits') }}</span>
           </button>
           
           <button 
@@ -73,7 +73,7 @@
             @click="$emit('go-home')"
           >
             <span class="btn-emoji">🏠</span>
-            <span class="btn-text">Accueil</span>
+            <span class="btn-text">{{ t('audit.success.actions.home') }}</span>
           </button>
         </div>
       </div>
@@ -88,6 +88,10 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
+
+// ✅ NOUVEAU: Utiliser i18n
+const { t } = useI18n()
 
 // Props
 const props = defineProps({
@@ -482,5 +486,33 @@ const closeDialog = () => {
     background: #FFF3E0;
     color: #E65100;
   }
+}
+
+/* === SUPPORT RTL POUR L'ARABE === */
+[dir="rtl"] .success-dialog {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .success-title {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .secondary-actions {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .action-btn {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .submission-info {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .close-btn {
+  left: var(--spacing-md);
+  right: auto;
 }
 </style>

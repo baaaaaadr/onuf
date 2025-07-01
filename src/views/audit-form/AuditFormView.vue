@@ -5,9 +5,9 @@
       <div class="header-content">
         <h1 class="header-title">
           <v-icon size="28" class="mr-2">mdi-security</v-icon>
-          Audit de Sécurité
+          {{ t('audit.title') }}
         </h1>
-        <p class="header-subtitle">Si vous n'êtes pas localisés automatiquement, alors choisissez votre quartier</p>
+        <p class="header-subtitle">{{ t('audit.subtitle') }}</p>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
       <div class="location-section">
         <div class="section-header">
           <v-icon class="section-icon">mdi-crosshairs-gps</v-icon>
-          <h2 class="section-title">Localisation GPS</h2>
+          <h2 class="section-title">{{ t('audit.location.title') }}</h2>
         </div>
         <div class="widget-container">
           <LocationWidget
@@ -37,14 +37,14 @@
       <div class="section-card">
         <div class="section-header">
           <v-icon class="section-icon">mdi-home-group</v-icon>
-          <h2 class="section-title">Quartier</h2>
-          <p class="section-description">Alternative si le GPS ne fonctionne pas</p>
+          <h2 class="section-title">{{ t('audit.neighborhood.title') }}</h2>
+          <p class="section-description">{{ t('audit.neighborhood.description') }}</p>
         </div>
         <div class="input-container">
           <v-select
             v-model="formData.location"
             :items="availableLocations"
-            label="Sélectionner un quartier"
+            :label="t('audit.neighborhood.select')"
             variant="outlined"
             prepend-inner-icon="mdi-map-marker"
             clearable
@@ -67,8 +67,8 @@
       <div class="section-card photo-section">
         <div class="section-header">
           <v-icon class="section-icon">mdi-camera</v-icon>
-          <h2 class="section-title">Photos (optionnel)</h2>
-          <p class="section-description">Ajoutez des photos pour documenter vos observations</p>
+          <h2 class="section-title">{{ t('audit.photos.title') }}</h2>
+          <p class="section-description">{{ t('audit.photos.description') }}</p>
         </div>
         <div class="widget-container">
           <PhotoCapture
@@ -86,13 +86,13 @@
       <div class="section-card comments-section">
         <div class="section-header">
           <v-icon class="section-icon">mdi-comment-text</v-icon>
-          <h2 class="section-title">Commentaires (optionnel)</h2>
-          <p class="section-description">Partagez vos observations additionnelles</p>
+          <h2 class="section-title">{{ t('audit.comments.title') }}</h2>
+          <p class="section-description">{{ t('audit.comments.description') }}</p>
         </div>
         <div class="input-container">
           <v-textarea
             v-model="formData.comment"
-            label="Commentaires additionnels (optionnel)"
+            :label="t('audit.comments.placeholder')"
             variant="outlined"
             rows="3"
             auto-grow
@@ -114,11 +114,11 @@
           >
             <span v-if="loading" class="btn-content">
               <div class="loading-spinner"></div>
-              Envoi en cours...
+              {{ t('audit.submit.sending') }}
             </span>
             <span v-else class="btn-content">
               <v-icon class="mr-2">mdi-check-circle</v-icon>
-              Soumettre l'audit
+              {{ t('audit.submit.button') }}
             </span>
           </button>
         </div>
@@ -165,6 +165,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
 import AuditQuestions from './components/AuditQuestions.vue'
 
 import AuditDebugDialog from './components/AuditDebugDialog.vue'
@@ -188,6 +189,7 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const { t } = useI18n() // ✅ NOUVEAU: Fonction de traduction
     const isOnline = ref(navigator.onLine)
     
     // Écouter les changements de connexion
@@ -244,7 +246,7 @@ export default {
       if (window.addDebugLog) {
         window.addDebugLog(`❌ Erreur GPS: ${error.message}`, 'error')
       }
-      showError("Impossible d'obtenir la position GPS")
+      showError(t('errors.gpsUnavailable'))
     }
     
     // Photo handling
@@ -314,11 +316,11 @@ export default {
         })
         
         if (!hasLocation && !hasAtLeastOneAnswer) {
-          showError("Veuillez obtenir votre position GPS ou choisir un quartier, et répondre à au moins une question")
+          showError(t('audit.validation.both'))
         } else if (!hasLocation) {
-          showError("Veuillez obtenir votre position GPS ou choisir un quartier")
+          showError(t('audit.validation.location'))
         } else if (!hasAtLeastOneAnswer) {
-          showError("Veuillez répondre à au moins une question")
+          showError(t('audit.validation.questions'))
         }
         return
       }
@@ -331,7 +333,7 @@ export default {
         }
       } catch (error) {
         console.error('Error submitting form:', error)
-        showError("Erreur lors de la soumission du formulaire")
+        showError(t('audit.submit.error'))
       } finally {
         loading.value = false
       }
@@ -376,6 +378,9 @@ export default {
       
       // Computed
       isFormValid,
+      
+      // i18n
+      t, // ✅ NOUVEAU: Fonction de traduction
       
       // Methods
       updateFormData,

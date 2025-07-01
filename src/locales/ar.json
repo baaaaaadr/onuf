@@ -1,0 +1,326 @@
+{
+  "app": {
+    "title": "منارة",
+    "description": "تطبيق تدقيق الأمان الحضري"
+  },
+  "navigation": {
+    "audit": "تدقيق",
+    "history": "السجل"
+  },
+  "audit": {
+    "title": "تدقيق أمني",
+    "subtitle": "إذا لم يتم تحديد موقعك تلقائياً، فاختر حيك",
+    "location": {
+      "title": "تحديد الموقع",
+      "description": "موقعك الحالي"
+    },
+    "neighborhood": {
+      "title": "الحي",
+      "description": "بديل إذا لم يعمل نظام تحديد المواقع",
+      "select": "اختر حياً"
+    },
+    "sections": {
+      "lighting": "الإنارة",
+      "walkpath": "الممرات",
+      "openness": "الانفتاح", 
+      "feeling": "الإحساس",
+      "peoplePresence": "التواجد البشري",
+      "cleanliness": "النظافة",
+      "naturalSurveillance": "المراقبة الطبيعية",
+      "spaceDiversity": "تنوع الفضاء",
+      "transportAccess": "الوصول إلى النقل",
+      "formalSecurity": "الأمن الرسمي",
+      "lighting_detailed": {
+        "title": "الإنارة",
+        "description": "توفر إضاءة كافية للرؤية في جميع الاتجاهات.",
+        "options": {
+          "none": "لا يوجد",
+          "weak": "ضعيفة",
+          "sufficient": "كافية",
+          "excellent": "ممتازة"
+        }
+      },
+      "walkways": {
+        "title": "الممرات",
+        "description": "رصيف أو طريق به مساحة للمشي.",
+        "options": {
+          "none": "لا يوجد",
+          "bad": "سيء",
+          "correct": "مقبول",
+          "excellent": "ممتاز"
+        }
+      },
+      "openness": {
+        "title": "الانفتاح",
+        "description": "القدرة على الرؤية والحركة في جميع الاتجاهات.",
+        "options": {
+          "blocked": "محجوب",
+          "limited": "محدود",
+          "open": "مفتوح",
+          "veryOpen": "مفتوح جداً"
+        }
+      },
+      "feeling": {
+        "title": "الإحساس",
+        "description": "كيف تشعر في هذا المكان الآن؟",
+        "options": {
+          "scary": "مخيف",
+          "uncomfortable": "غير مريح",
+          "acceptable": "مقبول",
+          "comfortable": "مريح"
+        }
+      },
+      "humanPresence": {
+        "title": "التواجد البشري",
+        "description": "هل يوجد أشخاص آخرون من حولك؟",
+        "options": {
+          "nobody": "لا أحد",
+          "few": "قليل",
+          "some": "بعضهم",
+          "many": "كثير"
+        }
+      },
+      "cleanliness": {
+        "title": "النظافة",
+        "description": "الحالة العامة لنظافة وصيانة المكان.",
+        "options": {
+          "veryDirty": "متسخ جداً",
+          "dirty": "متسخ",
+          "clean": "نظيف",
+          "veryClean": "نظيف جداً"
+        }
+      },
+      "naturalSurveillance": {
+        "title": "المراقبة الطبيعية",
+        "description": "الشعور بأنك مرئي من المباني (عيون على الشارع).",
+        "options": {
+          "none": "لا توجد",
+          "weak": "ضعيفة",
+          "medium": "متوسطة",
+          "high": "عالية"
+        }
+      },
+      "spaceDiversity": {
+        "title": "تنوع الفضاء",
+        "description": "وجود وتنوع الأجناس والأعمار (نساء، أطفال).",
+        "options": {
+          "notMixed": "غير مختلط",
+          "littleMixed": "مختلط قليلاً",
+          "fairlyMixed": "مختلط إلى حد ما",
+          "veryMixed": "مختلط جداً"
+        }
+      },
+      "transportAccess": {
+        "title": "الوصول إلى النقل",
+        "description": "قرب وسهولة الوصول إلى وسائل النقل العام.",
+        "options": {
+          "inaccessible": "غير متاح",
+          "far": "بعيد",
+          "close": "قريب",
+          "veryClose": "قريب جداً"
+        }
+      },
+      "formalSecurity": {
+        "title": "الأمن الرسمي",
+        "description": "الوجود المرئي للشرطة أو حراس الأمن.",
+        "options": {
+          "none": "لا يوجد",
+          "weak": "ضعيف",
+          "medium": "متوسط",
+          "high": "عالي"
+        }
+      }
+    },
+    "photos": {
+      "title": "صور (اختياري)",
+      "description": "أضف صوراً لتوثيق ملاحظاتك",
+      "action": "التقط صوراً",
+      "widget": {
+        "empty": {
+          "title": "التقط صوراً",
+          "description": "وثق تدقيقك بالصور",
+          "takePhoto": "التقط صورة",
+          "chooseFromGallery": "اختر من المعرض"
+        },
+        "gallery": {
+          "photo": "صورة",
+          "photos": "صور",
+          "add": "إضافة",
+          "processing": "جاري الضغط...",
+          "viewPhoto": "عرض الصورة",
+          "rotatePhoto": "تدوير",
+          "deletePhoto": "حذف",
+          "clearAll": "حذف الكل"
+        },
+        "viewer": {
+          "title": "صورة {current} / {total}",
+          "download": "تحميل",
+          "previous": "السابق",
+          "next": "التالي",
+          "close": "إغلاق"
+        },
+        "messages": {
+          "photoAdded": "تمت إضافة الصورة",
+          "photoRemoved": "تم حذف الصورة",
+          "allPhotosRemoved": "تم حذف جميع الصور",
+          "processingError": "خطأ في معالجة الصورة",
+          "maxPhotosReached": "الحد الأقصى {max} صور مسموح",
+          "confirmClearAll": "حذف {count} صور؟"
+        }
+      }
+    },
+    "comments": {
+      "title": "تعليقات (اختياري)",
+      "description": "شارك ملاحظاتك الإضافية",
+      "placeholder": "تعليقات إضافية (اختياري)"
+    },
+    "submit": {
+      "button": "إرسال التدقيق",
+      "sending": "جاري الإرسال...",
+      "success": "تم إرسال التدقيق بنجاح!",
+      "error": "خطأ في الإرسال"
+    },
+    "success": {
+      "title": "تم التدقيق!",
+      "message": "شكراً لمساهمتك في الأمان الحضري.",
+      "statusOnline": "تمت مزامنة البيانات",
+      "statusOffline": "تم حفظه محلياً",
+      "auditId": "رقم التدقيق:",
+      "actions": {
+        "newAudit": "تدقيق جديد",
+        "myAudits": "تدقيقاتي",
+        "home": "الرئيسية"
+      }
+    },
+    "validation": {
+      "location": "يرجى الحصول على موقع GPS أو اختيار حي",
+      "questions": "يرجى الإجابة على سؤال واحد على الأقل",
+      "both": "يرجى الحصول على موقع GPS أو اختيار حي، والإجابة على سؤال واحد على الأقل"
+    }
+  },
+  "history": {
+    "title": "تدقيقاتي",
+    "loading": "جاري تحميل التدقيقات...",
+    "empty": {
+      "title": "لا توجد تدقيقات مسجلة",
+      "description": "ستظهر تدقيقات الأمان الخاصة بك هنا بمجرد اكتمالها.",
+      "action": "ابدأ تدقيقاً"
+    },
+    "stats": {
+      "total": "التدقيقات",
+      "synced": "تمت المزامنة"
+    },
+    "filters": {
+      "all": "الكل",
+      "synced": "السحابة",
+      "local": "محلي",
+      "failed": "فشلت"
+    },
+    "actions": {
+      "export": "تصدير",
+      "delete": "حذف",
+      "sync": "مزامنة"
+    },
+    "sync": {
+      "offline": "ستتم المزامنة عند إعادة الاتصال",
+      "status": "حالة المزامنة",
+      "synced": "تمت المزامنة",
+      "pending": "في الانتظار",
+      "failed": "فشلت",
+      "syncing": "جاري...",
+      "retry": "إعادة المحاولة"
+    },
+    "detail": {
+      "title": "تفاصيل التدقيق",
+      "location": "الموقع",
+      "date": "التاريخ",
+      "coordinates": "الإحداثيات",
+      "precision": "الدقة",
+      "evaluations": "التقييمات",
+      "globalScore": "النتيجة الإجمالية",
+      "photos": "الصور",
+      "unavailable": "الصورة غير متاحة",
+      "technicalInfo": "المعلومات التقنية",
+      "source": "المصدر",
+      "attempts": "المحاولات",
+      "export": "تصدير",
+      "close": "إغلاق",
+      "retrySync": "إعادة المحاولة"
+    }
+  },
+  "menu": {
+    "systemStatus": "حالة النظام",
+    "cloudSync": "المزامنة السحابية",
+    "networkConnectivity": "اتصال الشبكة",
+    "gpsLocation": "تحديد الموقع",
+    "startGuide": "دليل البدء",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "gpsStatus": "الدقة",
+    "gpsActivating": "جاري التفعيل...",
+    "lastSync": "آخر مزامنة",
+    "syncNow": "مزامنة الآن",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق"
+  },
+  "gps": {
+    "title": "تحديد الموقع",
+    "position": "الموقع",
+    "precision": "الدقة",
+    "quality": "الجودة",
+    "lastUpdate": "آخر تحديث",
+    "loading": "جاري تحميل الخريطة...",
+    "initializing": "جاري تهيئة الخريطة",
+    "unavailable": "موقع GPS غير متاح",
+    "refresh": "إعادة المحاولة",
+    "close": "إغلاق"
+  },
+  "onboarding": {
+    "title": "مرحباً بك في أونوف!",
+    "steps": {
+      "gps": {
+        "title": "فعل نظام تحديد المواقع",
+        "description": "لسياق تدقيقات الأمان الخاصة بك، يحتاج التطبيق إلى موقعك."
+      },
+      "observe": {
+        "title": "راقب بيئتك",
+        "description": "قيم جوانب الأمان: الإنارة، الممرات، الانفتاح، الإحساس..."
+      },
+      "answer": {
+        "title": "أجب على الأسئلة",
+        "description": "واجهة بسيطة مع رموز تعبيرية وخيارات بصرية. التقاط صور اختياري."
+      },
+      "sync": {
+        "title": "المزامنة التلقائية",
+        "description": "يتم حفظ بياناتك محلياً ومزامنتها عند الإمكان."
+      }
+    },
+    "startButton": "ابدأ تدقيقي الأول!"
+  },
+  "errors": {
+    "gpsUnavailable": "لا يمكن الحصول على موقع GPS",
+    "networkError": "خطأ في اتصال الشبكة",
+    "validationError": "يرجى التحقق من المعلومات المدخلة"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "share": "مشاركة",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "yes": "نعم",
+    "no": "لا",
+    "unknown": "غير معروف",
+    "unavailable": "غير متاح",
+    "changeLanguage": "تغيير اللغة"
+  }
+}

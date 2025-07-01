@@ -47,13 +47,13 @@
           
           <v-list>
             <!-- Section Statut Système -->
-            <v-list-subheader>Statut Système</v-list-subheader>
+            <v-list-subheader>{{ t('menu.systemStatus') }}</v-list-subheader>
             
             <v-list-item @click="showSyncDialog = true">
               <template v-slot:prepend>
                 <v-icon :color="syncIndicatorColor">{{ syncIcon }}</v-icon>
               </template>
-              <v-list-item-title>Synchronisation Cloud</v-list-item-title>
+              <v-list-item-title>{{ t('menu.cloudSync') }}</v-list-item-title>
               <v-list-item-subtitle>{{ syncStatusText }}</v-list-item-subtitle>
             </v-list-item>
             
@@ -63,9 +63,9 @@
                   {{ isOnline ? 'mdi-wifi' : 'mdi-wifi-off' }}
                 </v-icon>
               </template>
-              <v-list-item-title>Connectivité Réseau</v-list-item-title>
+              <v-list-item-title>{{ t('menu.networkConnectivity') }}</v-list-item-title>
               <v-list-item-subtitle>
-                {{ isOnline ? 'En ligne' : 'Hors ligne' }}
+                {{ isOnline ? t('menu.online') : t('menu.offline') }}
               </v-list-item-subtitle>
             </v-list-item>
             
@@ -73,7 +73,7 @@
               <template v-slot:prepend>
                 <v-icon :color="gpsAccuracyLevel.color">{{ gpsAccuracyLevel.icon }}</v-icon>
               </template>
-              <v-list-item-title>Géolocalisation GPS</v-list-item-title>
+              <v-list-item-title>{{ t('menu.gpsLocation') }}</v-list-item-title>
               <v-list-item-subtitle>
                 {{ gpsStatusText }}
               </v-list-item-subtitle>
@@ -86,8 +86,18 @@
               <template v-slot:prepend>
                 <v-icon>mdi-play-circle-outline</v-icon>
               </template>
-              <v-list-item-title>Guide de démarrage</v-list-item-title>
+              <v-list-item-title>{{ t('menu.startGuide') }}</v-list-item-title>
             </v-list-item>
+            
+            <v-divider class="my-2" />
+            
+            <!-- ✅ NOUVEAU: Sélecteur de langue -->
+            <v-list-subheader>Langue / Language / اللغة</v-list-subheader>
+            
+            <LanguageSwitcher 
+              variant="list" 
+              @language-changed="handleLanguageChange"
+            />
             
             <v-divider class="my-2" />
             
@@ -98,14 +108,14 @@
               <template v-slot:prepend>
                 <v-icon>mdi-account-settings</v-icon>
               </template>
-              <v-list-item-title>Profil</v-list-item-title>
+              <v-list-item-title>{{ t('menu.profile') }}</v-list-item-title>
             </v-list-item>
             
             <v-list-item @click="logout">
               <template v-slot:prepend>
                 <v-icon>mdi-logout</v-icon>
               </template>
-              <v-list-item-title>Déconnexion</v-list-item-title>
+              <v-list-item-title>{{ t('menu.logout') }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -391,9 +401,15 @@ import { useAuth } from '@/composables/useSupabase'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import { globalGeolocation } from '@/composables/useGeolocation'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
+// ✅ NOUVEAU: Import du composant de changement de langue
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 export default {
   name: 'StatusBar',
+  components: {
+    LanguageSwitcher // ✅ NOUVEAU: Enregistrer le composant
+  },
   props: {
     pageTitle: {
       type: String,
@@ -407,6 +423,7 @@ export default {
   setup() {
     const router = useRouter()
     const route = useRoute()
+    const { t } = useI18n() // ✅ NOUVEAU: Fonction de traduction
     
     // Composables
     const { currentUser, logout: authLogout } = useAuth()
@@ -776,6 +793,12 @@ export default {
       })
     }
     
+    // ✅ NOUVEAU: Gestionnaire de changement de langue
+    const handleLanguageChange = (newLang) => {
+      console.log(`🌍 StatusBar: Langue changée vers ${newLang}`)
+      // Le composable useLang s'occupe déjà de tout
+    }
+    
     return {
       // Data
       currentUser,
@@ -821,7 +844,9 @@ export default {
       refreshGps,
       manualSync,
       retryFailed,
-      formatTime
+      formatTime,
+      handleLanguageChange, // ✅ NOUVEAU: Ajouter la méthode au return
+      t // ✅ NOUVEAU: Fonction de traduction
     }
   }
 }

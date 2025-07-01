@@ -1,4 +1,4 @@
-// Configuration des questions d'audit avec leurs options
+// Configuration des questions d'audit avec support i18n
 // Import des icônes SVG
 import lumi1 from '@/assets/icons/lumi1.svg'
 import lumi2 from '@/assets/icons/lumi2.svg'
@@ -41,101 +41,94 @@ import police2 from '@/assets/icons/police2.svg'
 import police3 from '@/assets/icons/police3.svg'
 import police4 from '@/assets/icons/police4.svg'
 
-export const questions = [
+// ✅ NOUVEAU: Configuration basée sur des clés i18n
+export const questionsConfig = [
   {
     id: 'lighting',
-    title: 'Éclairage',
-    description: 'Disponibilité de suffisamment de lumière pour voir tout autour de vous.',
+    titleKey: 'audit.sections.lighting_detailed.title',
+    descriptionKey: 'audit.sections.lighting_detailed.description',
     options: [
       { 
         value: 1, 
-        text: 'Aucun', 
+        textKey: 'audit.sections.lighting_detailed.options.none',
         svgPath: lumi1,
         emoji: '🌑', 
         icon: 'mdi-lightbulb-off-outline', 
-        color: 'grey-lighten-1',
-        description: 'Pas d\'éclairage visible'
+        color: 'grey-lighten-1'
       },
       { 
         value: 2, 
-        text: 'Faible', 
+        textKey: 'audit.sections.lighting_detailed.options.weak',
         svgPath: lumi2,
         emoji: '🌒', 
         icon: 'mdi-lightbulb-outline', 
-        color: 'red-darken-1',
-        description: 'Éclairage insuffisant'
+        color: 'red-darken-1'
       },
       { 
         value: 3, 
-        text: 'Suffisant', 
+        textKey: 'audit.sections.lighting_detailed.options.sufficient',
         svgPath: lumi3,
         emoji: '🌕', 
         icon: 'mdi-lightbulb-on-outline', 
-        color: 'orange-darken-1',
-        description: 'Bon niveau d\'éclairage'
+        color: 'orange-darken-1'
       },
       { 
         value: 4, 
-        text: 'Excellent', 
+        textKey: 'audit.sections.lighting_detailed.options.excellent',
         svgPath: lumi4,
         emoji: '☀️', 
         icon: 'mdi-lightbulb-on', 
-        color: 'green-darken-1',
-        description: 'Très bien éclairé'
+        color: 'green-darken-1'
       },
     ]
   },
   {
     id: 'walkpath',
-    title: 'Cheminement',
-    description: 'Soit un trottoir, soit une route avec de l\'espace pour marcher.',
+    titleKey: 'audit.sections.walkways.title',
+    descriptionKey: 'audit.sections.walkways.description',
     options: [
       { 
         value: 1, 
-        text: 'Aucun', 
+        textKey: 'audit.sections.walkways.options.none',
         svgPath: walk1,
         emoji: '🚫', 
         icon: 'mdi-cancel', 
-        color: 'grey-lighten-1',
-        description: 'Pas de cheminement'
+        color: 'grey-lighten-1'
       },
       { 
         value: 2, 
-        text: 'Mauvais', 
+        textKey: 'audit.sections.walkways.options.bad',
         svgPath: walk2,
         emoji: '🕳️', 
         icon: 'mdi-alert-circle-outline', 
-        color: 'red-darken-1',
-        description: 'Cheminement difficile'
+        color: 'red-darken-1'
       },
       { 
         value: 3, 
-        text: 'Correct', 
+        textKey: 'audit.sections.walkways.options.correct',
         svgPath: walk3,
         emoji: '🛤️', 
         icon: 'mdi-check-circle-outline', 
-        color: 'orange-darken-1',
-        description: 'Cheminement praticable'
+        color: 'orange-darken-1'
       },
       { 
         value: 4, 
-        text: 'Excellent', 
+        textKey: 'audit.sections.walkways.options.excellent',
         svgPath: walk4,
         emoji: '🛣️', 
         icon: 'mdi-thumb-up-outline', 
-        color: 'green-darken-1',
-        description: 'Cheminement optimal'
+        color: 'green-darken-1'
       },
     ]
   },
   {
     id: 'openness',
-    title: 'Ouverture',
-    description: 'Capacité de voir et de se déplacer dans toutes les directions.',
+    titleKey: 'audit.sections.openness.title',
+    descriptionKey: 'audit.sections.openness.description',
     options: [
       { 
         value: 1, 
-        text: 'Bloqué', 
+        textKey: 'audit.sections.openness.options.blocked',
         svgPath: visibility1,
         emoji: '🧱', 
         icon: 'mdi-arrow-collapse-all', 
@@ -143,7 +136,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Limité', 
+        textKey: 'audit.sections.openness.options.limited',
         svgPath: visibility2,
         emoji: '🚧', 
         icon: 'mdi-arrow-expand-horizontal', 
@@ -151,7 +144,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Ouvert', 
+        textKey: 'audit.sections.openness.options.open',
         svgPath: visibility3,
         emoji: '🌅', 
         icon: 'mdi-arrow-expand-all', 
@@ -159,7 +152,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Très ouvert', 
+        textKey: 'audit.sections.openness.options.veryOpen',
         svgPath: visibility4,
         emoji: '🌄', 
         icon: 'mdi-arrow-top-left-bottom-right', 
@@ -169,12 +162,12 @@ export const questions = [
   },
   {
     id: 'feeling',
-    title: 'Ressenti',
-    description: 'Comment vous sentez-vous dans cet endroit en ce moment ?',
+    titleKey: 'audit.sections.feeling.title',
+    descriptionKey: 'audit.sections.feeling.description',
     options: [
       { 
         value: 1, 
-        text: 'Effrayant', 
+        textKey: 'audit.sections.feeling.options.scary',
         svgPath: feeling1,
         emoji: '😰', 
         icon: 'mdi-emoticon-dead-outline', 
@@ -182,7 +175,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Inconfortable', 
+        textKey: 'audit.sections.feeling.options.uncomfortable',
         svgPath: feeling2,
         emoji: '😟', 
         icon: 'mdi-emoticon-sad-outline', 
@@ -190,7 +183,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Acceptable', 
+        textKey: 'audit.sections.feeling.options.acceptable',
         svgPath: feeling3,
         emoji: '😐', 
         icon: 'mdi-emoticon-neutral-outline', 
@@ -198,7 +191,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Confortable', 
+        textKey: 'audit.sections.feeling.options.comfortable',
         svgPath: feeling4,
         emoji: '😊', 
         icon: 'mdi-emoticon-happy-outline', 
@@ -208,12 +201,12 @@ export const questions = [
   },
   {
     id: 'peoplePresence',
-    title: 'Présence humaine',
-    description: 'Y a-t-il d\'autres personnes autour de vous ?',
+    titleKey: 'audit.sections.humanPresence.title',
+    descriptionKey: 'audit.sections.humanPresence.description',
     options: [
       { 
         value: 1, 
-        text: 'Personne', 
+        textKey: 'audit.sections.humanPresence.options.nobody',
         svgPath: frequentation1,
         emoji: '👻', 
         icon: 'mdi-account-off', 
@@ -221,7 +214,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Peu', 
+        textKey: 'audit.sections.humanPresence.options.few',
         svgPath: frequentation2,
         emoji: '👤', 
         icon: 'mdi-account', 
@@ -229,7 +222,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Quelques-uns', 
+        textKey: 'audit.sections.humanPresence.options.some',
         svgPath: frequentation3,
         emoji: '👥', 
         icon: 'mdi-account-group-outline', 
@@ -237,7 +230,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Beaucoup', 
+        textKey: 'audit.sections.humanPresence.options.many',
         svgPath: frequentation4,
         emoji: '👫', 
         icon: 'mdi-account-group', 
@@ -247,12 +240,12 @@ export const questions = [
   },
   {
     id: 'cleanliness',
-    title: 'Propreté',
-    description: 'État général de propreté et d\'entretien du lieu.',
+    titleKey: 'audit.sections.cleanliness.title',
+    descriptionKey: 'audit.sections.cleanliness.description',
     options: [
       { 
         value: 1, 
-        text: 'Très sale', 
+        textKey: 'audit.sections.cleanliness.options.veryDirty',
         svgPath: clean1,
         emoji: '🗑️', 
         icon: 'mdi-delete-variant', 
@@ -260,7 +253,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Sale', 
+        textKey: 'audit.sections.cleanliness.options.dirty',
         svgPath: clean2,
         emoji: '🧽', 
         icon: 'mdi-broom', 
@@ -268,7 +261,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Propre', 
+        textKey: 'audit.sections.cleanliness.options.clean',
         svgPath: clean3,
         emoji: '🧼', 
         icon: 'mdi-spray', 
@@ -276,7 +269,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Très propre', 
+        textKey: 'audit.sections.cleanliness.options.veryClean',
         svgPath: clean4,
         emoji: '✨', 
         icon: 'mdi-star-circle', 
@@ -286,12 +279,12 @@ export const questions = [
   },
   {
     id: 'naturalSurveillance',
-    title: 'Surveillance Naturelle',
-    description: 'Le sentiment d\'être visible depuis les bâtiments (Yeux sur la rue).',
+    titleKey: 'audit.sections.naturalSurveillance.title',
+    descriptionKey: 'audit.sections.naturalSurveillance.description',
     options: [
       { 
         value: 1, 
-        text: 'Aucune', 
+        textKey: 'audit.sections.naturalSurveillance.options.none',
         svgPath: surveillance1,
         emoji: '🏚️', 
         icon: 'mdi-eye-off', 
@@ -299,7 +292,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Faible', 
+        textKey: 'audit.sections.naturalSurveillance.options.weak',
         svgPath: surveillance2,
         emoji: '🏢', 
         icon: 'mdi-eye-outline', 
@@ -307,7 +300,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Moyenne', 
+        textKey: 'audit.sections.naturalSurveillance.options.medium',
         svgPath: surveillance3,
         emoji: '🏘️', 
         icon: 'mdi-eye', 
@@ -315,7 +308,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Élevée', 
+        textKey: 'audit.sections.naturalSurveillance.options.high',
         svgPath: surveillance4,
         emoji: '🏪', 
         icon: 'mdi-eye-circle', 
@@ -325,12 +318,12 @@ export const questions = [
   },
   {
     id: 'spaceDiversity',
-    title: 'Mixité de l\'Espace',
-    description: 'La présence et la diversité des genres et des âges (femmes, enfants).',
+    titleKey: 'audit.sections.spaceDiversity.title',
+    descriptionKey: 'audit.sections.spaceDiversity.description',
     options: [
       { 
         value: 1, 
-        text: 'Non mixte', 
+        textKey: 'audit.sections.spaceDiversity.options.notMixed',
         svgPath: mix1,
         emoji: '👔', 
         icon: 'mdi-account-tie', 
@@ -338,7 +331,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Peu mixte', 
+        textKey: 'audit.sections.spaceDiversity.options.littleMixed',
         svgPath: mix2,
         emoji: '👨‍👨', 
         icon: 'mdi-account-multiple', 
@@ -346,7 +339,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Assez mixte', 
+        textKey: 'audit.sections.spaceDiversity.options.fairlyMixed',
         svgPath: mix3,
         emoji: '👨‍👩', 
         icon: 'mdi-account-group', 
@@ -354,7 +347,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Très mixte', 
+        textKey: 'audit.sections.spaceDiversity.options.veryMixed',
         svgPath: mix4,
         emoji: '👨‍👩‍👧‍👦', 
         icon: 'mdi-account-supervisor-circle', 
@@ -364,12 +357,12 @@ export const questions = [
   },
   {
     id: 'transportAccess',
-    title: 'Accès aux Transports',
-    description: 'La proximité et la facilité d\'accès aux transports en commun.',
+    titleKey: 'audit.sections.transportAccess.title',
+    descriptionKey: 'audit.sections.transportAccess.description',
     options: [
       { 
         value: 1, 
-        text: 'Inaccessible', 
+        textKey: 'audit.sections.transportAccess.options.inaccessible',
         svgPath: bus1,
         emoji: '🚫', 
         icon: 'mdi-bus-alert', 
@@ -377,7 +370,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Éloigné', 
+        textKey: 'audit.sections.transportAccess.options.far',
         svgPath: bus2,
         emoji: '🚶‍♂️', 
         icon: 'mdi-bus-clock', 
@@ -385,7 +378,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Proche', 
+        textKey: 'audit.sections.transportAccess.options.close',
         svgPath: bus3,
         emoji: '🚏', 
         icon: 'mdi-bus-stop', 
@@ -393,7 +386,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Très proche', 
+        textKey: 'audit.sections.transportAccess.options.veryClose',
         svgPath: bus4,
         emoji: '🚌', 
         icon: 'mdi-bus-multiple', 
@@ -403,12 +396,12 @@ export const questions = [
   },
   {
     id: 'formalSecurity',
-    title: 'Sécurité Formelle',
-    description: 'La présence visible de la police ou de gardiens de sécurité.',
+    titleKey: 'audit.sections.formalSecurity.title',
+    descriptionKey: 'audit.sections.formalSecurity.description',
     options: [
       { 
         value: 1, 
-        text: 'Aucune', 
+        textKey: 'audit.sections.formalSecurity.options.none',
         svgPath: police1,
         emoji: '❌', 
         icon: 'mdi-shield-off', 
@@ -416,7 +409,7 @@ export const questions = [
       },
       { 
         value: 2, 
-        text: 'Faible', 
+        textKey: 'audit.sections.formalSecurity.options.weak',
         svgPath: police2,
         emoji: '👮', 
         icon: 'mdi-shield-outline', 
@@ -424,7 +417,7 @@ export const questions = [
       },
       { 
         value: 3, 
-        text: 'Moyenne', 
+        textKey: 'audit.sections.formalSecurity.options.medium',
         svgPath: police3,
         emoji: '🚓', 
         icon: 'mdi-shield-check', 
@@ -432,7 +425,7 @@ export const questions = [
       },
       { 
         value: 4, 
-        text: 'Élevée', 
+        textKey: 'audit.sections.formalSecurity.options.high',
         svgPath: police4,
         emoji: '🚔', 
         icon: 'mdi-shield-star', 
@@ -442,9 +435,30 @@ export const questions = [
   }
 ]
 
+// ✅ NOUVEAU: Fonction pour créer les questions avec traductions
+export const createTranslatedQuestions = (t) => {
+  return questionsConfig.map(config => ({
+    id: config.id,
+    title: t(config.titleKey),
+    description: t(config.descriptionKey),
+    options: config.options.map(option => ({
+      ...option,
+      text: t(option.textKey)
+    }))
+  }))
+}
+
+// ✅ GARDE: Export de compatibilité (pour éviter les erreurs)
+export const questions = questionsConfig.map(config => ({
+  id: config.id,
+  title: config.titleKey, // Clé au lieu du texte
+  description: config.descriptionKey,
+  options: config.options
+}))
+
 // Fonction helper pour obtenir une question par son ID
 export const getQuestionById = (id) => {
-  return questions.find(q => q.id === id)
+  return questionsConfig.find(q => q.id === id)
 }
 
 // Fonction helper pour obtenir toutes les options d'une question
@@ -452,4 +466,3 @@ export const getQuestionOptions = (questionId) => {
   const question = getQuestionById(questionId)
   return question ? question.options : []
 }
-

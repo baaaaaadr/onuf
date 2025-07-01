@@ -304,3 +304,239 @@ body {
     display: none !important;
   }
 }
+
+/* === RTL SUPPORT FOR ARABIC === */
+/* Configuration globale RTL */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Composants Vuetify en RTL */
+[dir="rtl"] .v-list-item {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .v-list-item__prepend {
+  margin-inline-start: 16px;
+  margin-inline-end: 0;
+}
+
+[dir="rtl"] .v-list-item__append {
+  margin-inline-start: 0;
+  margin-inline-end: 16px;
+}
+
+[dir="rtl"] .v-app-bar {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .v-app-bar .d-flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .v-btn {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .v-btn .v-icon--start {
+  margin-inline-start: 8px;
+  margin-inline-end: 0;
+}
+
+[dir="rtl"] .v-btn .v-icon--end {
+  margin-inline-start: 0;
+  margin-inline-end: 8px;
+}
+
+/* Texte et alignement */
+[dir="rtl"] .v-card-title,
+[dir="rtl"] .v-card-subtitle,
+[dir="rtl"] .v-card-text,
+[dir="rtl"] .v-list-item-title,
+[dir="rtl"] .v-list-item-subtitle,
+[dir="rtl"] .text-h1,
+[dir="rtl"] .text-h2,
+[dir="rtl"] .text-h3,
+[dir="rtl"] .text-h4,
+[dir="rtl"] .text-h5,
+[dir="rtl"] .text-h6,
+[dir="rtl"] .text-body-1,
+[dir="rtl"] .text-body-2,
+[dir="rtl"] .text-caption {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Formulaires en RTL */
+[dir="rtl"] .v-field {
+  direction: rtl;
+}
+
+[dir="rtl"] .v-field__input {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .v-select__selection {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Navigation */
+[dir="rtl"] .v-bottom-navigation {
+  direction: rtl;
+}
+
+[dir="rtl"] .v-tab {
+  direction: rtl;
+}
+
+/* Classes spécifiques ONUF en RTL */
+[dir="rtl"] .onuf-container {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .onuf-option-card {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Grille RTL */
+[dir="rtl"] .v-row {
+  flex-direction: row-reverse;
+}
+
+/* Espacement RTL */
+[dir="rtl"] .mr-2 {
+  margin-left: 8px !important;
+  margin-right: 0 !important;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-right: 8px !important;
+  margin-left: 0 !important;
+}
+
+[dir="rtl"] .pr-2 {
+  padding-left: 8px !important;
+  padding-right: 0 !important;
+}
+
+[dir="rtl"] .pl-2 {
+  padding-right: 8px !important;
+  padding-left: 0 !important;
+}
+
+/* Icônes en RTL */
+[dir="rtl"] .v-icon {
+  transform: scaleX(-1);
+}
+
+/* Ne pas retourner ces icônes spécifiques */
+[dir="rtl"] .v-icon.mdi-menu,
+[dir="rtl"] .v-icon.mdi-close,
+[dir="rtl"] .v-icon.mdi-check,
+[dir="rtl"] .v-icon.mdi-account,
+[dir="rtl"] .v-icon.mdi-camera,
+[dir="rtl"] .v-icon.mdi-map-marker,
+[dir="rtl"] .v-icon.mdi-wifi,
+[dir="rtl"] .v-icon.mdi-cloud {
+  transform: none;
+}
+
+/* Corrections spécifiques pour les composants */
+[dir="rtl"] .status-bar .d-flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .audit-questions,
+[dir="rtl"] .audit-form {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Styles spécifiques pour les sections d'audit */
+[dir="rtl"] .audit-section-modern {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .audit-section-modern .v-card-title {
+  text-align: right;
+}
+
+[dir="rtl"] .audit-section-modern .v-card-subtitle {
+  text-align: right;
+}
+
+/* Grille d'options en RTL */
+[dir="rtl"] .option-grid {
+  direction: rtl;
+}
+
+[dir="rtl"] .option-item {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Photo capture en RTL */
+[dir="rtl"] .photo-capture {
+  direction: rtl;
+}
+
+[dir="rtl"] .photo-gallery .gallery-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .photo-empty {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Vuetify Select en RTL */
+[dir="rtl"] .v-select .v-select__selections {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+/* Localisation widget */
+[dir="rtl"] .location-widget {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Bottom navigation RTL */
+[dir="rtl"] .v-bottom-navigation .v-btn {
+  direction: rtl;
+}
+
+/* Force RTL sur les composants Vue systémiques */
+[dir="rtl"] .v-main {
+  direction: rtl;
+}
+
+[dir="rtl"] .v-container {
+  direction: rtl;
+}
+
+/* Override pour forcer le RTL sur les éléments de texte principaux */
+[dir="rtl"] p,
+[dir="rtl"] div,
+[dir="rtl"] span,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] label {
+  direction: rtl;
+  text-align: right;
+}

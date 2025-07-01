@@ -1,0 +1,326 @@
+{
+  "app": {
+    "title": "MANARA",
+    "description": "Application d'audit de sécurité urbaine"
+  },
+  "navigation": {
+    "audit": "Audit",
+    "history": "Historique"
+  },
+  "audit": {
+    "title": "Audit de Sécurité",
+    "subtitle": "Si vous n'êtes pas localisés automatiquement, alors choisissez votre quartier",
+    "location": {
+      "title": "Localisation GPS",
+      "description": "Votre position actuelle"
+    },
+    "neighborhood": {
+      "title": "Quartier",
+      "description": "Alternative si le GPS ne fonctionne pas",
+      "select": "Sélectionner un quartier"
+    },
+    "sections": {
+      "lighting": "Éclairage",
+      "walkpath": "Cheminement",
+      "openness": "Ouverture", 
+      "feeling": "Ressenti",
+      "peoplePresence": "Présence",
+      "cleanliness": "Propreté",
+      "naturalSurveillance": "Surveillance",
+      "spaceDiversity": "Mixité",
+      "transportAccess": "Transports",
+      "formalSecurity": "Sécurité",
+      "lighting_detailed": {
+        "title": "Éclairage",
+        "description": "Disponibilité de suffisamment de lumière pour voir tout autour de vous.",
+        "options": {
+          "none": "Aucun",
+          "weak": "Faible",
+          "sufficient": "Suffisant",
+          "excellent": "Excellent"
+        }
+      },
+      "walkways": {
+        "title": "Cheminement",
+        "description": "Soit un trottoir, soit une route avec de l'espace pour marcher.",
+        "options": {
+          "none": "Aucun",
+          "bad": "Mauvais",
+          "correct": "Correct",
+          "excellent": "Excellent"
+        }
+      },
+      "openness": {
+        "title": "Ouverture",
+        "description": "Capacité de voir et de se déplacer dans toutes les directions.",
+        "options": {
+          "blocked": "Bloqué",
+          "limited": "Limité",
+          "open": "Ouvert",
+          "veryOpen": "Très ouvert"
+        }
+      },
+      "feeling": {
+        "title": "Ressenti",
+        "description": "Comment vous sentez-vous dans cet endroit en ce moment ?",
+        "options": {
+          "scary": "Effrayant",
+          "uncomfortable": "Inconfortable",
+          "acceptable": "Acceptable",
+          "comfortable": "Confortable"
+        }
+      },
+      "humanPresence": {
+        "title": "Présence humaine",
+        "description": "Y a-t-il d'autres personnes autour de vous ?",
+        "options": {
+          "nobody": "Personne",
+          "few": "Peu",
+          "some": "Quelques-uns",
+          "many": "Beaucoup"
+        }
+      },
+      "cleanliness": {
+        "title": "Propreté",
+        "description": "État général de propreté et d'entretien du lieu.",
+        "options": {
+          "veryDirty": "Très sale",
+          "dirty": "Sale",
+          "clean": "Propre",
+          "veryClean": "Très propre"
+        }
+      },
+      "naturalSurveillance": {
+        "title": "Surveillance Naturelle",
+        "description": "Le sentiment d'être visible depuis les bâtiments (Yeux sur la rue).",
+        "options": {
+          "none": "Aucune",
+          "weak": "Faible",
+          "medium": "Moyenne",
+          "high": "Élevée"
+        }
+      },
+      "spaceDiversity": {
+        "title": "Mixité de l'Espace",
+        "description": "La présence et la diversité des genres et des âges (femmes, enfants).",
+        "options": {
+          "notMixed": "Non mixte",
+          "littleMixed": "Peu mixte",
+          "fairlyMixed": "Assez mixte",
+          "veryMixed": "Très mixte"
+        }
+      },
+      "transportAccess": {
+        "title": "Accès aux Transports",
+        "description": "La proximité et la facilité d'accès aux transports en commun.",
+        "options": {
+          "inaccessible": "Inaccessible",
+          "far": "Éloigné",
+          "close": "Proche",
+          "veryClose": "Très proche"
+        }
+      },
+      "formalSecurity": {
+        "title": "Sécurité Formelle",
+        "description": "La présence visible de la police ou de gardiens de sécurité.",
+        "options": {
+          "none": "Aucune",
+          "weak": "Faible",
+          "medium": "Moyenne",
+          "high": "Élevée"
+        }
+      }
+    },
+    "photos": {
+      "title": "Photos (optionnel)",
+      "description": "Ajoutez des photos pour documenter vos observations",
+      "action": "Prendre des photos",
+      "widget": {
+        "empty": {
+          "title": "Prendre des photos",
+          "description": "Documentez votre audit avec des photos",
+          "takePhoto": "Prendre une photo",
+          "chooseFromGallery": "Choisir depuis la galerie"
+        },
+        "gallery": {
+          "photo": "photo",
+          "photos": "photos",
+          "add": "Ajouter",
+          "processing": "Compression...",
+          "viewPhoto": "Voir la photo",
+          "rotatePhoto": "Faire pivoter",
+          "deletePhoto": "Supprimer",
+          "clearAll": "Tout supprimer"
+        },
+        "viewer": {
+          "title": "Photo {current} / {total}",
+          "download": "Télécharger",
+          "previous": "Précédent",
+          "next": "Suivant",
+          "close": "Fermer"
+        },
+        "messages": {
+          "photoAdded": "Photo ajoutée",
+          "photoRemoved": "Photo supprimée",
+          "allPhotosRemoved": "Toutes les photos supprimées",
+          "processingError": "Erreur lors du traitement de la photo",
+          "maxPhotosReached": "Maximum {max} photos autorisées",
+          "confirmClearAll": "Supprimer les {count} photos ?"
+        }
+      }
+    },
+    "comments": {
+      "title": "Commentaires (optionnel)",
+      "description": "Partagez vos observations additionnelles",
+      "placeholder": "Commentaires additionnels (optionnel)"
+    },
+    "submit": {
+      "button": "Soumettre l'audit",
+      "sending": "Envoi en cours...",
+      "success": "Audit envoyé avec succès !",
+      "error": "Erreur lors de l'envoi"
+    },
+    "success": {
+      "title": "Audit Terminé !",
+      "message": "Merci pour votre contribution à la sécurité urbaine.",
+      "statusOnline": "Données synchronisées",
+      "statusOffline": "Sauvegardé localement",
+      "auditId": "ID d'audit :",
+      "actions": {
+        "newAudit": "Nouvel audit",
+        "myAudits": "Mes audits",
+        "home": "Accueil"
+      }
+    },
+    "validation": {
+      "location": "Veuillez obtenir votre position GPS ou choisir un quartier",
+      "questions": "Veuillez répondre à au moins une question",
+      "both": "Veuillez obtenir votre position GPS ou choisir un quartier, et répondre à au moins une question"
+    }
+  },
+  "history": {
+    "title": "Mes Audits",
+    "loading": "Chargement des audits...",
+    "empty": {
+      "title": "Aucun audit enregistré",
+      "description": "Vos audits de sécurité apparaîtront ici une fois terminés.",
+      "action": "Commencer un audit"
+    },
+    "stats": {
+      "total": "Audits",
+      "synced": "Synchronisés"
+    },
+    "filters": {
+      "all": "Tous",
+      "synced": "Cloud",
+      "local": "Local",
+      "failed": "Échecs"
+    },
+    "actions": {
+      "export": "Exporter",
+      "delete": "Supprimer",
+      "sync": "Synchroniser"
+    },
+    "sync": {
+      "offline": "seront synchronisés à la reconnexion",
+      "status": "État de synchronisation",
+      "synced": "Synchronisé",
+      "pending": "En attente",
+      "failed": "Échec",
+      "syncing": "En cours...",
+      "retry": "Réessayer sync"
+    },
+    "detail": {
+      "title": "Détail de l'audit",
+      "location": "Localisation",
+      "date": "Date",
+      "coordinates": "Coordonnées",
+      "precision": "Précision",
+      "evaluations": "Évaluations",
+      "globalScore": "Score global",
+      "photos": "Photos",
+      "unavailable": "Photo indisponible",
+      "technicalInfo": "Informations techniques",
+      "source": "Source",
+      "attempts": "Tentatives",
+      "export": "Exporter",
+      "close": "Fermer",
+      "retrySync": "Réessayer sync"
+    }
+  },
+  "menu": {
+    "systemStatus": "Statut Système",
+    "cloudSync": "Synchronisation Cloud",
+    "networkConnectivity": "Connectivité Réseau",
+    "gpsLocation": "Géolocalisation GPS",
+    "startGuide": "Guide de démarrage",
+    "profile": "Profil",
+    "logout": "Déconnexion",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "gpsStatus": "Précision",
+    "gpsActivating": "Activation en cours...",
+    "lastSync": "Dernière synchronisation",
+    "syncNow": "Synchroniser maintenant",
+    "retry": "Réessayer",
+    "close": "Fermer"
+  },
+  "gps": {
+    "title": "Géolocalisation GPS",
+    "position": "Position",
+    "precision": "Précision",
+    "quality": "Qualité",
+    "lastUpdate": "Mise à jour",
+    "loading": "Chargement de la carte...",
+    "initializing": "Initialisation Leaflet",
+    "unavailable": "Position GPS non disponible",
+    "refresh": "Réessayer",
+    "close": "Fermer"
+  },
+  "onboarding": {
+    "title": "Bienvenue dans ONUF !",
+    "steps": {
+      "gps": {
+        "title": "Activez votre GPS",
+        "description": "Pour contextualiser vos audits de sécurité, l'application a besoin de votre position."
+      },
+      "observe": {
+        "title": "Observez votre environnement",
+        "description": "Évaluez les aspects de sécurité : éclairage, cheminement, ouverture, ressenti..."
+      },
+      "answer": {
+        "title": "Répondez aux questions",
+        "description": "Interface simple avec emojis et choix visuels. Prise de photos optionnelle."
+      },
+      "sync": {
+        "title": "Synchronisation automatique",
+        "description": "Vos données sont sauvegardées localement et synchronisées quand possible."
+      }
+    },
+    "startButton": "Commencer mon premier audit !"
+  },
+  "errors": {
+    "gpsUnavailable": "Impossible d'obtenir la position GPS",
+    "networkError": "Erreur de connexion réseau",
+    "validationError": "Veuillez vérifier les informations saisies"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "share": "Partager",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "yes": "Oui",
+    "no": "Non",
+    "unknown": "Inconnu",
+    "unavailable": "Non disponible",
+    "changeLanguage": "Changer de langue"
+  }
+}

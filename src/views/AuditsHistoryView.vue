@@ -9,19 +9,19 @@
           color="primary"
           size="64"
         ></v-progress-circular>
-        <div class="text-body-1 mt-4">Chargement des audits...</div>
+        <div class="text-body-1 mt-4">{{ t('history.loading') }}</div>
       </div>
 
       <!-- Aucun audit -->
       <div v-else-if="allAudits.length === 0" class="text-center mt-8">
         <v-icon size="80" color="grey-lighten-1" class="mb-4">mdi-clipboard-list-outline</v-icon>
-        <h3 class="text-h5 mb-2">Aucun audit enregistré</h3>
+        <h3 class="text-h5 mb-2">{{ t('history.empty.title') }}</h3>
         <p class="text-body-2 text-grey mb-4">
-          Vos audits de sécurité apparaîtront ici une fois terminés.
+          {{ t('history.empty.description') }}
         </p>
         <v-btn color="primary" to="/audit" size="large">
           <v-icon left>mdi-plus</v-icon>
-          Commencer un audit
+          {{ t('history.empty.action') }}
         </v-btn>
       </div>
 
@@ -34,7 +34,7 @@
               <v-card-text class="pa-3">
                 <v-icon size="30" color="primary" class="mb-2">mdi-counter</v-icon>
                 <div class="text-h6">{{ allAudits.length }}</div>
-                <div class="text-caption">Audits</div>
+                <div class="text-caption">{{ t('history.stats.total') }}</div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -53,7 +53,7 @@
                   {{ safeSyncStats.failed > 0 ? 'mdi-cloud-alert' : 'mdi-cloud-check' }}
                 </v-icon>
                 <div class="text-h6">{{ safeSyncStats.success }}</div>
-                <div class="text-caption">Synchronisés</div>
+                <div class="text-caption">{{ t('history.stats.synced') }}</div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -72,7 +72,7 @@
               filter
             >
               <v-icon start size="small">mdi-all-inclusive</v-icon>
-              Tous
+              {{ t('history.filters.all') }}
               <v-chip class="ml-2" size="x-small" label>{{ allAuditsCount }}</v-chip>
             </v-chip>
             
@@ -82,7 +82,7 @@
               filter
             >
               <v-icon start size="small">mdi-cloud-check</v-icon>
-              Cloud
+              {{ t('history.filters.synced') }}
               <v-chip class="ml-2" size="x-small" label>{{ syncedCount }}</v-chip>
             </v-chip>
             
@@ -92,7 +92,7 @@
               filter
             >
               <v-icon start size="small">mdi-harddisk</v-icon>
-              Local
+              {{ t('history.filters.local') }}
               <v-chip class="ml-2" size="x-small" label>{{ localCount }}</v-chip>
             </v-chip>
             
@@ -104,7 +104,7 @@
               color="error"
             >
               <v-icon start size="small">mdi-cloud-alert</v-icon>
-              Échecs
+              {{ t('history.filters.failed') }}
               <v-chip class="ml-2" size="x-small" label color="error">{{ safeSyncStats.failed }}</v-chip>
             </v-chip>
           </v-chip-group>
@@ -146,7 +146,7 @@
             rounded
           >
             <v-icon start>mdi-cloud-sync</v-icon>
-            Synchroniser ({{ safeSyncStats.pending + safeSyncStats.failed }})
+            {{ t('history.actions.sync') }} ({{ safeSyncStats.pending + safeSyncStats.failed }})
           </v-btn>
         </div>
 
@@ -159,7 +159,7 @@
           class="mb-4"
         >
           <v-icon class="mr-2">mdi-wifi-off</v-icon>
-          {{ safeSyncStats.pending + safeSyncStats.failed }} audit(s) seront synchronisés à la reconnexion
+          {{ safeSyncStats.pending + safeSyncStats.failed }} {{ t('history.sync.offline') }}
         </v-alert>
 
         <!-- Liste des audits avec vrais statuts de sync -->
@@ -193,7 +193,7 @@
       <v-card v-if="selectedAudit">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2">mdi-clipboard-text</v-icon>
-          Détail de l'audit
+          {{ t('history.detail.title') }}
           <v-spacer />
           <v-chip 
             :color="getRealSyncStatusColor(selectedAudit)"
@@ -212,23 +212,23 @@
           <div class="mb-4">
             <h4 class="text-subtitle-1 mb-2 d-flex align-center">
               <v-icon class="mr-2" color="primary">mdi-map-marker</v-icon>
-              Localisation
+              {{ t('history.detail.location') }}
             </h4>
             <p class="text-body-2">{{ formatAddress(selectedAudit) }}</p>
             <div v-if="hasCoordinates(selectedAudit)" class="text-caption text-grey">
-              Coordonnées: {{ formatCoordinates(selectedAudit) }}
+              {{ t('history.detail.coordinates') }}: {{ formatCoordinates(selectedAudit) }}
               <span v-if="getLocationAccuracy(selectedAudit)" class="ml-2">
-                • Précision: ±{{ Math.round(getLocationAccuracy(selectedAudit)) }}m
+                • {{ t('history.detail.precision') }}: ±{{ Math.round(getLocationAccuracy(selectedAudit)) }}m
               </span>
             </div>
             <div class="text-caption text-grey">
-              Date: {{ formatDate(getAuditDate(selectedAudit)) }}
+              {{ t('history.detail.date') }}: {{ formatDate(getAuditDate(selectedAudit)) }}
             </div>
           </div>
 
           <!-- Scores détaillés -->
           <div class="mb-4">
-            <h4 class="text-subtitle-1 mb-2">📊 Évaluations</h4>
+            <h4 class="text-subtitle-1 mb-2">📊 {{ t('history.detail.evaluations') }}</h4>
             <div class="audit-scores">
               <div class="score-item" v-for="scoreItem in getScoreItems(selectedAudit)" :key="scoreItem.key">
                 <span class="score-label">{{ scoreItem.icon }} {{ scoreItem.label }}:</span>
@@ -249,7 +249,7 @@
             <!-- Score global -->
             <v-divider class="my-3" />
             <div class="d-flex justify-space-between align-center">
-              <span class="text-subtitle-2">Score global:</span>
+              <span class="text-subtitle-2">{{ t('history.detail.globalScore') }}:</span>
               <div class="d-flex align-center">
                 <div class="score-circles">
                   <div 
@@ -269,7 +269,7 @@
           <!-- Photos améliorées avec support Supabase -->
           <div v-if="hasPhotos(selectedAudit)" class="mb-4">
             <h4 class="text-subtitle-1 mb-2">
-              📸 Photos ({{ getPhotosCount(selectedAudit) }})
+              📸 {{ t('history.detail.photos') }} ({{ getPhotosCount(selectedAudit) }})
             </h4>
             
             <v-row dense>
@@ -297,7 +297,7 @@
                   </v-img>
                   <v-card-text v-else class="text-center pa-2">
                     <v-icon>mdi-image-broken</v-icon>
-                    <div class="text-caption mt-1">Photo indisponible</div>
+                    <div class="text-caption mt-1">{{ t('history.detail.unavailable') }}</div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -331,7 +331,7 @@
             <v-expansion-panel>
               <v-expansion-panel-title>
                 <v-icon class="mr-2">mdi-information</v-icon>
-                Informations techniques
+                {{ t('history.detail.technicalInfo') }}
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="technical-info">
@@ -369,7 +369,7 @@
             :disabled="!isOnline"
           >
             <v-icon left>mdi-refresh</v-icon>
-            Réessayer sync
+            {{ t('history.detail.retrySync') }}
           </v-btn>
           
           <v-btn
@@ -377,11 +377,11 @@
             @click="exportSingleAudit"
           >
             <v-icon left>mdi-download</v-icon>
-            Exporter
+            {{ t('history.detail.export') }}
           </v-btn>
           
           <v-spacer />
-          <v-btn @click="showAuditDialog = false">Fermer</v-btn>
+          <v-btn @click="showAuditDialog = false">{{ t('history.detail.close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -416,7 +416,7 @@
         
         <v-card-actions class="pa-2">
           <v-spacer />
-          <v-btn @click="showPhotoDialog = false" color="primary">Fermer</v-btn>
+          <v-btn @click="showPhotoDialog = false" color="primary">{{ t('history.detail.close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -424,7 +424,7 @@
     <!-- Dialog détails de sync -->
     <v-dialog v-model="showSyncDetails" max-width="500">
       <v-card>
-        <v-card-title>État de synchronisation</v-card-title>
+        <v-card-title>{{ t('history.sync.status') }}</v-card-title>
         <v-card-text>
           <v-row>
             <v-col cols="6" class="text-center">
@@ -449,7 +449,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="showSyncDetails = false">Fermer</v-btn>
+          <v-btn @click="showSyncDetails = false">{{ t('history.detail.close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -522,12 +522,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import AuditCard from '@/components/common/AuditCard.vue'
 
 // Router
 const router = useRouter()
+const { t } = useI18n() // ✅ NOUVEAU: Fonction de traduction
 
 // Composables avec vrais statuts de sync
 const { getAllAudits, deleteAudit: deleteAuditData, syncAllLocalAudits } = useAudits()
@@ -861,17 +863,78 @@ const getScoreColor = (score) => {
 }
 
 const getScoreItems = (audit) => {
+  // Get each section translation directly from the audit namespace
   return [
-    { key: 'lighting', icon: '💡', label: 'Éclairage', value: audit.lighting || 0, color: getScoreColor(audit.lighting) },
-    { key: 'walkpath', icon: '🚶', label: 'Cheminement', value: audit.walkpath || 0, color: getScoreColor(audit.walkpath) },
-    { key: 'openness', icon: '👁️', label: 'Ouverture', value: audit.openness || 0, color: getScoreColor(audit.openness) },
-    { key: 'feeling', icon: '😊', label: 'Ressenti', value: audit.feeling || 0, color: getScoreColor(audit.feeling) },
-    { key: 'people_presence', icon: '👥', label: 'Présence', value: audit.people_presence || audit.peoplePresence || 0, color: getScoreColor(audit.people_presence || audit.peoplePresence) },
-    { key: 'cleanliness', icon: '🧹', label: 'Propreté', value: audit.cleanliness || 0, color: getScoreColor(audit.cleanliness) },
-    { key: 'natural_surveillance', icon: '👁️‍🗨️', label: 'Surveillance', value: audit.natural_surveillance || audit.naturalSurveillance || 0, color: getScoreColor(audit.natural_surveillance || audit.naturalSurveillance) },
-    { key: 'space_diversity', icon: '👨‍👩‍👧‍👦', label: 'Mixité', value: audit.space_diversity || audit.spaceDiversity || 0, color: getScoreColor(audit.space_diversity || audit.spaceDiversity) },
-    { key: 'transport_access', icon: '🚌', label: 'Transports', value: audit.transport_access || audit.transportAccess || 0, color: getScoreColor(audit.transport_access || audit.transportAccess) },
-    { key: 'formal_security', icon: '👮', label: 'Sécurité', value: audit.formal_security || audit.formalSecurity || 0, color: getScoreColor(audit.formal_security || audit.formalSecurity) }
+    { 
+      key: 'lighting', 
+      icon: '💡', 
+      label: t('audit.lighting'), 
+      value: audit.lighting || 0, 
+      color: getScoreColor(audit.lighting) 
+    },
+    { 
+      key: 'walkpath', 
+      icon: '🚶', 
+      label: t('audit.walkpath'), 
+      value: audit.walkpath || 0, 
+      color: getScoreColor(audit.walkpath) 
+    },
+    { 
+      key: 'openness', 
+      icon: '👁️', 
+      label: t('audit.openness'), 
+      value: audit.openness || 0, 
+      color: getScoreColor(audit.openness) 
+    },
+    { 
+      key: 'feeling', 
+      icon: '😊', 
+      label: t('audit.feeling'), 
+      value: audit.feeling || 0, 
+      color: getScoreColor(audit.feeling) 
+    },
+    { 
+      key: 'people_presence', 
+      icon: '👥', 
+      label: t('audit.peoplePresence'), 
+      value: audit.people_presence || audit.peoplePresence || 0, 
+      color: getScoreColor(audit.people_presence || audit.peoplePresence) 
+    },
+    { 
+      key: 'cleanliness', 
+      icon: '🧹', 
+      label: t('audit.cleanliness'), 
+      value: audit.cleanliness || 0, 
+      color: getScoreColor(audit.cleanliness) 
+    },
+    { 
+      key: 'natural_surveillance', 
+      icon: '👁️‍🗨️', 
+      label: t('audit.naturalSurveillance'), 
+      value: audit.natural_surveillance || audit.naturalSurveillance || 0, 
+      color: getScoreColor(audit.natural_surveillance || audit.naturalSurveillance) 
+    },
+    { 
+      key: 'space_diversity', 
+      icon: '👨‍👩‍👧‍👦', 
+      label: t('audit.spaceDiversity'), 
+      value: audit.space_diversity || audit.spaceDiversity || 0, 
+      color: getScoreColor(audit.space_diversity || audit.spaceDiversity) 
+    },
+    { 
+      key: 'transport_access', 
+      icon: '🚌', 
+      label: t('audit.transportAccess'), 
+      value: audit.transport_access || audit.transportAccess || 0, 
+      color: getScoreColor(audit.transport_access || audit.transportAccess) 
+    },
+    { 
+      key: 'formal_security', 
+      icon: '👮', 
+      label: t('audit.formalSecurity'), 
+      value: audit.formal_security || audit.formalSecurity || 0, 
+      color: getScoreColor(audit.formal_security || audit.formalSecurity) 
+    }
   ]
 }
 

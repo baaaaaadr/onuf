@@ -1,14 +1,14 @@
 <template>
-  <div class="photo-capture">
+  <div class="photo-capture" :class="{ 'photo-capture--rtl': isRTL }">
     <!-- État : Aucune photo -->
     <div v-if="photos.length === 0" class="photo-empty">
       <div class="empty-icon">
         <v-icon size="64" color="grey">mdi-camera-outline</v-icon>
       </div>
       
-      <h3 class="text-h6 mt-3 mb-2">Prendre des photos</h3>
+      <h3 class="text-h6 mt-3 mb-2">{{ t('audit.photos.widget.empty.title') }}</h3>
       <p class="text-body-2 text-medium-emphasis mb-4">
-        Documentez votre audit avec des photos
+        {{ t('audit.photos.widget.empty.description') }}
       </p>
         
       <!-- Boutons d'action -->
@@ -20,7 +20,7 @@
           class="mb-2"
         >
           <v-icon start>mdi-camera</v-icon>
-          Prendre une photo
+          {{ t('audit.photos.widget.empty.takePhoto') }}
         </v-btn>
         
         <v-btn
@@ -29,7 +29,7 @@
           @click="openGallery"
         >
           <v-icon start>mdi-image-multiple</v-icon>
-          Choisir depuis la galerie
+          {{ t('audit.photos.widget.empty.chooseFromGallery') }}
         </v-btn>
       </div>
     </div>
@@ -40,7 +40,7 @@
       <div class="gallery-header">
         <h3 class="text-h6">
           <v-icon class="mr-2">mdi-image-multiple</v-icon>
-          {{ photos.length }} photo{{ photos.length > 1 ? 's' : '' }}
+          {{ photos.length }} {{ photos.length > 1 ? t('audit.photos.widget.gallery.photos') : t('audit.photos.widget.gallery.photo') }}
         </h3>
         
         <div class="header-actions">
@@ -97,7 +97,7 @@
                 color="white"
                 size="24"
               ></v-progress-circular>
-              <span class="text-caption mt-1">Compression...</span>
+              <span class="text-caption mt-1">{{ t('audit.photos.widget.gallery.processing') }}</span>
             </div>
             
             <div v-else class="photo-overlay">
@@ -143,7 +143,7 @@
         <div class="photo-item add-photo" @click="showAddMenu = true">
           <div class="add-photo-content">
             <v-icon size="32" color="primary">mdi-plus</v-icon>
-            <span class="text-caption">Ajouter</span>
+            <span class="text-caption">{{ t('audit.photos.widget.gallery.add') }}</span>
           </div>
         </div>
       </div>
@@ -186,14 +186,14 @@
           <template v-slot:prepend>
             <v-icon>mdi-camera</v-icon>
           </template>
-          <v-list-item-title>Prendre une photo</v-list-item-title>
+          <v-list-item-title>{{ t('audit.photos.widget.empty.takePhoto') }}</v-list-item-title>
         </v-list-item>
         
         <v-list-item @click="openGallery">
           <template v-slot:prepend>
             <v-icon>mdi-image-multiple</v-icon>
           </template>
-          <v-list-item-title>Choisir depuis la galerie</v-list-item-title>
+          <v-list-item-title>{{ t('audit.photos.widget.empty.chooseFromGallery') }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -216,7 +216,7 @@
           </v-btn>
           
           <span class="viewer-title">
-            Photo {{ selectedIndex + 1 }} / {{ photos.length }}
+            {{ t('audit.photos.widget.viewer.title', { current: selectedIndex + 1, total: photos.length }) }}
           </span>
           
           <v-btn
@@ -280,6 +280,15 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
+
+// ✅ NOUVEAU: Utiliser i18n pour les traductions
+const { t, locale } = useI18n()
+
+// ✅ NOUVEAU: Détecter si la langue actuelle est RTL
+const isRTL = computed(() => {
+  return locale.value === 'ar'
+})
 
 // Props
 const props = defineProps({
@@ -372,7 +381,7 @@ const handleFileSelect = async (event, source) => {
   console.log(`${files.length} fichier(s) sélectionné(s) depuis ${source}`)
   
   if (photos.value.length + files.length > props.maxPhotos) {
-    showError(`Maximum ${props.maxPhotos} photos autorisées`)
+    showError(t('audit.photos.widget.messages.maxPhotosReached', { max: props.maxPhotos }))
     return
   }
 
@@ -422,7 +431,7 @@ const processPhoto = async (file) => {
     
     emit('photo-added', photos.value[index])
     updateModelValue()
-    showSuccess('Photo ajoutée')
+    showSuccess(t('audit.photos.widget.messages.photoAdded'))
   } catch (error) {
     console.error('Erreur traitement photo:', error)
     
@@ -432,7 +441,7 @@ const processPhoto = async (file) => {
       photos.value.splice(index, 1)
     }
     
-    showError('Erreur lors du traitement de la photo')
+    showError(t('audit.photos.widget.messages.processingError'))
   }
 }
 
@@ -563,14 +572,14 @@ const removePhoto = (index) => {
   const removed = photos.value.splice(index, 1)[0]
   emit('photo-removed', removed)
   updateModelValue()
-  showSuccess('Photo supprimée')
+  showSuccess(t('audit.photos.widget.messages.photoRemoved'))
 }
 
 const clearAll = () => {
-  if (confirm(`Supprimer les ${photos.value.length} photos ?`)) {
+  if (confirm(t('audit.photos.widget.messages.confirmClearAll', { count: photos.value.length }))) {
     photos.value = []
     updateModelValue()
-    showSuccess('Toutes les photos supprimées')
+    showSuccess(t('audit.photos.widget.messages.allPhotosRemoved'))
   }
 }
 
@@ -839,5 +848,35 @@ watch(() => props.modelValue, (newValue) => {
   .action-buttons .v-btn {
     width: 100%;
   }
+}
+
+/* RTL Support pour l'arabe */
+.photo-capture--rtl {
+  direction: rtl;
+}
+
+.photo-capture--rtl .gallery-header {
+  flex-direction: row-reverse;
+}
+
+.photo-capture--rtl .header-actions {
+  flex-direction: row-reverse;
+}
+
+.photo-capture--rtl .photo-actions {
+  flex-direction: row-reverse;
+}
+
+.photo-capture--rtl .photo-info {
+  right: auto;
+  left: var(--spacing-xs);
+}
+
+.photo-capture--rtl .viewer-header {
+  flex-direction: row-reverse;
+}
+
+.photo-capture--rtl .viewer-nav {
+  flex-direction: row-reverse;
 }
 </style>

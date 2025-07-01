@@ -1,8 +1,8 @@
 <template>
   <div class="audit-questions">
-    <!-- Afficher toutes les questions -->
+    <!-- Afficher toutes les questions traduites -->
     <AuditSectionModern
-      v-for="question in questions"
+      v-for="question in translatedQuestions"
       :key="question.id"
       :title="question.title"
       :description="question.description"
@@ -15,8 +15,13 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
 import AuditSectionModern from '@/components/AuditSectionModern.vue'
-import { questions } from '../config/questions'
+import { questionsConfig, createTranslatedQuestions } from '../config/questions'
+
+// ✅ NOUVEAU: Utiliser i18n
+const { t } = useI18n()
 
 // Props
 const props = defineProps({
@@ -29,13 +34,18 @@ const props = defineProps({
 // Emit
 const emit = defineEmits(['update:formData'])
 
+// ✅ NOUVEAU: Créer les questions traduites
+const translatedQuestions = computed(() => {
+  return createTranslatedQuestions(t)
+})
+
 // Mettre à jour une question spécifique
 const updateQuestion = (questionId, value) => {
   emit('update:formData', questionId, value)
   
   // Logger l'action si la fonction globale existe
   if (window.addUserAction) {
-    const question = questions.find(q => q.id === questionId)
+    const question = translatedQuestions.value.find(q => q.id === questionId)
     const option = question?.options.find(o => o.value === value)
     window.addUserAction(`✅ ${question?.title}: ${option?.text}`)
   }

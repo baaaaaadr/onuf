@@ -22,7 +22,7 @@
             {{ pendingAuditsCount > 99 ? '99+' : pendingAuditsCount }}
           </div>
         </div>
-        <span class="nav-label">{{ auditLabel }}</span>
+        <span class="nav-label">{{ auditLabel || t('navigation.audit') }}</span>
         <div v-if="isActive(auditValue)" class="nav-indicator"></div>
       </div>
     </v-btn>
@@ -43,7 +43,7 @@
             {{ unsyncedCount > 99 ? '99+' : unsyncedCount }}
           </div>
         </div>
-        <span class="nav-label">{{ historyLabel }}</span>
+        <span class="nav-label">{{ historyLabel || t('navigation.history') }}</span>
         <div v-if="isActive(historyValue)" class="nav-indicator"></div>
       </div>
     </v-btn>
@@ -71,16 +71,20 @@
 <script setup>
 import { computed, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
+
+// ✅ NOUVEAU: Utiliser i18n
+const { t } = useI18n()
 
 const props = defineProps({
-  // Labels personnalisés
+  // Labels personnalisés (avec fallback i18n)
   auditLabel: {
     type: String,
-    default: 'Audit'
+    default: null // Utiliser i18n par défaut
   },
   historyLabel: {
     type: String,
-    default: 'Historique'
+    default: null // Utiliser i18n par défaut
   },
   
   // Valeurs des onglets

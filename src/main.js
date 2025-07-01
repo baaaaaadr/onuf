@@ -1,8 +1,16 @@
-// src/main.js - Version mise à jour avec nouveaux composables
+// src/main.js - Version mise à jour avec nouveaux composables + i18n
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router/index.js'
 import vuetify from './plugins/vuetify'
+
+// ✅ NOUVEAU: Import de vue-i18n pour l'internationalisation
+import { createI18n } from 'vue-i18n'
+
+// Import des fichiers de traduction
+import fr from './locales/fr.json'
+import en from './locales/en.json'
+import ar from './locales/ar.json'
 
 // Import des styles
 import 'vuetify/styles' // ✅ IMPORTANT: Styles Vuetify
@@ -20,11 +28,29 @@ import './utils/debug' // ← AJOUT pour charger __debugONUF
 
 console.log('🚀 Initialisation ONUF PWA...')
 
+// ✅ NOUVEAU: Configuration i18n
+// 1. Récupérer la langue stockée ou utiliser français par défaut
+const storedLang = localStorage.getItem('user-lang') || 'fr'
+
+// 2. Créer l'instance i18n
+const i18n = createI18n({
+  legacy: false, // Utiliser la Composition API
+  locale: storedLang, // Langue par défaut
+  fallbackLocale: 'fr', // Langue de fallback
+  messages: { fr, en, ar } // Messages de traduction
+})
+
+// 3. Définir l'attribut lang du HTML
+document.querySelector('html').setAttribute('lang', storedLang)
+
+console.log(`🌍 Internationalisation configurée - Langue: ${storedLang}`)
+
 const app = createApp(App)
 
 // Configuration de base
 app.use(router)
 app.use(vuetify)
+app.use(i18n) // ✅ NOUVEAU: Ajouter i18n à l'app
 
 // Initialiser l'authentification
 console.log('🔐 Initialisation authentification...')
@@ -82,6 +108,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // Stocker l'événement pour l'utiliser plus tard
   window.deferredPrompt = e
 })
+
+// ✅ NOUVEAU: Initialiser la langue et le thème RTL avant le montage
+// S'assurer que la direction HTML et le thème Vuetify sont corrects
+const initRTL = () => {
+  const isRTL = storedLang === 'ar'
+  document.body.dir = isRTL ? 'rtl' : 'ltr'
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
+  console.log(`🌍 Direction HTML appliquée: ${isRTL ? 'RTL' : 'LTR'}`)
+}
+
+initRTL()
 
 // Mount de l'application
 app.mount('#app')

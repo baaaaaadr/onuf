@@ -217,10 +217,24 @@ const defaults = {
   }
 }
 
+// ✅ NOUVEAU: Créer thème RTL pour l'arabe
+const onufLightRTL = {
+  ...onufLightTheme,
+  rtl: true // Activer le mode RTL
+}
+
+// ✅ NOUVEAU: Fonction pour déterminer le thème initial basé sur la langue
+const getInitialTheme = () => {
+  const storedLang = localStorage.getItem('user-lang') || 'fr'
+  return storedLang === 'ar' ? 'onufLightRTL' : 'onufLight'
+}
+
 // Export de la configuration complète
 export default createVuetify({
   components,
   directives,
+  // ✅ NOUVEAU: Configuration RTL globale
+  rtl: getInitialTheme() === 'onufLightRTL',
   defaults: {
     VCardTitle: {
       class: 'text-h5 font-weight-bold',
@@ -228,9 +242,10 @@ export default createVuetify({
     }
   },
   theme: {
-    defaultTheme: 'onufLight',
+    defaultTheme: getInitialTheme(), // ✅ MODIFIÉ: Thème basé sur la langue
     themes: {
-      onufLight: onufLightTheme
+      onufLight: onufLightTheme,
+      onufLightRTL: onufLightRTL // ✅ NOUVEAU: Thème RTL
     },
     variations: {
       colors: ['primary', 'secondary', 'success', 'warning', 'error', 'info'],
