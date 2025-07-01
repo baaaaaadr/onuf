@@ -5,6 +5,7 @@ import { useTheme } from 'vuetify'
 
 // État global pour la langue
 const currentLanguage = ref('fr')
+const isInitialized = ref(false) // ✅ NOUVEAU: Éviter les initialisations multiples
 
 // ✅ CORRIGÉ: Configuration des langues supportées
 const supportedLanguages = [
@@ -45,18 +46,34 @@ export function useLang() {
     console.warn('useTheme not available in this context')
   }
 
-  // Charger la langue sauvegardée au démarrage
+  // ✅ CORRIGÉ: Charger la langue sauvegardée seulement si pas encore initialisé
   const initializeLanguage = () => {
+    if (isInitialized.value) {
+      console.log('🌍 useLang déjà initialisé, ignoré')
+      return
+    }
+    
     try {
       const savedLang = localStorage.getItem('onuf-language')
+      console.log('🌍 Langue sauvegardée trouvée:', savedLang)
+      
       if (savedLang && supportedLanguages.find(lang => lang.code === savedLang)) {
+        console.log(`🌍 Initialisation langue: ${savedLang}`)
         currentLanguage.value = savedLang
+        
         if (i18n) {
           i18n.locale.value = savedLang
         }
-        // ✅ NOUVEAU: Appliquer immédiatement RTL si nécessaire
-        applyRTLConfiguration(savedLang)
+        
+        // ✅ NOUVEAU: Appliquer RTL seulement si différent de la langue actuelle
+        if (savedLang !== 'fr') { // Fr est la langue par défaut
+          applyRTLConfiguration(savedLang)
+        }
+      } else {
+        console.log('🌍 Pas de langue sauvegardée, utilisation du français par défaut')
       }
+      
+      isInitialized.value = true
     } catch (error) {
       console.error('Erreur chargement langue:', error)
     }
@@ -73,6 +90,8 @@ export function useLang() {
     if (!languageInfo) return
 
     const isRTL = languageInfo.direction === 'rtl'
+    
+    console.log(`🌍 Application de la configuration RTL: ${langCode} (${languageInfo.direction})`)
     
     // 1. Mettre à jour l'attribut dir du document
     document.documentElement.setAttribute('dir', languageInfo.direction)
@@ -114,10 +133,10 @@ export function useLang() {
       detail: { direction: languageInfo.direction, isRTL }
     }))
     
-    console.log(`🌍 Configuration RTL appliquée: ${langCode} (${languageInfo.direction})`)
+    console.log(`✅ Configuration RTL appliquée: ${langCode} (${languageInfo.direction})`)
   }
 
-  // Fonction pour changer de langue
+  // ✅ CORRIGÉ: Fonction pour changer de langue (seulement sur action utilisateur)
   const setLanguage = async (langCode) => {
     try {
       if (!supportedLanguages.find(lang => lang.code === langCode)) {
@@ -125,7 +144,7 @@ export function useLang() {
         return
       }
 
-      console.log(`🌍 Changement de langue vers: ${langCode}`)
+      console.log(`🌍 CHANGEMENT DE LANGUE (action utilisateur): ${currentLanguage.value} → ${langCode}`)
       
       // Mettre à jour l'état global
       currentLanguage.value = langCode
@@ -133,12 +152,14 @@ export function useLang() {
       // Mettre à jour vue-i18n si disponible
       if (i18n) {
         i18n.locale.value = langCode
+        console.log(`📖 Vue i18n locale mise à jour: ${langCode}`)
       }
       
       // Sauvegarder dans localStorage
       localStorage.setItem('onuf-language', langCode)
+      console.log(`💾 Langue sauvegardée: ${langCode}`)
       
-      // ✅ CORRIGÉ: Appliquer la configuration RTL de manière robuste
+      // ✅ CORRIGÉ: Toujours appliquer la configuration RTL lors d'un changement
       applyRTLConfiguration(langCode)
       
       // ✅ NOUVEAU: Petite attente pour laisser Vue réagir
@@ -156,18 +177,17 @@ export function useLang() {
     setLanguage(supportedLanguages[nextIndex].code)
   }
 
-  // Watcher pour les changements de langue
+  // Watcher pour les changements de langue (seulement si initialisé)
   watch(currentLanguage, (newLang) => {
-    console.log(`👁️ Langue changée observée: ${newLang}`)
-    
-    // S'assurer que la configuration RTL est appliquée
-    if (typeof window !== 'undefined') {
-      applyRTLConfiguration(newLang)
+    if (isInitialized.value) {
+      console.log(`👁️ Langue changée observée: ${newLang}`)
     }
   })
 
-  // Initialiser au premier chargement
-  if (typeof window !== 'undefined') {
+  // ✅ CORRIGÉ: Initialiser seulement au premier appel global (pas à chaque utilisation du composable)
+  if (typeof window !== 'undefined' && !isInitialized.value) {
+    // Ne s'exécute qu'une seule fois
+    console.log('🌍 Initialisation initiale useLang')
     initializeLanguage()
   }
 
@@ -178,6 +198,7 @@ export function useLang() {
     setLanguage,
     cycleLanguage,
     initializeLanguage,
-    applyRTLConfiguration
+    applyRTLConfiguration,
+    isInitialized: isInitialized.value
   }
 }

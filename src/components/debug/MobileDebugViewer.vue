@@ -1,265 +1,591 @@
 <!-- src/components/debug/MobileDebugViewer.vue -->
 <template>
+  <!-- Bouton debug flottant -->
+  <v-btn
+    v-if="isDevelopment || forceShow"
+    icon
+    size="small"
+    color="error"
+    class="debug-btn"
+    @click="showDebug = !showDebug"
+    :style="{ bottom: debugBtnPosition }"
+  >
+    🐛
+  </v-btn>
+
+  <!-- Panel debug fullscreen -->
   <v-dialog
     v-model="showDebug"
     fullscreen
     transition="dialog-bottom-transition"
+    scrollable
   >
-    <template v-slot:activator="{ props }">
-      <!-- Bouton flottant pour ouvrir le debug -->
-      <v-btn
-        v-bind="props"
-        v-if="isDebugMode"
-        position="fixed"
-        location="bottom end"
-        class="mb-16 mr-2"
-        icon="mdi-bug"
-        color="error"
-        size="small"
-        elevation="8"
-        style="z-index: 9999;"
-      />
-    </template>
-
     <v-card>
+      <!-- Header -->
       <v-toolbar color="error" dark>
-        <v-btn icon="mdi-close" @click="showDebug = false" />
-        <v-toolbar-title>Debug Mobile</v-toolbar-title>
+        <v-toolbar-title>🐛 Debug Mobile - ONUF</v-toolbar-title>
         <v-spacer />
+        <v-btn icon @click="refreshData">
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn>
         <v-btn icon @click="clearLogs">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
-        <v-btn icon @click="exportLogs">
-          <v-icon>mdi-download</v-icon>
+        <v-btn icon @click="showDebug = false">
+          <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
 
-      <!-- Filtres -->
-      <v-card-text class="pa-2">
-        <v-chip-group
-          v-model="selectedTypes"
-          multiple
-          dense
-          class="mb-2"
-        >
-          <v-chip
-            value="log"
-            color="blue"
-            variant="outlined"
-            size="small"
-          >
-            Logs ({{ countByType.log }})
-          </v-chip>
-          <v-chip
-            value="warn"
-            color="orange"
-            variant="outlined"
-            size="small"
-          >
-            Warnings ({{ countByType.warn }})
-          </v-chip>
-          <v-chip
-            value="error"
-            color="error"
-            variant="outlined"
-            size="small"
-          >
-            Errors ({{ countByType.error }})
-          </v-chip>
-        </v-chip-group>
+      <!-- Contenu -->
+      <v-card-text class="pa-0">
+        <v-tabs v-model="activeTab" color="error">
+          <v-tab value="i18n">🌍 i18n</v-tab>
+          <v-tab value="vue">⚡ Vue</v-tab>
+          <v-tab value="logs">📝 Logs</v-tab>
+          <v-tab value="network">🌐 Réseau</v-tab>
+          <v-tab value="storage">💾 Storage</v-tab>
+        </v-tabs>
 
-        <!-- Recherche -->
-        <v-text-field
-          v-model="searchQuery"
-          prepend-inner-icon="mdi-magnify"
-          label="Rechercher dans les logs"
-          clearable
-          density="compact"
-          variant="outlined"
-          hide-details
-          class="mb-2"
-        />
+        <v-tabs-window v-model="activeTab">
+          <!-- Tab i18n -->
+          <v-tabs-window-item value="i18n">
+            <v-container>
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>🌍 État des traductions</v-card-title>
+                <v-card-text>
+                  <div class="debug-section">
+                    <strong>Locale actuelle:</strong> {{ currentLocale }}<br>
+                    <strong>Disponible:</strong> {{ availableLocales?.join(', ') }}<br>
+                    <strong>Fallback:</strong> {{ fallbackLocale }}<br>
+                    <strong>Missing:</strong> {{ missingKeys.length }} clés<br>
+                    <strong>Legacy mode:</strong> {{ legacyMode }}<br>
+                  </div>
+                  
+                  <v-divider class="my-3" />
+                  
+                  <strong>Test traductions:</strong><br>
+                  <div class="mt-2">
+                    <div><code>app.title</code> → "{{ testTranslation('app.title') }}"</div>
+                    <div><code>audit.title</code> → "{{ testTranslation('audit.title') }}"</div>
+                    <div><code>navigation.audit</code> → "{{ testTranslation('navigation.audit') }}"</div>
+                  </div>
+                  
+                  <v-divider class="my-3" />
+                  
+                  <strong>Messages chargés:</strong><br>
+                  <pre class="text-caption">{{ JSON.stringify(loadedMessages, null, 2) }}</pre>
+                </v-card-text>
+              </v-card>
+
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>🔧 Configuration i18n</v-card-title>
+                <v-card-text>
+                  <pre class="text-caption">{{ i18nConfig }}</pre>
+                </v-card-text>
+              </v-card>
+
+              <v-card class="mb-4" variant="outlined" v-if="missingKeys.length > 0">
+                <v-card-title>⚠️ Clés manquantes ({{ missingKeys.length }})</v-card-title>
+                <v-card-text>
+                  <div v-for="key in missingKeys.slice(0, 20)" :key="key" class="text-caption">
+                    {{ key }}
+                  </div>
+                  <div v-if="missingKeys.length > 20" class="text-caption">
+                    ... et {{ missingKeys.length - 20 }} autres
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tabs-window-item>
+
+          <!-- Tab Vue -->
+          <v-tabs-window-item value="vue">
+            <v-container>
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>⚡ État Vue</v-card-title>
+                <v-card-text>
+                  <div class="debug-section">
+                    <strong>Version Vue:</strong> {{ vueVersion }}<br>
+                    <strong>Mode:</strong> {{ buildMode }}<br>
+                    <strong>Route actuelle:</strong> {{ currentRoute }}<br>
+                    <strong>Composants:</strong> {{ componentCount }}<br>
+                    <strong>Plugins:</strong> {{ installedPlugins?.join(', ') }}<br>
+                  </div>
+                </v-card-text>
+              </v-card>
+
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>📱 Environnement</v-card-title>
+                <v-card-text>
+                  <div class="debug-section">
+                    <strong>User Agent:</strong><br>
+                    <div class="text-caption">{{ userAgent }}</div><br>
+                    <strong>Viewport:</strong> {{ viewport.width }}x{{ viewport.height }}<br>
+                    <strong>Online:</strong> {{ navigator.onLine }}<br>
+                    <strong>Langue navigateur:</strong> {{ navigator.language }}<br>
+                    <strong>Plateforme:</strong> {{ navigator.platform }}<br>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tabs-window-item>
+
+          <!-- Tab Logs -->
+          <v-tabs-window-item value="logs">
+            <v-container>
+              <v-card variant="outlined">
+                <v-card-title>📝 Console Logs ({{ logs.length }})</v-card-title>
+                <v-card-text>
+                  <div 
+                    v-for="(log, index) in logs.slice(-50)" 
+                    :key="index"
+                    class="log-entry mb-1 pa-2"
+                    :class="`log-${log.level}`"
+                  >
+                    <div class="d-flex">
+                      <div class="log-time">{{ formatTime(log.timestamp) }}</div>
+                      <div class="log-level ml-2">{{ log.level.toUpperCase() }}</div>
+                      <div class="log-message ml-2 flex-grow-1">{{ log.message }}</div>
+                    </div>
+                    <div v-if="log.data" class="log-data mt-1">
+                      <pre class="text-caption">{{ formatLogData(log.data) }}</pre>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tabs-window-item>
+
+          <!-- Tab Network -->
+          <v-tabs-window-item value="network">
+            <v-container>
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>🌐 Tests réseau</v-card-title>
+                <v-card-text>
+                  <v-btn @click="testTranslationFiles" color="primary" class="mb-2">
+                    Tester fichiers traductions
+                  </v-btn>
+                  <div v-if="networkTests.length > 0">
+                    <div v-for="test in networkTests" :key="test.url" class="mt-2">
+                      <div class="d-flex align-center">
+                        <v-icon 
+                          :color="test.status === 200 ? 'success' : 'error'" 
+                          class="mr-2"
+                        >
+                          {{ test.status === 200 ? 'mdi-check' : 'mdi-close' }}
+                        </v-icon>
+                        <code>{{ test.url }}</code>
+                        <v-spacer />
+                        <span>{{ test.status }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tabs-window-item>
+
+          <!-- Tab Storage -->
+          <v-tabs-window-item value="storage">
+            <v-container>
+              <v-card class="mb-4" variant="outlined">
+                <v-card-title>💾 LocalStorage</v-card-title>
+                <v-card-text>
+                  <div v-for="[key, value] in localStorageItems" :key="key" class="mb-2">
+                    <strong>{{ key }}:</strong> {{ value }}
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-container>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-card-text>
 
-      <!-- Liste des logs -->
-      <v-virtual-scroll
-        :items="filteredLogs"
-        :height="scrollHeight"
-        item-height="80"
-      >
-        <template v-slot:default="{ item }">
-          <v-card
-            class="ma-2"
-            :color="getLogColor(item.type)"
-            variant="outlined"
-            @click="expandedLog = expandedLog === item.id ? null : item.id"
-          >
-            <v-card-text class="pa-2">
-              <div class="d-flex align-center mb-1">
-                <v-icon
-                  :icon="getLogIcon(item.type)"
-                  :color="getLogIconColor(item.type)"
-                  size="small"
-                  class="mr-2"
-                />
-                <span class="text-caption">
-                  {{ formatTimestamp(item.timestamp) }}
-                </span>
-              </div>
-              
-              <div 
-                class="log-message"
-                :class="{ 'expanded': expandedLog === item.id }"
-              >
-                {{ item.message }}
-              </div>
-            </v-card-text>
-          </v-card>
-        </template>
-      </v-virtual-scroll>
-
-      <!-- Actions rapides -->
-      <v-card-actions class="pa-2">
-        <v-btn
-          block
-          variant="tonal"
-          color="primary"
-          @click="shareLogsViaEmail"
-        >
-          <v-icon start>mdi-email</v-icon>
-          Envoyer par email
+      <!-- Actions -->
+      <v-card-actions class="pa-4">
+        <v-btn @click="copyDebugInfo" color="success">
+          <v-icon start>mdi-content-copy</v-icon>
+          Copier debug info
         </v-btn>
+        <v-btn @click="downloadDebugInfo" color="info">
+          <v-icon start>mdi-download</v-icon>
+          Télécharger
+        </v-btn>
+        <v-spacer />
+        <v-switch
+          v-model="forceShow"
+          label="Forcer affichage"
+          @change="updateForceShow"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import mobileDebugLogger from '@/utils/mobileDebug'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
+// État
 const showDebug = ref(false)
-const searchQuery = ref('')
-const selectedTypes = ref(['log', 'warn', 'error'])
-const expandedLog = ref(null)
-// Force le mode debug en production pour les tests
-const isDebugMode = computed(() => {
-  return window.location.search.includes('debug=true')
-})
+const activeTab = ref('i18n')
+const logs = ref([])
+const networkTests = ref([])
+const forceShow = ref(false)
+
+// Vue et route
+const route = useRoute()
+let i18n = null
+try {
+  i18n = useI18n()
+} catch (error) {
+  console.warn('useI18n non disponible dans debug viewer')
+}
 
 // Computed
-const scrollHeight = computed(() => window.innerHeight - 250)
+const isDevelopment = computed(() => {
+  return import.meta.env.MODE === 'development' || forceShow.value
+})
 
-const filteredLogs = computed(() => {
-  return mobileDebugLogger.logs.value.filter(log => {
-    if (!selectedTypes.value.includes(log.type)) return false
-    if (searchQuery.value) {
-      return log.message.toLowerCase().includes(searchQuery.value.toLowerCase())
+const debugBtnPosition = computed(() => {
+  return '120px' // Au-dessus de la navigation
+})
+
+const currentLocale = computed(() => {
+  return i18n?.locale?.value || 'non disponible'
+})
+
+const availableLocales = computed(() => {
+  return i18n?.availableLocales || []
+})
+
+const fallbackLocale = computed(() => {
+  return i18n?.fallbackLocale?.value || 'non disponible'
+})
+
+const legacyMode = computed(() => {
+  return i18n?.legacy || false
+})
+
+const missingKeys = ref([])
+
+const loadedMessages = computed(() => {
+  if (!i18n?.messages?.value) return {}
+  
+  const messages = {}
+  for (const [locale, msgs] of Object.entries(i18n.messages.value)) {
+    messages[locale] = {
+      keys: Object.keys(msgs || {}).length,
+      sample: Object.keys(msgs || {}).slice(0, 5)
     }
-    return true
-  })
+  }
+  return messages
 })
 
-const countByType = computed(() => {
-  const counts = { log: 0, warn: 0, error: 0 }
-  mobileDebugLogger.logs.value.forEach(log => {
-    counts[log.type] = (counts[log.type] || 0) + 1
-  })
-  return counts
+const i18nConfig = computed(() => {
+  if (!i18n) return 'i18n non disponible'
+  
+  return {
+    locale: i18n.locale?.value,
+    availableLocales: i18n.availableLocales,
+    fallbackLocale: i18n.fallbackLocale?.value,
+    legacy: i18n.legacy,
+    mode: i18n.mode,
+    globalInjection: i18n.globalInjection,
+    missingWarn: i18n.missingWarn,
+    fallbackWarn: i18n.fallbackWarn
+  }
 })
 
-// Methods
-const formatTimestamp = (timestamp) => {
-  const date = new Date(timestamp)
-  return date.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    fractionalSecondDigits: 3
-  })
-}
+const vueVersion = computed(() => {
+  return window.__VUE__ ? '3.x' : 'non détecté'
+})
 
-const getLogColor = (type) => {
-  switch (type) {
-    case 'error': return 'error'
-    case 'warn': return 'warning'
-    default: return 'surface'
-  }
-}
+const buildMode = computed(() => {
+  return import.meta.env.MODE
+})
 
-const getLogIcon = (type) => {
-  switch (type) {
-    case 'error': return 'mdi-alert-circle'
-    case 'warn': return 'mdi-alert'
-    default: return 'mdi-information'
-  }
-}
+const currentRoute = computed(() => {
+  return route.name || route.path
+})
 
-const getLogIconColor = (type) => {
-  switch (type) {
-    case 'error': return 'error'
-    case 'warn': return 'warning'
-    default: return 'info'
+const componentCount = computed(() => {
+  const app = document.querySelector('#app')?.__vue_app__
+  return app?._instance?.components?.size || 'non détecté'
+})
+
+const installedPlugins = computed(() => {
+  const app = document.querySelector('#app')?.__vue_app__
+  return app?._plugins ? Object.keys(app._plugins) : ['non détecté']
+})
+
+const userAgent = computed(() => {
+  return navigator.userAgent
+})
+
+const viewport = ref({ width: window.innerWidth, height: window.innerHeight })
+
+const localStorageItems = computed(() => {
+  const items = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.startsWith('onuf') || key?.includes('lang')) {
+      items.push([key, localStorage.getItem(key)])
+    }
   }
+  return items
+})
+
+// Méthodes
+const refreshData = () => {
+  viewport.value = { width: window.innerWidth, height: window.innerHeight }
+  captureErrors()
 }
 
 const clearLogs = () => {
-  if (confirm('Effacer tous les logs ?')) {
-    mobileDebugLogger.clear()
+  logs.value = []
+}
+
+const testTranslation = (key) => {
+  try {
+    if (!i18n?.t) return 'fonction t() non disponible'
+    const result = i18n.t(key)
+    if (result === key) {
+      missingKeys.value.push(key)
+      return `❌ MANQUANT: ${key}`
+    }
+    return result
+  } catch (error) {
+    return `❌ ERREUR: ${error.message}`
   }
 }
 
-const exportLogs = () => {
-  mobileDebugLogger.downloadLogs('text')
-}
-
-const shareLogsViaEmail = () => {
-  const logs = mobileDebugLogger.exportAsText()
-  const subject = `ONUF Debug Logs - ${new Date().toLocaleString('fr-FR')}`
-  const body = encodeURIComponent(logs.substring(0, 2000) + '\n\n[Logs tronqués - Téléchargez le fichier complet]')
+const testTranslationFiles = async () => {
+  networkTests.value = []
+  const files = ['/src/locales/fr.json', '/src/locales/en.json', '/src/locales/ar.json']
   
-  window.location.href = `mailto:?subject=${subject}&body=${body}`
+  for (const file of files) {
+    try {
+      const response = await fetch(file)
+      networkTests.value.push({
+        url: file,
+        status: response.status,
+        ok: response.ok
+      })
+    } catch (error) {
+      networkTests.value.push({
+        url: file,
+        status: 'ERREUR',
+        ok: false,
+        error: error.message
+      })
+    }
+  }
 }
 
-// Auto-refresh
-let refreshInterval
-onMounted(() => {
-  refreshInterval = setInterval(() => {
-    // Force reactivity update
-  }, 1000)
-})
+const formatTime = (timestamp) => {
+  return new Date(timestamp).toLocaleTimeString()
+}
 
-onUnmounted(() => {
-  clearInterval(refreshInterval)
+const formatLogData = (data) => {
+  if (typeof data === 'object') {
+    return JSON.stringify(data, null, 2)
+  }
+  return String(data)
+}
+
+const copyDebugInfo = async () => {
+  const debugInfo = {
+    timestamp: new Date().toISOString(),
+    url: window.location.href,
+    userAgent: navigator.userAgent,
+    i18n: {
+      locale: currentLocale.value,
+      availableLocales: availableLocales.value,
+      messages: loadedMessages.value,
+      missingKeys: missingKeys.value.slice(0, 50)
+    },
+    vue: {
+      version: vueVersion.value,
+      mode: buildMode.value,
+      route: currentRoute.value
+    },
+    logs: logs.value.slice(-20),
+    localStorage: Object.fromEntries(localStorageItems.value)
+  }
+  
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(debugInfo, null, 2))
+    addLog('info', 'Debug info copié dans le presse-papier')
+  } catch (error) {
+    addLog('error', 'Erreur copie:', error)
+  }
+}
+
+const downloadDebugInfo = () => {
+  const debugInfo = {
+    timestamp: new Date().toISOString(),
+    url: window.location.href,
+    userAgent: navigator.userAgent,
+    i18n: i18nConfig.value,
+    logs: logs.value,
+    tests: networkTests.value
+  }
+  
+  const blob = new Blob([JSON.stringify(debugInfo, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `onuf-debug-${Date.now()}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+const updateForceShow = () => {
+  localStorage.setItem('onuf-debug-force', forceShow.value.toString())
+}
+
+const addLog = (level, message, data = null) => {
+  logs.value.push({
+    timestamp: Date.now(),
+    level,
+    message,
+    data
+  })
+  
+  // Garder seulement les 200 derniers logs
+  if (logs.value.length > 200) {
+    logs.value = logs.value.slice(-200)
+  }
+}
+
+const captureErrors = () => {
+  // Capturer les erreurs Vue
+  const app = document.querySelector('#app')?.__vue_app__
+  if (app) {
+    app.config.errorHandler = (error, instance, info) => {
+      addLog('error', `Vue Error: ${error.message}`, { error: error.stack, info })
+    }
+  }
+  
+  // Capturer les erreurs globales
+  window.addEventListener('error', (event) => {
+    addLog('error', `Global Error: ${event.message}`, {
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno
+    })
+  })
+  
+  // Capturer les promesses rejetées
+  window.addEventListener('unhandledrejection', (event) => {
+    addLog('error', `Unhandled Promise: ${event.reason}`, event.reason)
+  })
+}
+
+// Lifecycle
+onMounted(() => {
+  // Récupérer l'état forcé
+  forceShow.value = localStorage.getItem('onuf-debug-force') === 'true'
+  
+  // Capturer les erreurs
+  captureErrors()
+  
+  // Intercepter console.log pour debug
+  const originalLog = console.log
+  const originalError = console.error
+  const originalWarn = console.warn
+  
+  console.log = (...args) => {
+    addLog('log', args.join(' '))
+    originalLog(...args)
+  }
+  
+  console.error = (...args) => {
+    addLog('error', args.join(' '))
+    originalError(...args)
+  }
+  
+  console.warn = (...args) => {
+    addLog('warn', args.join(' '))
+    originalWarn(...args)
+  }
+  
+  // Log initial
+  addLog('info', '🐛 MobileDebugViewer initialisé')
+  addLog('info', `Mode: ${buildMode.value}, Locale: ${currentLocale.value}`)
+  
+  // Tester les traductions au démarrage
+  nextTick(() => {
+    testTranslation('app.title')
+    testTranslation('audit.title')
+    testTranslation('navigation.audit')
+  })
 })
 </script>
 
 <style scoped>
-.log-message {
-  font-family: monospace;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all 0.3s ease;
-  color: #212121; /* Dark gray for better contrast */
+.debug-btn {
+  position: fixed !important;
+  right: 20px;
+  z-index: 2000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
 }
 
-.log-message.expanded {
-  white-space: pre-wrap;
+.debug-section {
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.log-entry {
+  font-family: monospace;
+  font-size: 12px;
+  border-left: 3px solid #ccc;
+  background: #f5f5f5;
+}
+
+.log-entry.log-error {
+  border-left-color: #f44336;
+  background: #ffebee;
+}
+
+.log-entry.log-warn {
+  border-left-color: #ff9800;
+  background: #fff8e1;
+}
+
+.log-entry.log-info {
+  border-left-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.log-time {
+  font-size: 10px;
+  opacity: 0.7;
+  min-width: 60px;
+}
+
+.log-level {
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 50px;
+}
+
+.log-message {
   word-break: break-word;
 }
 
-:deep(.v-virtual-scroll__item) {
-  padding: 0 !important;
+.log-data {
+  padding-left: 120px;
+  opacity: 0.8;
 }
 
-/* Ensure text is visible in dark mode */
-:deep(.v-theme--light) .log-message {
-  color: #212121; /* Dark gray for light theme */
-}
-
-:deep(.v-theme--dark) .log-message {
-  color: #e0e0e0; /* Light gray for dark theme */
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
 }
 </style>

@@ -98,7 +98,7 @@ try {
   console.log('  ❌ Erreur lecture main.js:', error.message);
 }
 
-// ✅ NOUVEAU: Vérifier useLang.js pour les erreurs Vuetify
+// ✅ CORRIGÉ: Vérifier useLang.js pour les erreurs Vuetify et RTL
 console.log('\n🌍 Vérification configuration RTL:');
 try {
   const useLangJs = fs.readFileSync(path.join('src', 'composables', 'useLang.js'), 'utf8');
@@ -111,16 +111,29 @@ try {
     console.log('  ✅ Pas de dépendance directe Vuetify');
   }
   
-  if (useLangJs.includes('direction: rtl')) {
-    console.log('  ✅ Support RTL configuré');
+  // ✅ CORRIGÉ: Meilleure détection du support RTL
+  if (useLangJs.includes('direction: \'rtl\'') || useLangJs.includes('direction: "rtl"')) {
+    console.log('  ✅ Support RTL configuré dans les langues');
   } else {
-    console.log('  ⚠️ Support RTL non détecté');
+    console.log('  ⚠️ Support RTL non détecté dans la configuration des langues');
+  }
+  
+  if (useLangJs.includes('applyRTLConfiguration')) {
+    console.log('  ✅ Fonction applyRTLConfiguration trouvée');
+  } else {
+    console.log('  ❌ Fonction applyRTLConfiguration manquante');
   }
   
   if (useLangJs.includes('document.documentElement.setAttribute')) {
     console.log('  ✅ Configuration dir HTML trouvée');
   } else {
     console.log('  ❌ Configuration dir HTML manquante');
+  }
+  
+  if (useLangJs.includes('isInitialized')) {
+    console.log('  ✅ Prévention initialisation multiple configurée');
+  } else {
+    console.log('  ⚠️ Pas de protection contre initialisation multiple');
   }
   
 } catch (error) {
@@ -143,6 +156,12 @@ try {
       console.log('  ✅ Direction RTL forcée');
     } else {
       console.log('  ⚠️ Direction RTL non forcée');
+    }
+    
+    if (rtlCss.includes('text-align: right !important')) {
+      console.log('  ✅ Alignement texte RTL configuré');
+    } else {
+      console.log('  ⚠️ Alignement texte RTL manquant');
     }
     
   } else {
@@ -190,8 +209,28 @@ try {
   console.log('  ❌ Erreur lecture App.vue:', error.message);
 }
 
+// ✅ NOUVEAU: Vérifier le debug mobile
+console.log('\n🐛 Vérification debug mobile:');
+try {
+  const debugComponentPath = path.join('src', 'components', 'debug', 'MobileDebugViewer.vue');
+  if (fs.existsSync(debugComponentPath)) {
+    console.log('  ✅ MobileDebugViewer.vue trouvé');
+    
+    const debugContent = fs.readFileSync(debugComponentPath, 'utf8');
+    if (debugContent.includes('i18n.locale') || debugContent.includes('translations')) {
+      console.log('  ✅ Debug traductions configuré');
+    } else {
+      console.log('  ⚠️ Debug traductions non configuré');
+    }
+  } else {
+    console.log('  ❌ MobileDebugViewer.vue manquant');
+  }
+} catch (error) {
+  console.log('  ❌ Erreur vérification debug mobile:', error.message);
+}
+
 // Vérifier les erreurs communes
-console.log('\n🐛 Vérification erreurs communes:');
+console.log('\n🔧 Vérification erreurs communes:');
 const commonErrors = [
   {
     pattern: 'useVuetify',
@@ -210,6 +249,7 @@ const commonErrors = [
   }
 ];
 
+let hasErrors = false;
 commonErrors.forEach(error => {
   error.files.forEach(file => {
     const filePath = path.join(__dirname, file);
@@ -217,15 +257,23 @@ commonErrors.forEach(error => {
       const content = fs.readFileSync(filePath, 'utf8');
       if (content.includes(error.pattern)) {
         console.log(`  ❌ ${file}: ${error.message}`);
+        hasErrors = true;
       }
     }
   });
 });
 
+if (!hasErrors) {
+  console.log('  ✅ Aucune erreur commune détectée');
+}
+
 console.log('\n🎯 Résumé des actions à effectuer:');
-console.log('1. Corriger les erreurs ❌ ci-dessus');
+if (hasErrors) {
+  console.log('1. Corriger les erreurs ❌ ci-dessus');
+}
 console.log('2. Tester: npm run dev');
 console.log('3. Tester build: npm run build && npm run preview');
-console.log('4. Déployer sur Netlify: git add . && git commit && git push');
+console.log('4. Debug production: Utiliser MobileDebugViewer sur Netlify');
+console.log('5. Déployer: git add . && git commit && git push');
 
 console.log('\n✨ Diagnostic terminé !');
