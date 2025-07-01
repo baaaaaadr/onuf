@@ -19,6 +19,9 @@ import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 
+// ✅ NOUVEAU: Import du support RTL
+import './assets/styles/rtl-support.css'
+
 // ✅ NOUVEAU: Configuration i18n avec imports statiques
 const messages = {
   fr,
@@ -34,7 +37,7 @@ const i18n = createI18n({
   globalInjection: true // Injection globale pour $t
 })
 
-// Configuration Vuetify avec support RTL
+// ✅ CORRIGÉ: Configuration Vuetify avec support RTL amélioré
 const vuetify = createVuetify({
   components,
   directives,
@@ -63,7 +66,7 @@ const vuetify = createVuetify({
       },
     },
   },
-  // ✅ Support RTL dynamique
+  // ✅ CORRIGÉ: Support RTL initial
   rtl: false, // Sera géré dynamiquement par le composable useLang
 })
 
@@ -75,3 +78,7 @@ app.use(vuetify)
 app.use(i18n) // ✅ IMPORTANT: Ajouter i18n APRÈS vuetify
 
 app.mount('#app')
+
+// ✅ CORRIGÉ: L'initialisation de la langue se fera automatiquement
+// via les composants qui utilisent useLang() - pas besoin de forcer ici
+console.log('✅ ONUF PWA démarré avec support i18n et RTL')

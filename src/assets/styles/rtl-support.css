@@ -1,0 +1,308 @@
+/* src/assets/styles/rtl-support.css */
+/* Support RTL pour l'arabe - Version robuste */
+
+/* Direction générale - PRIORITÉ MAXIMALE */
+html[dir="rtl"] {
+  direction: rtl !important;
+}
+
+html[dir="ltr"] {
+  direction: ltr !important;
+}
+
+/* Classes utilitaires pour RTL */
+.rtl {
+  direction: rtl !important;
+}
+
+.ltr {
+  direction: ltr !important;
+}
+
+/* ✅ NOUVEAU: Support RTL sans dépendre de Vuetify */
+[dir="rtl"] * {
+  direction: inherit;
+}
+
+/* Alignement du texte en RTL */
+html[dir="rtl"] .v-app-bar__title,
+html[dir="rtl"] .v-list-item-title,
+html[dir="rtl"] .v-card-title,
+html[dir="rtl"] .text-h4,
+html[dir="rtl"] .text-h5,
+html[dir="rtl"] .text-h6,
+html[dir="rtl"] .audit-section-title,
+html[dir="rtl"] .audit-section-description,
+html[dir="rtl"] .v-card-subtitle,
+html[dir="rtl"] .text-subtitle-1,
+html[dir="rtl"] .text-body-1,
+html[dir="rtl"] .text-body-2 {
+  text-align: right !important;
+}
+
+/* Flexbox RTL - Plus spécifique */
+html[dir="rtl"] .d-flex:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .d-flex.align-center:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+/* Exception pour les éléments qui doivent garder leur ordre */
+html[dir="rtl"] .keep-order {
+  flex-direction: row !important;
+}
+
+/* Marges et padding inversés en RTL */
+html[dir="rtl"] .mr-1 {
+  margin-right: 0 !important;
+  margin-left: 4px !important;
+}
+
+html[dir="rtl"] .ml-1 {
+  margin-left: 0 !important;
+  margin-right: 4px !important;
+}
+
+html[dir="rtl"] .mr-2 {
+  margin-right: 0 !important;
+  margin-left: 8px !important;
+}
+
+html[dir="rtl"] .ml-2 {
+  margin-left: 0 !important;
+  margin-right: 8px !important;
+}
+
+html[dir="rtl"] .mr-3 {
+  margin-right: 0 !important;
+  margin-left: 12px !important;
+}
+
+html[dir="rtl"] .ml-3 {
+  margin-left: 0 !important;
+  margin-right: 12px !important;
+}
+
+html[dir="rtl"] .mr-4 {
+  margin-right: 0 !important;
+  margin-left: 16px !important;
+}
+
+html[dir="rtl"] .ml-4 {
+  margin-left: 0 !important;
+  margin-right: 16px !important;
+}
+
+/* Padding RTL */
+html[dir="rtl"] .pr-2 {
+  padding-right: 0 !important;
+  padding-left: 8px !important;
+}
+
+html[dir="rtl"] .pl-2 {
+  padding-left: 0 !important;
+  padding-right: 8px !important;
+}
+
+html[dir="rtl"] .pr-3 {
+  padding-right: 0 !important;
+  padding-left: 12px !important;
+}
+
+html[dir="rtl"] .pl-3 {
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+}
+
+/* Formulaires RTL */
+html[dir="rtl"] .v-text-field input,
+html[dir="rtl"] .v-text-field textarea {
+  text-align: right !important;
+}
+
+html[dir="rtl"] .v-text-field .v-field__prepend-inner {
+  order: 2;
+}
+
+html[dir="rtl"] .v-text-field .v-field__append-inner {
+  order: 1;
+}
+
+/* Boutons RTL */
+html[dir="rtl"] .v-btn:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .v-btn .v-icon {
+  margin-left: 0 !important;
+  margin-right: 4px !important;
+}
+
+/* Lists RTL */
+html[dir="rtl"] .v-list-item:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .v-list-item__prepend {
+  order: 2;
+  margin-right: 0 !important;
+  margin-left: 16px !important;
+}
+
+html[dir="rtl"] .v-list-item__append {
+  order: 1;
+  margin-left: 0 !important;
+  margin-right: 16px !important;
+}
+
+/* Cards RTL */
+html[dir="rtl"] .v-card-text {
+  text-align: right !important;
+}
+
+/* Navigation RTL */
+html[dir="rtl"] .v-bottom-navigation:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .v-bottom-navigation .v-btn:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+/* App bar RTL */
+html[dir="rtl"] .v-app-bar .v-toolbar__content:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+/* Grille RTL */
+html[dir="rtl"] .v-row:not(.keep-order) {
+  flex-direction: row-reverse !important;
+}
+
+/* Icônes - La plupart ne doivent PAS être inversées */
+html[dir="rtl"] .v-icon {
+  transform: none !important;
+}
+
+/* Seules quelques icônes directionnelles doivent être inversées */
+html[dir="rtl"] .mdi-arrow-left {
+  transform: scaleX(-1) !important;
+}
+
+html[dir="rtl"] .mdi-arrow-right {
+  transform: scaleX(-1) !important;
+}
+
+html[dir="rtl"] .mdi-chevron-left {
+  transform: scaleX(-1) !important;
+}
+
+html[dir="rtl"] .mdi-chevron-right {
+  transform: scaleX(-1) !important;
+}
+
+/* Spécifique aux composants ONUF */
+html[dir="rtl"] .language-flag {
+  margin-right: 0 !important;
+  margin-left: 12px !important;
+}
+
+html[dir="rtl"] .feature-icon {
+  margin-right: 0 !important;
+  margin-left: 12px !important;
+}
+
+html[dir="rtl"] .language-switcher .v-list-item {
+  text-align: right !important;
+}
+
+html[dir="rtl"] .language-name {
+  text-align: right !important;
+}
+
+/* Transitions RTL */
+html[dir="rtl"] .slide-left-enter-from {
+  transform: translateX(-100px) !important;
+}
+
+html[dir="rtl"] .slide-left-leave-to {
+  transform: translateX(100px) !important;
+}
+
+html[dir="rtl"] .slide-right-enter-from {
+  transform: translateX(100px) !important;
+}
+
+html[dir="rtl"] .slide-right-leave-to {
+  transform: translateX(-100px) !important;
+}
+
+/* Font family pour l'arabe */
+html[dir="rtl"] {
+  font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', 'Arial', sans-serif !important;
+}
+
+/* Correction pour les nombres en arabe */
+html[dir="rtl"] .number {
+  direction: ltr !important;
+  display: inline-block;
+}
+
+/* ✅ NOUVEAU: Support pour les sections d'audit en RTL */
+html[dir="rtl"] .audit-section {
+  text-align: right !important;
+}
+
+html[dir="rtl"] .audit-options {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .option-card {
+  text-align: center !important; /* Les cartes d'options restent centrées */
+}
+
+/* ✅ NOUVEAU: Support pour les widgets de localisation */
+html[dir="rtl"] .location-widget {
+  text-align: right !important;
+}
+
+html[dir="rtl"] .location-widget .v-btn {
+  flex-direction: row-reverse !important;
+}
+
+/* Debug - classe temporaire pour voir les changements */
+.rtl-debug {
+  border: 2px solid red !important;
+}
+
+html[dir="rtl"] .rtl-debug::before {
+  content: "RTL ACTIVE";
+  background: red;
+  color: white;
+  padding: 2px 4px;
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+/* ✅ IMPORTANT: Assurer que le RTL fonctionne globalement */
+[dir="rtl"] {
+  direction: rtl !important;
+}
+
+[dir="ltr"] {
+  direction: ltr !important;
+}
+
+/* Force le RTL même si Vuetify résiste */
+html[dir="rtl"] .v-application {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .v-main {
+  direction: rtl !important;
+}

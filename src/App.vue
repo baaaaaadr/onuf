@@ -397,11 +397,9 @@ const loginError = ref('')
 const isDevelopment = computed(() => import.meta.env.MODE === 'development')
 const appVersion = computed(() => import.meta.env.VITE_APP_VERSION || '2.0.0')
 
-// Titre de la page
+// Titre de la page - ✅ CORRIGÉ: suppression 'dashboard'
 const pageTitle = computed(() => {
   const titles = {
-    'intro': 'Accueil',
-    'dashboard': 'Accueil', 
     'audit': 'Nouvel Audit',
     'history': 'Mes Audits',
     'ma-ville': 'Ma Ville'
@@ -409,9 +407,9 @@ const pageTitle = computed(() => {
   return titles[route.name] || 'ONUF'
 })
 
-// Navigation
+// Navigation - ✅ CORRIGÉ: suppression 'dashboard'
 const showBackButton = computed(() => {
-  const noBackRoutes = ['intro', 'dashboard', 'history']
+  const noBackRoutes = ['audit', 'history', 'ma-ville']
   return !noBackRoutes.includes(route.name)
 })
 
@@ -421,7 +419,7 @@ const showBottomNav = computed(() => {
 })
 
 const showFab = computed(() => {
-  const showFabRoutes = ['intro', 'dashboard', 'history']
+  const showFabRoutes = ['history']
   return showFabRoutes.includes(route.name)
 })
 
@@ -499,7 +497,7 @@ const handleLogin = async () => {
       // Vérifier PWA
       checkInstallPrompt()
       
-      // Rediriger vers audit directement
+      // ✅ CORRIGÉ: Rediriger vers audit au lieu de dashboard
       nextTick(() => {
         router.replace({ name: 'audit' })
       })
@@ -642,10 +640,10 @@ onMounted(async () => {
   }
 })
 
-// Watchers
+// Watchers - ✅ CORRIGÉ: suppression des références à 'dashboard'
 watch(() => route.name, (newRoute, oldRoute) => {
   // Déterminer direction de transition
-  const routes = ['dashboard', 'audit', 'history', 'ma-ville']
+  const routes = ['audit', 'history', 'ma-ville']
   const newIndex = routes.indexOf(newRoute)
   const oldIndex = routes.indexOf(oldRoute)
   
@@ -658,13 +656,13 @@ watch(() => route.name, (newRoute, oldRoute) => {
   }
 }, { immediate: false })
 
-// Watch pour l'authentification (sans déclenchement immédiat)
+// ✅ CORRIGÉ: Watch pour l'authentification - redirection vers audit
 watch(isAuthenticated, (authenticated) => {
   if (authenticated && route.path === '/') {
-    // Utilisateur connecté et sur la page racine, rediriger vers dashboard
+    // Utilisateur connecté et sur la page racine, rediriger vers audit
     nextTick(() => {
-      if (route.name !== 'dashboard') {
-        router.replace({ name: 'dashboard' })
+      if (route.name !== 'audit') {
+        router.replace({ name: 'audit' })
       }
     })
   }
