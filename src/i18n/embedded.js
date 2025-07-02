@@ -8,7 +8,8 @@ export const fr = {
   },
   "navigation": {
     "audit": "Audit",
-    "history": "Historique"
+    "history": "Historique",
+    "myAudits": "Mes Audits"
   },
   "audit": {
     "title": "Audit de Sécurité",
@@ -25,11 +26,107 @@ export const fr = {
     "sections": {
       "lighting": {
         "title": "Éclairage",
-        "description": "Évaluation de l'éclairage public"
+        "description": "Disponibilité de suffisamment de lumière pour voir tout autour de vous.",
+        "options": {
+          "none": "Aucun",
+          "weak": "Faible",
+          "sufficient": "Suffisant",
+          "excellent": "Excellent"
+        }
       },
       "walkways": {
-        "title": "Cheminements",
-        "description": "État des trottoirs et passages"
+        "title": "Cheminement",
+        "description": "Soit un trottoir, soit une route avec de l'espace pour marcher.",
+        "options": {
+          "none": "Aucun",
+          "bad": "Mauvais",
+          "correct": "Correct",
+          "excellent": "Excellent"
+        }
+      },
+      "openness": {
+        "title": "Ouverture",
+        "description": "Capacité de voir et de se déplacer dans toutes les directions.",
+        "options": {
+          "blocked": "Bloqué",
+          "limited": "Limité",
+          "open": "Ouvert",
+          "veryOpen": "Très ouvert"
+        }
+      },
+      "feeling": {
+        "title": "Ressenti",
+        "description": "Comment vous sentez-vous dans cet endroit en ce moment ?",
+        "options": {
+          "scary": "Effrayant",
+          "uncomfortable": "Inconfortable",
+          "acceptable": "Acceptable",
+          "comfortable": "Confortable"
+        }
+      },
+      "humanPresence": {
+        "title": "Présence humaine",
+        "description": "Y a-t-il d'autres personnes autour de vous ?",
+        "options": {
+          "nobody": "Personne",
+          "few": "Peu",
+          "some": "Quelques-uns",
+          "many": "Beaucoup"
+        }
+      },
+      "cleanliness": {
+        "title": "Propreté",
+        "description": "État général de propreté et d'entretien du lieu.",
+        "options": {
+          "veryDirty": "Très sale",
+          "dirty": "Sale",
+          "clean": "Propre",
+          "veryClean": "Très propre"
+        }
+      },
+      "naturalSurveillance": {
+        "title": "Surveillance Naturelle",
+        "description": "Le sentiment d'être visible depuis les bâtiments (Yeux sur la rue).",
+        "options": {
+          "none": "Aucune",
+          "weak": "Faible",
+          "medium": "Moyenne",
+          "high": "Élevée"
+        }
+      },
+      "spaceDiversity": {
+        "title": "Mixité de l'Espace",
+        "description": "La présence et la diversité des genres et des âges (femmes, enfants).",
+        "options": {
+          "notMixed": "Non mixte",
+          "littleMixed": "Peu mixte",
+          "fairlyMixed": "Assez mixte",
+          "veryMixed": "Très mixte"
+        }
+      },
+      "spaceQuality": {
+        "title": "Qualité de l'espace",
+        "description": "Aménagement et confort"
+      },
+      "transportAccess": {
+        "title": "Accès aux Transports",
+        "description": "La proximité et la facilité d'accès aux transports en commun.",
+        "options": {
+          "inaccessible": "Inaccessible",
+          "far": "Éloigné",
+          "close": "Proche",
+          "veryClose": "Très proche"
+        }
+      },
+      "formalSecurity": {
+        "title": "Sécurité Formelle",
+        "description": "La présence visible de la police ou de gardiens de sécurité.",
+        "options": {
+          "none": "Aucune",
+          "weak": "Faible",
+          "medium": "Moyenne",
+          "high": "Élevée"
+        }
       },
       "signage": {
         "title": "Signalisation",
@@ -65,12 +162,44 @@ export const fr = {
       "abandoned": "Abandonné"
     },
     "photos": {
-      "title": "Photos",
-      "description": "Ajoutez des photos pour documenter l'audit",
+      "title": "Photos (optionnel)",
+      "description": "Ajoutez des photos pour documenter vos observations",
+      "action": "Prendre des photos",
       "add": "Ajouter une photo",
       "capture": "Prendre une photo",
       "delete": "Supprimer",
-      "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette photo ?"
+      "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette photo ?",
+      "widget": {
+        "empty": {
+          "title": "Prendre des photos",
+          "description": "Documentez votre audit avec des photos",
+          "takePhoto": "Prendre une photo",
+          "chooseFromGallery": "Choisir depuis la galerie"
+        }
+      }
+    },
+    "comments": {
+      "title": "Commentaires (optionnel)",
+      "description": "Partagez vos observations additionnelles",
+      "placeholder": "Commentaires additionnels (optionnel)"
+    },
+    "submit": {
+      "button": "Soumettre l'audit",
+      "sending": "Envoi en cours...",
+      "success": "Audit envoyé avec succès !",
+      "error": "Erreur lors de l'envoi"
+    },
+    "success": {
+      "title": "Audit Terminé !",
+      "message": "Merci pour votre contribution à la sécurité urbaine.",
+      "statusOnline": "Données synchronisées",
+      "statusOffline": "Sauvegardé localement",
+      "auditId": "ID d'audit :",
+      "actions": {
+        "newAudit": "Nouvel audit",
+        "myAudits": "Mes audits",
+        "home": "Accueil"
+      }
     },
     "summary": {
       "title": "Résumé de l'audit",
@@ -91,13 +220,54 @@ export const fr = {
     }
   },
   "history": {
-    "title": "Historique des Audits",
-    "empty": "Aucun audit effectué",
-    "search": "Rechercher...",
+    "title": "Mes Audits",
+    "loading": "Chargement des audits...",
+    "empty": {
+      "title": "Aucun audit enregistré",
+      "description": "Vos audits de sécurité apparaîtront ici une fois terminés.",
+      "action": "Commencer un audit"
+    },
+    "stats": {
+      "total": "Audits",
+      "synced": "Synchronisés"
+    },
+    "filters": {
+      "all": "Tous",
+      "synced": "Cloud",
+      "local": "Local",
+      "failed": "Échecs"
+    },
     "filter": {
       "all": "Tous",
       "synced": "Synchronisés",
       "pending": "En attente"
+    },
+    "sync": {
+      "offline": "seront synchronisés à la reconnexion",
+      "status": "État de synchronisation",
+      "synced": "Synchronisé",
+      "pending": "En attente",
+      "failed": "Échec",
+      "syncing": "En cours...",
+      "retry": "Réessayer sync"
+    },
+    "detail": {
+      "title": "Détail de l'audit",
+      "location": "Localisation",
+      "date": "Date",
+      "coordinates": "Coordonnées",
+      "precision": "Précision",
+      "evaluations": "Évaluations",
+      "globalScore": "Score global",
+      "photos": "Photos",
+      "unavailable": "Photo indisponible",
+      "technicalInfo": "Informations techniques",
+      "source": "Source",
+      "attempts": "Tentatives",
+      "export": "Exporter",
+      "close": "Fermer",
+      "retrySync": "Réessayer sync",
+      "delete": "Supprimer"
     },
     "status": {
       "synced": "Synchronisé",
@@ -149,7 +319,16 @@ export const fr = {
     "next": "Suivant",
     "finish": "Terminer",
     "required": "Requis",
-    "optional": "Optionnel"
+    "optional": "Optionnel",
+    "share": "Partager",
+    "openInMaps": "Ouvrir dans Maps",
+    "shareButton": "PARTAGER",
+    "openInMapsButton": "OUVRIR DANS MAPS",
+    "unknownPosition": "Position inconnue",
+    "yes": "Oui",
+    "no": "Non",
+    "unknown": "Inconnu",
+    "unavailable": "Non disponible"
   },
   "errors": {
     "network": "Erreur réseau",
@@ -166,7 +345,8 @@ export const en = {
   },
   "navigation": {
     "audit": "Audit",
-    "history": "History"
+    "history": "History",
+    "myAudits": "My Audits"
   },
   "audit": {
     "title": "Security Audit",
@@ -183,11 +363,107 @@ export const en = {
     "sections": {
       "lighting": {
         "title": "Lighting",
-        "description": "Public lighting assessment"
+        "description": "Availability of enough light to see all around you.",
+        "options": {
+          "none": "None",
+          "weak": "Weak",
+          "sufficient": "Sufficient",
+          "excellent": "Excellent"
+        }
       },
       "walkways": {
         "title": "Walkways",
-        "description": "Sidewalks and passages condition"
+        "description": "Either a sidewalk or a road with space to walk.",
+        "options": {
+          "none": "None",
+          "bad": "Bad",
+          "correct": "Correct",
+          "excellent": "Excellent"
+        }
+      },
+      "openness": {
+        "title": "Openness",
+        "description": "Ability to see and move in all directions.",
+        "options": {
+          "blocked": "Blocked",
+          "limited": "Limited",
+          "open": "Open",
+          "veryOpen": "Very open"
+        }
+      },
+      "feeling": {
+        "title": "Feeling",
+        "description": "How do you feel in this place right now?",
+        "options": {
+          "scary": "Scary",
+          "uncomfortable": "Uncomfortable",
+          "acceptable": "Acceptable",
+          "comfortable": "Comfortable"
+        }
+      },
+      "humanPresence": {
+        "title": "Human Presence",
+        "description": "Are there other people around you?",
+        "options": {
+          "nobody": "Nobody",
+          "few": "Few",
+          "some": "Some",
+          "many": "Many"
+        }
+      },
+      "cleanliness": {
+        "title": "Cleanliness",
+        "description": "General state of cleanliness and maintenance of the place.",
+        "options": {
+          "veryDirty": "Very dirty",
+          "dirty": "Dirty",
+          "clean": "Clean",
+          "veryClean": "Very clean"
+        }
+      },
+      "naturalSurveillance": {
+        "title": "Natural Surveillance",
+        "description": "The feeling of being visible from buildings (Eyes on the street).",
+        "options": {
+          "none": "None",
+          "weak": "Weak",
+          "medium": "Medium",
+          "high": "High"
+        }
+      },
+      "spaceDiversity": {
+        "title": "Space Diversity",
+        "description": "The presence and diversity of genders and ages (women, children).",
+        "options": {
+          "notMixed": "Not mixed",
+          "littleMixed": "Little mixed",
+          "fairlyMixed": "Fairly mixed",
+          "veryMixed": "Very mixed"
+        }
+      },
+      "spaceQuality": {
+        "title": "Space Quality",
+        "description": "Layout and comfort"
+      },
+      "transportAccess": {
+        "title": "Transport Access",
+        "description": "Proximity and ease of access to public transport.",
+        "options": {
+          "inaccessible": "Inaccessible",
+          "far": "Far",
+          "close": "Close",
+          "veryClose": "Very close"
+        }
+      },
+      "formalSecurity": {
+        "title": "Formal Security",
+        "description": "Visible presence of police or security guards.",
+        "options": {
+          "none": "None",
+          "weak": "Weak",
+          "medium": "Medium",
+          "high": "High"
+        }
       },
       "signage": {
         "title": "Signage",
@@ -223,12 +499,44 @@ export const en = {
       "abandoned": "Abandoned"
     },
     "photos": {
-      "title": "Photos",
-      "description": "Add photos to document the audit",
+      "title": "Photos (optional)",
+      "description": "Add photos to document your observations",
+      "action": "Take photos",
       "add": "Add photo",
       "capture": "Take photo",
       "delete": "Delete",
-      "confirm_delete": "Are you sure you want to delete this photo?"
+      "confirm_delete": "Are you sure you want to delete this photo?",
+      "widget": {
+        "empty": {
+          "title": "Take photos",
+          "description": "Document your audit with photos",
+          "takePhoto": "Take a photo",
+          "chooseFromGallery": "Choose from gallery"
+        }
+      }
+    },
+    "comments": {
+      "title": "Comments (optional)",
+      "description": "Share your additional observations",
+      "placeholder": "Additional comments (optional)"
+    },
+    "submit": {
+      "button": "Submit audit",
+      "sending": "Sending...",
+      "success": "Audit sent successfully!",
+      "error": "Error sending"
+    },
+    "success": {
+      "title": "Audit Complete!",
+      "message": "Thank you for your contribution to urban safety.",
+      "statusOnline": "Data synchronized",
+      "statusOffline": "Saved locally",
+      "auditId": "Audit ID:",
+      "actions": {
+        "newAudit": "New audit",
+        "myAudits": "My audits",
+        "home": "Home"
+      }
     },
     "summary": {
       "title": "Audit Summary",
@@ -249,13 +557,54 @@ export const en = {
     }
   },
   "history": {
-    "title": "Audit History",
-    "empty": "No audits performed",
-    "search": "Search...",
+    "title": "My Audits",
+    "loading": "Loading audits...",
+    "empty": {
+      "title": "No audits recorded",
+      "description": "Your security audits will appear here once completed.",
+      "action": "Start an audit"
+    },
+    "stats": {
+      "total": "Audits",
+      "synced": "Synced"
+    },
+    "filters": {
+      "all": "All",
+      "synced": "Cloud",
+      "local": "Local",
+      "failed": "Failed"
+    },
     "filter": {
       "all": "All",
       "synced": "Synced",
       "pending": "Pending"
+    },
+    "sync": {
+      "offline": "will be synchronized when reconnected",
+      "status": "Sync status",
+      "synced": "Synced",
+      "pending": "Pending",
+      "failed": "Failed",
+      "syncing": "In progress...",
+      "retry": "Retry sync"
+    },
+    "detail": {
+      "title": "Audit details",
+      "location": "Location",
+      "date": "Date",
+      "coordinates": "Coordinates",
+      "precision": "Precision",
+      "evaluations": "Evaluations",
+      "globalScore": "Global score",
+      "photos": "Photos",
+      "unavailable": "Photo unavailable",
+      "technicalInfo": "Technical information",
+      "source": "Source",
+      "attempts": "Attempts",
+      "export": "Export",
+      "close": "Close",
+      "retrySync": "Retry sync",
+      "delete": "Delete"
     },
     "status": {
       "synced": "Synced",
@@ -307,7 +656,16 @@ export const en = {
     "next": "Next",
     "finish": "Finish",
     "required": "Required",
-    "optional": "Optional"
+    "optional": "Optional",
+    "share": "Share",
+    "openInMaps": "Open in Maps",
+    "shareButton": "SHARE",
+    "openInMapsButton": "OPEN IN MAPS",
+    "unknownPosition": "Unknown position",
+    "yes": "Yes",
+    "no": "No",
+    "unknown": "Unknown",
+    "unavailable": "Unavailable"
   },
   "errors": {
     "network": "Network error",
@@ -324,7 +682,8 @@ export const ar = {
   },
   "navigation": {
     "audit": "تدقيق",
-    "history": "السجل"
+    "history": "السجل",
+    "myAudits": "تدقيقاتي"
   },
   "audit": {
     "title": "تدقيق أمني",
@@ -341,11 +700,107 @@ export const ar = {
     "sections": {
       "lighting": {
         "title": "الإنارة",
-        "description": "تقييم الإنارة العامة"
+        "description": "توفر ضوء كافٍ للرؤية في جميع الاتجاهات.",
+        "options": {
+          "none": "معدوم",
+          "weak": "ضعيف",
+          "sufficient": "كافٍ",
+          "excellent": "ممتاز"
+        }
       },
       "walkways": {
         "title": "الممرات",
-        "description": "حالة الأرصفة والممرات"
+        "description": "إما رصيف أو طريق مع مساحة للمشي.",
+        "options": {
+          "none": "معدوم",
+          "bad": "سيء",
+          "correct": "مقبول",
+          "excellent": "ممتاز"
+        }
+      },
+      "openness": {
+        "title": "الانفتاح",
+        "description": "القدرة على الرؤية والحركة في جميع الاتجاهات.",
+        "options": {
+          "blocked": "مسدود",
+          "limited": "محدود",
+          "open": "مفتوح",
+          "veryOpen": "مفتوح جداً"
+        }
+      },
+      "feeling": {
+        "title": "الشعور",
+        "description": "كيف تشعر في هذا المكان الآن؟",
+        "options": {
+          "scary": "مخيف",
+          "uncomfortable": "غير مريح",
+          "acceptable": "مقبول",
+          "comfortable": "مريح"
+        }
+      },
+      "humanPresence": {
+        "title": "الوجود البشري",
+        "description": "هل هناك أشخاص آخرون حولك؟",
+        "options": {
+          "nobody": "لا أحد",
+          "few": "قليل",
+          "some": "بعض",
+          "many": "كثير"
+        }
+      },
+      "cleanliness": {
+        "title": "النظافة",
+        "description": "الحالة العامة لنظافة وصيانة المكان.",
+        "options": {
+          "veryDirty": "قذر جداً",
+          "dirty": "قذر",
+          "clean": "نظيف",
+          "veryClean": "نظيف جداً"
+        }
+      },
+      "naturalSurveillance": {
+        "title": "المراقبة الطبيعية",
+        "description": "الشعور بالرؤية من المباني (عيون على الشارع).",
+        "options": {
+          "none": "معدومة",
+          "weak": "ضعيفة",
+          "medium": "متوسطة",
+          "high": "عالية"
+        }
+      },
+      "spaceDiversity": {
+        "title": "تنوع المكان",
+        "description": "وجود وتنوع الأجناس والأعمار (نساء، أطفال).",
+        "options": {
+          "notMixed": "غير مختلط",
+          "littleMixed": "قليل الاختلاط",
+          "fairlyMixed": "مختلط نسبياً",
+          "veryMixed": "مختلط جداً"
+        }
+      },
+      "spaceQuality": {
+        "title": "جودة المكان",
+        "description": "التصميم والراحة"
+      },
+      "transportAccess": {
+        "title": "الوصول للنقل",
+        "description": "القرب وسهولة الوصول إلى وسائل النقل العام.",
+        "options": {
+          "inaccessible": "غير متاح",
+          "far": "بعيد",
+          "close": "قريب",
+          "veryClose": "قريب جداً"
+        }
+      },
+      "formalSecurity": {
+        "title": "الأمن الرسمي",
+        "description": "الوجود المرئي للشرطة أو حراس الأمن.",
+        "options": {
+          "none": "معدوم",
+          "weak": "ضعيف",
+          "medium": "متوسط",
+          "high": "عالي"
+        }
       },
       "signage": {
         "title": "اللافتات",
@@ -381,12 +836,44 @@ export const ar = {
       "abandoned": "مهجور"
     },
     "photos": {
-      "title": "الصور",
-      "description": "أضف صورًا لتوثيق التدقيق",
+      "title": "الصور (اختياري)",
+      "description": "أضف صورًا لتوثيق ملاحظاتك",
+      "action": "التقاط صور",
       "add": "إضافة صورة",
       "capture": "التقاط صورة",
       "delete": "حذف",
-      "confirm_delete": "هل أنت متأكد من حذف هذه الصورة؟"
+      "confirm_delete": "هل أنت متأكد من حذف هذه الصورة؟",
+      "widget": {
+        "empty": {
+          "title": "التقاط صور",
+          "description": "وثق تدقيقك بالصور",
+          "takePhoto": "التقاط صورة",
+          "chooseFromGallery": "اختر من المعرض"
+        }
+      }
+    },
+    "comments": {
+      "title": "التعليقات (اختياري)",
+      "description": "شارك ملاحظاتك الإضافية",
+      "placeholder": "تعليقات إضافية (اختياري)"
+    },
+    "submit": {
+      "button": "إرسال التدقيق",
+      "sending": "جاري الإرسال...",
+      "success": "تم إرسال التدقيق بنجاح!",
+      "error": "خطأ في الإرسال"
+    },
+    "success": {
+      "title": "اكتمل التدقيق!",
+      "message": "شكراً لمساهمتك في السلامة الحضرية.",
+      "statusOnline": "تمت مزامنة البيانات",
+      "statusOffline": "محفوظ محلياً",
+      "auditId": "معرف التدقيق:",
+      "actions": {
+        "newAudit": "تدقيق جديد",
+        "myAudits": "تدقيقاتي",
+        "home": "الرئيسية"
+      }
     },
     "summary": {
       "title": "ملخص التدقيق",
@@ -407,13 +894,54 @@ export const ar = {
     }
   },
   "history": {
-    "title": "سجل التدقيقات",
-    "empty": "لا توجد تدقيقات",
-    "search": "بحث...",
+    "title": "تدقيقاتي",
+    "loading": "جاري تحميل التدقيقات...",
+    "empty": {
+      "title": "لا توجد تدقيقات مسجلة",
+      "description": "ستظهر تدقيقات الأمان الخاصة بك هنا بمجرد اكتمالها.",
+      "action": "ابدأ تدقيقاً"
+    },
+    "stats": {
+      "total": "التدقيقات",
+      "synced": "متزامن"
+    },
+    "filters": {
+      "all": "الكل",
+      "synced": "السحابة",
+      "local": "محلي",
+      "failed": "فشل"
+    },
     "filter": {
       "all": "الكل",
       "synced": "متزامن",
       "pending": "قيد الانتظار"
+    },
+    "sync": {
+      "offline": "سيتم المزامنة عند إعادة الاتصال",
+      "status": "حالة المزامنة",
+      "synced": "متزامن",
+      "pending": "قيد الانتظار",
+      "failed": "فشل",
+      "syncing": "جاري...",
+      "retry": "إعادة المزامنة"
+    },
+    "detail": {
+      "title": "تفاصيل التدقيق",
+      "location": "الموقع",
+      "date": "التاريخ",
+      "coordinates": "الإحداثيات",
+      "precision": "الدقة",
+      "evaluations": "التقييمات",
+      "globalScore": "النتيجة الإجمالية",
+      "photos": "الصور",
+      "unavailable": "الصورة غير متاحة",
+      "technicalInfo": "معلومات تقنية",
+      "source": "المصدر",
+      "attempts": "المحاولات",
+      "export": "تصدير",
+      "close": "إغلاق",
+      "retrySync": "إعادة المزامنة",
+      "delete": "حذف"
     },
     "status": {
       "synced": "متزامن",
@@ -465,7 +993,16 @@ export const ar = {
     "next": "التالي",
     "finish": "إنهاء",
     "required": "مطلوب",
-    "optional": "اختياري"
+    "optional": "اختياري",
+    "share": "مشاركة",
+    "openInMaps": "فتح في الخرائط",
+    "shareButton": "مشاركة",
+    "openInMapsButton": "فتح في الخرائط",
+    "unknownPosition": "موقع غير معروف",
+    "yes": "نعم",
+    "no": "لا",
+    "unknown": "غير معروف",
+    "unavailable": "غير متاح"
   },
   "errors": {
     "network": "خطأ في الشبكة",
