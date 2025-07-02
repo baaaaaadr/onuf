@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Traductions ONUF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #4CAF50; }
+        .error { color: #F44336; }
+        .warning { color: #FF9800; }
+        button {
+            background: #D4A574;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #c19660;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.ok { background: #e8f5e9; color: #4CAF50; }
+        .status.error { background: #ffebee; color: #F44336; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test des Traductions ONUF</h1>
+    
+    <div class="test-card">
+        <h2>📊 État de l'application</h2>
+        <div id="app-status">Chargement...</div>
+    </div>
+    
+    <div class="test-card">
+        <h2>🌍 Test des traductions</h2>
+        <button onclick="testTranslations()">Tester les traductions</button>
+        <button onclick="testAllLocales()">Tester toutes les langues</button>
+        <button onclick="activateDebug()">Activer le debug</button>
+        <div id="translation-results"></div>
+    </div>
+    
+    <div class="test-card">
+        <h2>🔧 Actions rapides</h2>
+        <button onclick="clearCache()">Vider le cache</button>
+        <button onclick="resetLanguage()">Réinitialiser la langue</button>
+        <button onclick="downloadDiagnostic()">Télécharger diagnostic</button>
+    </div>
+    
+    <div class="test-card">
+        <h2>📝 Console de diagnostic</h2>
+        <pre id="console-output"></pre>
+    </div>
+
+    <script>
+        // Fonction pour logger dans la console visible
+        function log(message, type = 'info') {
+            const output = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            output.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Vérifier l'état de l'application
+        function checkAppStatus() {
+            const status = document.getElementById('app-status');
+            let html = '';
+            
+            // Vérifier si l'app est chargée
+            if (window.__onuf) {
+                html += '<div><span class="status ok">APP OK</span> Application ONUF détectée</div>';
+                
+                // Vérifier i18n
+                if (window.__onuf.i18n) {
+                    html += '<div><span class="status ok">I18N OK</span> Module i18n chargé</div>';
+                    html += `<div>Locale actuelle: <strong>${window.__onuf.i18n.global.locale.value}</strong></div>`;
+                } else {
+                    html += '<div><span class="status error">I18N KO</span> Module i18n non trouvé</div>';
+                }
+                
+                // Vérifier les messages
+                if (window.__onuf.messages) {
+                    const locales = Object.keys(window.__onuf.messages);
+                    html += `<div><span class="status ok">MESSAGES OK</span> ${locales.length} langues: ${locales.join(', ')}</div>`;
+                } else {
+                    html += '<div><span class="status error">MESSAGES KO</span> Traductions non trouvées</div>';
+                }
+            } else {
+                html += '<div><span class="status error">APP KO</span> Application ONUF non détectée</div>';
+                html += '<div class="warning">⚠️ Assurez-vous d\'être sur la page de l\'application</div>';
+            }
+            
+            status.innerHTML = html;
+        }
+
+        // Tester les traductions
+        function testTranslations() {
+            const results = document.getElementById('translation-results');
+            results.innerHTML = '<h3>Test de traductions courantes:</h3>';
+            
+            if (!window.__onuf || !window.__onuf.i18n) {
+                results.innerHTML += '<div class="error">❌ Application non chargée</div>';
+                return;
+            }
+            
+            const testKeys = [
+                'app.title',
+                'app.description',
+                'navigation.audit',
+                'navigation.history',
+                'audit.title',
+                'audit.subtitle',
+                'common.save',
+                'common.cancel'
+            ];
+            
+            const t = window.__onuf.i18n.global.t;
+            let successCount = 0;
+            
+            testKeys.forEach(key => {
+                const result = t(key);
+                const isSuccess = result !== key;
+                if (isSuccess) successCount++;
+                
+                results.innerHTML += `
+                    <div>
+                        <code>${key}</code> → 
+                        <span class="${isSuccess ? 'success' : 'error'}">
+                            ${isSuccess ? '✅' : '❌'} "${result}"
+                        </span>
+                    </div>
+                `;
+            });
+            
+            results.innerHTML += `
+                <div style="margin-top: 10px">
+                    <strong>Résultat: ${successCount}/${testKeys.length} traductions OK</strong>
+                </div>
+            `;
+            
+            log(`Test terminé: ${successCount}/${testKeys.length} traductions réussies`, 
+                successCount === testKeys.length ? 'success' : 'error');
+        }
+
+        // Tester toutes les langues
+        function testAllLocales() {
+            if (!window.__onuf) {
+                alert('Application non chargée!');
+                return;
+            }
+            
+            const results = document.getElementById('translation-results');
+            results.innerHTML = '<h3>Test multi-langues:</h3>';
+            
+            const locales = ['fr', 'en', 'ar'];
+            const testKey = 'app.title';
+            
+            locales.forEach(locale => {
+                window.__onuf.setLocale(locale);
+                const result = window.__onuf.i18n.global.t(testKey);
+                results.innerHTML += `
+                    <div>
+                        <strong>${locale}:</strong> ${result}
+                    </div>
+                `;
+            });
+            
+            // Restaurer la langue d'origine
+            const savedLang = localStorage.getItem('onuf-language') || 'fr';
+            window.__onuf.setLocale(savedLang);
+            
+            log('Test multi-langues terminé', 'success');
+        }
+
+        // Activer le debug
+        function activateDebug() {
+            localStorage.setItem('onuf-debug-enabled', 'true');
+            log('Debug activé! Rechargez la page pour voir le bouton 🐛', 'success');
+            
+            if (confirm('Debug activé! Voulez-vous recharger la page maintenant?')) {
+                location.reload();
+            }
+        }
+
+        // Vider le cache
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                    log('Cache vidé avec succès', 'success');
+                });
+            }
+            
+            // Vider aussi le localStorage sauf les préférences
+            const keysToKeep = ['onuf-language', 'onuf-debug-enabled'];
+            const allKeys = Object.keys(localStorage);
+            
+            allKeys.forEach(key => {
+                if (!keysToKeep.includes(key) && key.startsWith('onuf')) {
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            log('LocalStorage nettoyé', 'success');
+        }
+
+        // Réinitialiser la langue
+        function resetLanguage() {
+            localStorage.removeItem('onuf-language');
+            log('Langue réinitialisée. La page va se recharger...', 'success');
+            setTimeout(() => location.reload(), 1000);
+        }
+
+        // Télécharger le diagnostic
+        function downloadDiagnostic() {
+            const diagnostic = {
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                onufDetected: !!window.__onuf,
+                diagnostic: window.__onuf ? window.__onuf.diagnose() : null,
+                localStorage: {}
+            };
+            
+            // Récupérer les clés localStorage pertinentes
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('onuf') || key.includes('lang')) {
+                    diagnostic.localStorage[key] = localStorage.getItem(key);
+                }
+            });
+            
+            const blob = new Blob([JSON.stringify(diagnostic, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `onuf-diagnostic-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('Diagnostic téléchargé', 'success');
+        }
+
+        // Initialisation
+        window.addEventListener('load', () => {
+            checkAppStatus();
+            
+            // Vérifier périodiquement si l'app est chargée
+            const checkInterval = setInterval(() => {
+                if (window.__onuf) {
+                    clearInterval(checkInterval);
+                    checkAppStatus();
+                    log('Application ONUF détectée et chargée!', 'success');
+                    
+                    // Auto-diagnostic si disponible
+                    if (window.__onuf.diagnose) {
+                        window.__onuf.diagnose();
+                    }
+                }
+            }, 500);
+            
+            // Arrêter après 10 secondes
+            setTimeout(() => clearInterval(checkInterval), 10000);
+        });
+
+        // Afficher les erreurs
+        window.addEventListener('error', (e) => {
+            log(`Erreur: ${e.message}`, 'error');
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Ne crée pas trop de fichiers MD dans le projet, sauf si c'est utile pour Claude
 ## 📱 **Projet ONUF PWA - Contexte**
 Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase.
 
-## 🎯 **État Actuel (Janvier 2025)**
+## 🎯 **État Actuel (Juillet 2025)**
 - ✅ Interface complète Vue.js + Vuetify 
 - ✅ Géolocalisation + carte Leaflet
 - ✅ 6 sections d'audit (éclairage, cheminement, etc.)
@@ -33,23 +33,35 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
 - ✅ **NAVIGATION SWIPE** : Navigation par gestes swipe entre les 4 écrans principaux
 - ✅ **CORRIGÉ 19/06** : Erreur "null user_id" lors de la synchronisation
 - ✅ **CORRIGÉ 19/06** : Interface audit (boutons dialogue, réinitialisation formulaire, icône check, messages snackbar)
+- ✅ **I18N INTÉGRÉ** : Support multi-langues FR/EN/AR avec RTL pour l'arabe
+- ✅ **TRADUCTIONS HYBRIDES** : Système fallback automatique JSON → embedded → minimal
+- ✅ **DEBUG PRODUCTION** : Bouton debug accessible via ?debug=true en production
 
 ## 🏗️ **Architecture**
-- **Frontend** : Vue.js 3 + Vuetify + PWA
+- **Frontend** : Vue.js 3 + Vuetify + PWA + Vue-i18n
 - **Backend** : Supabase (PostgreSQL + Storage + Auth)
 - **Auth** : Système personnalisé avec username/password
 - **Storage** : IndexedDB local + Synchronisation automatique avec Supabase
 - **Gestion d'état** : Composition API + Pinia
+- **Internationalisation** : Vue-i18n avec système hybride de chargement
 
 ## 🔐 **Accès**
 - **Admin** : `admin` / `admin123!`
 - **Agents** : `agent01`, `agent02`, `agent03` / `field123!`
 
-## 🛠️ **Dernières Réalisations (20 Janvier 2025)**
-- **✅ Correction erreur Vue** : Correction de l'erreur `Cannot read properties of undefined (reading 'value')` dans DashboardView.vue
-- **✅ Navigation par swipe** : Ajout de la navigation par gestes tactiles entre les 4 écrans principaux (Accueil, Audit, Historique, Ma Ville)
-- **✅ SwipeNavigation.vue créé** : Composant pour gérer les swipes avec indicateur visuel et support clavier
-- **✅ Intégration dans App.vue** : SwipeNavigation encapsule maintenant le router-view
+## 🛠️ **Dernières Réalisations (02 Juillet 2025)**
+- **✅ Système de traductions hybride** : 
+  - Détection automatique des problèmes d'import JSON
+  - Fallback automatique sur traductions intégrées
+  - Traductions minimales de secours en dernier recours
+- **✅ Debug en production** :
+  - Bouton debug accessible via `?debug=true`
+  - Panel debug complet avec onglet i18n
+  - Système de diagnostic intégré (`__onuf.diagnose()`)
+- **✅ Outils de diagnostic** :
+  - Page de test dédiée : `/test-translations.html`
+  - Script automatique : `fix-translations.bat`
+  - Configuration Netlify pour servir les JSON
 
 ## 🛠️ **Dernières Réalisations (19 Juin 2025)**
 - **✅ Correction erreur synchronisation** : Correction de l'erreur `null value in column "user_id"` lors de la synchronisation des audits
@@ -69,61 +81,57 @@ Application PWA d'audit de sécurité urbaine à Agadir avec Vue.js 3 + Supabase
   - Suppression du bouton "Accueil" dans la navigation du bas
   - Route "/" redirige automatiquement vers "/audit"
   - Bouton debug repositionné au-dessus de la navigation du bas
-## 🎆 Résumé des modifications terminées avec succès ! ✅
-
-J'ai implémenté toutes vos demandes :
-
-### 1. **Suppression complète de la page d'accueil**
-- ✅ La route `/` redirige automatiquement vers `/audit`
-- ✅ L'application démarre directement sur la page Audit
-- ✅ Bouton "Accueil" supprimé de la navigation du bas
-
-### 2. **Menu hamburger avec statuts système**
-- ✅ StatusBar intégré avec menu hamburger dans le header
-- ✅ Statuts système déplacés dans le menu :
-  - Synchronisation Cloud (avec dialog)
-  - Connectivité Réseau
-  - Géolocalisation GPS (avec carte plein écran)
-  - Guide de démarrage
-  - Section utilisateur (Profil, Déconnexion)
-
-### 3. **Correction du bouton jaune caché**
-- ✅ Le bouton debug (🐛) repositionné à 90px du bas
-- ✅ Z-index ajusté pour ne pas interférer avec la navigation
-
-### 4. **Navigation simplifiée**
-- ✅ Navigation contient seulement : **Audit** et **Historique**
-- ✅ Menu hamburger accessible en haut à droite avec tous les statuts
-
-**Note**: Si le menu hamburger n'apparaît toujours pas, essayez de:
-1. Rafraîchir complètement la page (Ctrl+F5)
-2. Vider le cache du navigateur
-3. Redémarrer le serveur de développement
-
-Le StatusBar est maintenant configuré correctement et devrait apparaître avec le menu hamburger.
 
 ## 📁 **Fichiers Importants**
 - `src/composables/useAudits.js` : Gestion CRUD + stratégie Local-First
 - `src/composables/useSyncQueue.js` : Synchronisation simplifiée
+- `src/composables/useLang.js` : Gestion des langues et RTL
+- `src/composables/useI18nFallback.js` : **NOUVEAU** Traductions avec fallback
 - `src/views/AuditFormView.vue` : Formulaire principal (corrections récentes)
 - `src/views/AuditsHistoryView.vue` : Historique + auto-refresh
 - `src/components/StatusBar.vue` : Header avec bouton "+" et indicateurs
 - `src/components/widgets/LocationWidget.vue` : Widget GPS moderne
 - `src/components/widgets/PhotoCapture.vue` : Interface photo moderne
 - `src/components/transitions/PageTransition.vue` : Transitions de page
-- `src/components/navigation/SwipeNavigation.vue` : **NOUVEAU** Navigation par swipe
+- `src/components/navigation/SwipeNavigation.vue` : Navigation par swipe
+- `src/components/debug/MobileDebugViewer.vue` : **MODIFIÉ** Debug en production
 - `src/components/common/FloatingActionButton.vue` : FAB avec ripple
+- `src/i18n/embedded.js` : **NOUVEAU** Traductions intégrées
+- `src/main.js` : **MODIFIÉ** Système hybride de chargement
+- `src/locales/*.json` : Fichiers de traduction (FR/EN/AR)
 - `src/assets/styles/animations.css` : Animations globales
 - `src/utils/debug.js` : Outils debug (window.__debugONUF)
-- `STRATEGIE_LOCAL_FIRST.md` : Documentation nouvelle approche
+- `public/test-translations.html` : **NOUVEAU** Page de test i18n
+- `vite.config.js` : **MODIFIÉ** Configuration pour JSON
+- `netlify.toml` : **NOUVEAU** Configuration serveur
+- `fix-translations.bat` : **NOUVEAU** Script de correction auto
 
 ## 🧪 **Debug Tools**
 ```javascript
+// Ancien système (toujours disponible)
 __debugONUF.getStats()           // Statistiques complètes
 __debugONUF.getLocalAudits()     // Audits locaux
 __debugONUF.getSyncQueue()       // Queue synchronisation
 __debugONUF.reloadAudits()       // Forcer reload interface
+
+// NOUVEAU système (recommandé)
+__onuf.diagnose()                // Diagnostic complet i18n et app
+__onuf.setLocale('ar')          // Changer de langue
+__onuf.i18n.global.t('app.title') // Tester une traduction
+
+// Activer debug en production
+URL: ?debug=true
+Console: localStorage.setItem('onuf-debug-enabled', 'true')
 ```
+
+## 🌍 **Internationalisation**
+- **Langues supportées** : Français (par défaut), English, العربية
+- **Support RTL** : Automatique pour l'arabe
+- **Système hybride** :
+  1. Import JSON (production normale)
+  2. Import embedded.js (si JSON échoue)
+  3. Traductions minimales (dernier recours)
+- **Changement de langue** : Via menu ou `__onuf.setLocale('en')`
 
 ## 🎆 **Composants du redesign**
 ### Phase 3.1 (✅ Terminée)
@@ -148,60 +156,63 @@ __debugONUF.reloadAudits()       // Forcer reload interface
   - Support clavier (flèches gauche/droite)
   - Ignorer les swipes sur éléments interactifs
 
-## 🔐 **Sécurité & Privacy (20 Janvier 2025)**
+## 🔐 **Sécurité & Privacy**
 - **✅ CORRIGÉ** : Filtrage des audits par utilisateur
 - Chaque agent ne voit que ses propres audits
 - Protection contre la suppression d'audits d'autres utilisateurs
 - Séparation complète des données entre agents
 - Voir `FIX_FILTER_AUDITS_BY_USER.md` pour détails
 
-## 🔧 **Corrections Techniques (20 Janvier 2025)**
+## 🔧 **Corrections Techniques**
 - **✅ CORRIGÉ** : Boucle récursive dans AuditsHistoryView
 - **✅ CORRIGÉ** : Problème d'initialisation de la sync
 - **✅ CORRIGÉ** : Avertissements Vue.js répétés
 - **✅ CORRIGÉ** : Erreur syncStats.value dans DashboardView
 - **✅ CORRIGÉ** : Erreur "null user_id" lors de la synchronisation
 - **✅ CORRIGÉ** : Problèmes interface audit (boutons, messages, icônes)
-- Voir `FIX_RECURSIVE_ERRORS.md`, `APPLY_FIXES.md`, `FIX_USER_ID_NULL_ERROR.md` et `FIX_AUDIT_INTERFACE_ISSUES.md`
+- **✅ CORRIGÉ** : Traductions qui ne s'affichent pas en production mobile
+- **✅ CORRIGÉ** : Bouton debug invisible en production
+- Voir tous les fichiers FIX_*.md pour détails
 
 ## 🚨 **Points d'attention**
 - **Canvas warning dans CityHeatmap** : Avertissement Canvas2D sur willReadFrequently (performance)
 - **Import animations** : Ajouter `@import './styles/animations.css';` dans main.css
 - **Test mobile** : Vérifier performances des nouvelles animations sur appareils bas de gamme
+- **Traductions production** : Toujours tester avec `npm run preview` avant déploiement
 
 ## 🚀 **Prochaines Étapes**
-1. **OPTIMISER HEATMAP** : 🐛 À FAIRE
-   - Corriger l'avertissement Canvas2D dans CityHeatmap.vue
-   - Ajouter willReadFrequently: true au contexte canvas
-
-2. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
+1. **TESTS UTILISATEUR** : 🧪 PRIORITÉ HAUTE
    - Tester l'application complète sur vrais dispositifs mobiles
-   - Vérifier les performances avec connexion lente
+   - Vérifier les traductions dans toutes les langues
    - Tester la navigation par swipe sur différents appareils
    - Collecter feedback sur le nouveau design
    - Identifier bugs restants
 
-3. **PHASE 3.4 - Optimisation Finale** :
+2. **OPTIMISATION FINALE** :
    - Bundle size optimization (réduire taille JS/CSS)
    - Service Worker avancé (cache intelligent)
    - Core Web Vitals > 90 (LCP, FID, CLS)
    - Virtual scrolling pour grandes listes
    - Web Workers pour compression photos
 
-4. **PHASE 4 - Finalisation** :
+3. **FINALISATION** :
    - Tests end-to-end automatisés
    - Documentation utilisateur finale
-   - Déploiement production (Netlify/Vercel)
    - Formation utilisateurs + vidéos
+   - Monitoring production
 
-## 📎 **Ressources**
-- **Dépôt** : `C:\Users\MiniMonster\Documents\my apps\ONUF\ONUF-pwa`
-- **Guides** : 
-  - `INTEGRATION_GUIDE_PHASE3_3.md` : Guide détaillé d'intégration
-  - `INTEGRATION_SIMPLE_PHASE3_3.md` : Instructions pas à pas
-  - `redesign\PHASE3_STEP3_COMPLETE.md` : Résumé Phase 3.3
-  - `redesign\PHASE3_STEP4_TODO.md` : Plan Phase 3.4
+## 📎 **Ressources & Guides**
+- **Dépôt** : `C:\Users\Monster\Documents\My Apps\ONUF\onuf`
+- **Guides principaux** : 
+  - `DIAGNOSTIC_RAPIDE.md` : Guide de diagnostic i18n
+  - `SOLUTION_FINALE_COMPLETE.md` : Résumé solution traductions
+  - `COMMANDES_RAPIDES.txt` : Commandes essentielles
+  - `STRATEGIE_LOCAL_FIRST.md` : Documentation approche offline
+- **Scripts utiles** :
+  - `fix-translations.bat` : Correction automatique
+  - `deploy.bat` : Déploiement avec traductions
+  - `check-embedded-translations.js` : Vérification intégrité
 
-> **Note** : 🎉 Navigation par swipe maintenant fonctionnelle! L'application supporte la navigation par gestes tactiles entre les 4 écrans principaux.
-> **STATUT ACTUEL** : Application prête pour tests utilisateur - design moderne, interactions fluides, offline-first, navigation par swipe.
-> **DERNIÈRES CORRECTIONS** : Erreur syncStats corrigée, navigation swipe ajoutée.
+> **Note** : 🎉 Système de traductions hybride garantissant le fonctionnement sur tous les environnements!
+> **STATUT ACTUEL** : Application prête avec i18n multi-langues (FR/EN/AR), support RTL, debug accessible en production, navigation swipe, offline-first.
+> **DERNIÈRES CORRECTIONS** : Traductions hybrides avec fallback automatique, bouton debug en production.

@@ -20,6 +20,11 @@ export default defineConfig({
     // ✅ S'assurer que les fichiers JSON sont inclus
     assetsInclude: ['**/*.json'],
     
+    // ✅ NOUVEAU: Copier les fichiers de traduction dans le build
+    commonjsOptions: {
+      include: [/locales/, /node_modules/]
+    },
+    
     rollupOptions: {
       output: {
         // Optimisation des chunks

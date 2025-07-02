@@ -1,15 +1,10 @@
-// src/main.js
+// C:\Users\Monster\Documents\My Apps\ONUF\onuf\src\main.js
+// NOUVELLE VERSION SIMPLIFIÉE À REMPLACER
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-
-// ✅ CORRIGÉ: Import de vue-i18n pour l'internationalisation
-import { createI18n } from 'vue-i18n'
-
-// ✅ CORRIGÉ: Import statique des fichiers de traduction pour la production
-import fr from './locales/fr.json'
-import en from './locales/en.json'
-import ar from './locales/ar.json'
+import i18n from './plugins/i18n' // Import du plugin i18n
 
 // Vuetify
 import 'vuetify/styles'
@@ -19,66 +14,63 @@ import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 
-// ✅ NOUVEAU: Import du support RTL
 import './assets/styles/rtl-support.css'
 
-// ✅ NOUVEAU: Configuration i18n avec imports statiques
-const messages = {
-  fr,
-  en,
-  ar
-}
-
-const i18n = createI18n({
-  legacy: false, // Composition API
-  locale: 'fr', // Langue par défaut
-  fallbackLocale: 'en', // Langue de secours
-  messages,
-  globalInjection: true // Injection globale pour $t
-})
-
-// ✅ CORRIGÉ: Configuration Vuetify avec support RTL amélioré
 const vuetify = createVuetify({
   components,
   directives,
-  icons: {
-    defaultSet: 'mdi',
-    aliases,
-    sets: {
-      mdi,
-    },
-  },
+  icons: { defaultSet: 'mdi', aliases, sets: { mdi } },
   theme: {
     defaultTheme: 'light',
     themes: {
       light: {
         colors: {
-          primary: '#D4A574',
-          secondary: '#8BC34A',
-          accent: '#FF9800',
-          error: '#F44336',
-          warning: '#FF9800',
-          info: '#2196F3',
-          success: '#4CAF50',
-          background: '#FAFAFA',
-          surface: '#FFFFFF',
+          primary: '#D4A574', secondary: '#8BC34A', accent: '#FF9800', error: '#F44336',
+          warning: '#FF9800', info: '#2196F3', success: '#4CAF50', background: '#FAFAFA', surface: '#FFFFFF',
         },
       },
     },
   },
-  // ✅ CORRIGÉ: Support RTL initial
-  rtl: false, // Sera géré dynamiquement par le composable useLang
-})
+  rtl: false,
+});
 
-const app = createApp(App)
+const app = createApp(App);
+app.use(router);
+app.use(vuetify);
+app.use(i18n); // Utilisation du plugin i18n
 
-// ✅ CORRIGÉ: Suppression de Pinia - le projet utilise les composables Vue 3
-app.use(router)
-app.use(vuetify)
-app.use(i18n) // ✅ IMPORTANT: Ajouter i18n APRÈS vuetify
+// Logique de debug
+if (typeof window !== 'undefined') {
+  window.__onuf = {
+    i18n, app,
+    messages: i18n.global.messages,
+    version: '1.0.1-patch4', env: import.meta.env.MODE,
+    diagnose: () => {
+      console.log('🏥 Diagnostic ONUF (v4):');
+      console.log('- Stratégie: Plugin Isolé');
+      console.log('- Environnement:', import.meta.env.MODE);
+      console.log('- Locale actuelle:', i18n.global.locale.value);
+      console.log('- Locales disponibles:', i18n.global.availableLocales); // Ceci doit être un Array
+      console.log('- Test de traduction (app.title):', i18n.global.t('app.title'));
+    },
+    setLocale: (locale) => {
+      if (['fr', 'en', 'ar'].includes(locale)) {
+        i18n.global.locale.value = locale;
+        localStorage.setItem('onuf-language', locale);
+        console.log(`✅ Langue changée: ${locale}`);
+      } else {
+        console.error(`❌ Langue non supportée: ${locale}`);
+      }
+    }
+  };
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('debug') === 'true' || localStorage.getItem('onuf-debug-enabled') === 'true') {
+    setTimeout(() => {
+      console.log('🚀 Auto-diagnostic activé');
+      window.__onuf.diagnose();
+    }, 1000);
+  }
+}
 
-app.mount('#app')
-
-// ✅ CORRIGÉ: L'initialisation de la langue se fera automatiquement
-// via les composants qui utilisent useLang() - pas besoin de forcer ici
-console.log('✅ ONUF PWA démarré avec support i18n et RTL')
+app.mount('#app');
+console.log('✅ ONUF PWA démarré avec plugin i18n isolé.');

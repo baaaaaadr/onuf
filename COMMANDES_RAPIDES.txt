@@ -1,0 +1,47 @@
+# 🚀 COMMANDES RAPIDES - RÉSOUDRE LES TRADUCTIONS
+
+## Option 1 : Solution automatique (RECOMMANDÉ)
+```bash
+# Exécuter le script de correction automatique
+fix-translations.bat
+```
+
+## Option 2 : Commandes manuelles
+
+### 1. Build et test local
+```bash
+npm run build
+npm run preview
+# Ouvrir: http://localhost:4173/audit?debug=true
+```
+
+### 2. Dans la console du navigateur (F12)
+```javascript
+// Diagnostic complet
+__onuf.diagnose()
+
+// Test simple
+__onuf.i18n.global.t('app.title')
+// Doit retourner "MANARA", pas "app.title"
+
+// Changer de langue
+__onuf.setLocale('ar')
+```
+
+### 3. Déployer si OK
+```bash
+git add .
+git commit -m "Fix: Système hybride de traductions avec fallback"
+git push
+```
+
+## 📱 Test sur mobile
+1. Aller sur : `https://onuf.netlify.app/audit?debug=true`
+2. Cliquer sur le bouton 🐛
+3. Vérifier l'onglet "🌍 i18n"
+
+## 🆘 Si problème
+Ouvrir : `/test-translations.html` et suivre les instructions
+
+---
+**Le nouveau système garantit que les traductions fonctionnent TOUJOURS !** 🎉

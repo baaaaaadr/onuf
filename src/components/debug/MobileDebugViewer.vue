@@ -2,7 +2,7 @@
 <template>
   <!-- Bouton debug flottant -->
   <v-btn
-    v-if="isDevelopment || forceShow"
+    v-if="showDebugButton"
     icon
     size="small"
     color="error"
@@ -248,6 +248,24 @@ const isDevelopment = computed(() => {
   return import.meta.env.MODE === 'development' || forceShow.value
 })
 
+// ✅ CORRIGÉ: Condition pour afficher le bouton
+const showDebugButton = computed(() => {
+  // Toujours afficher en développement
+  if (import.meta.env.MODE === 'development') return true
+  
+  // En production, vérifier plusieurs conditions
+  if (forceShow.value) return true
+  
+  // ✅ NOUVEAU: Afficher si un paramètre debug est présent dans l'URL
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('debug') === 'true') return true
+  
+  // ✅ NOUVEAU: Afficher si un flag est défini dans localStorage
+  if (localStorage.getItem('onuf-debug-enabled') === 'true') return true
+  
+  return false
+})
+
 const debugBtnPosition = computed(() => {
   return '120px' // Au-dessus de la navigation
 })
@@ -486,6 +504,12 @@ const captureErrors = () => {
 
 // Lifecycle
 onMounted(() => {
+  // ✅ NOUVEAU: Vérifier l'URL pour activer le debug
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('debug') === 'true') {
+    localStorage.setItem('onuf-debug-enabled', 'true')
+  }
+  
   // Récupérer l'état forcé
   forceShow.value = localStorage.getItem('onuf-debug-force') === 'true'
   

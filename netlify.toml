@@ -1,31 +1,26 @@
+# Netlify configuration file
+
 [build]
   publish = "dist"
   command = "npm run build"
 
-[build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "9"
+# Headers pour les fichiers JSON
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=3600"
 
-# Redirections pour SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[headers]]
+  for = "/locales/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=3600"
+    Access-Control-Allow-Origin = "*"
 
-# Headers de cache pour les assets
+# Headers pour les assets
 [[headers]]
   for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Headers pour les fichiers JS/CSS
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
@@ -34,6 +29,17 @@
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Redirections pour SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Redirection spéciale pour les fichiers de traduction
+[[redirects]]
+  from = "/src/locales/*"
+  to = "/locales/:splat"
+  status = 200
