@@ -10,7 +10,7 @@
     elevation="2"
   >
     <!-- Ligne principale -->
-    <div class="d-flex align-center justify-space-between w-100">
+    <div class="d-flex align-center justify-space-between w-100 px-2" :class="{ 'flex-row-reverse': isRTL }">
       <!-- Gauche: Logo + Titre -->
       <div class="d-flex align-center">
         <v-btn
@@ -22,7 +22,11 @@
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
         
-        <v-icon class="mr-2" size="28">mdi-map-marker-check</v-icon>
+        <img 
+          src="@/assets/logo.svg" 
+          alt="ONUF Logo" 
+          class="app-logo mr-4"
+        />
         <div>
           <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
           <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
@@ -102,7 +106,7 @@
             <v-divider class="my-2" />
             
             <!-- Section Utilisateur -->
-            <v-list-subheader>{{ currentUser?.display_name || currentUser?.username || 'Utilisateur' }}</v-list-subheader>
+            <v-list-subheader>{{ currentUser?.display_name || currentUser?.username || t('common.user') }}</v-list-subheader>
             
             <v-list-item @click="$router.push('/profile')">
               <template v-slot:prepend>
@@ -155,7 +159,7 @@
           <v-icon class="mr-2" :color="gpsAccuracyLevel.color">
             {{ gpsAccuracyLevel.icon }}
           </v-icon>
-          Géolocalisation GPS
+          {{ t('menu.gpsLocation') }}
         </v-toolbar-title>
         
         <v-spacer />
@@ -174,25 +178,25 @@
       <v-card-text class="pa-2" v-if="currentPosition">
         <v-row dense>
           <v-col cols="3">
-            <div class="text-caption text--secondary">Position</div>
+            <div class="text-caption text--secondary">{{ t('gps.position') }}</div>
             <div class="text-body-2 font-weight-medium">
               {{ formattedPosition.lat }}, {{ formattedPosition.lng }}
             </div>
           </v-col>
           <v-col cols="3">
-            <div class="text-caption text--secondary">Précision</div>
+            <div class="text-caption text--secondary">{{ t('gps.precision') }}</div>
             <div class="text-body-2" :class="`${gpsAccuracyLevel.color}--text`">
               {{ formattedPosition.accuracy }}
             </div>
           </v-col>
           <v-col cols="3">
-            <div class="text-caption text--secondary">Qualité</div>
+            <div class="text-caption text--secondary">{{ t('gps.quality') }}</div>
             <div class="text-body-2" :class="`${gpsAccuracyLevel.color}--text`">
               {{ gpsAccuracyLevel.text }}
             </div>
           </v-col>
           <v-col cols="3" v-if="lastUpdate">
-            <div class="text-caption text--secondary">Mise à jour</div>
+            <div class="text-caption text--secondary">{{ t('gps.lastUpdate') }}</div>
             <div class="text-body-2">{{ formatLastUpdate }}</div>
           </v-col>
         </v-row>
@@ -216,8 +220,8 @@
               color="primary"
               size="64"
             />
-            <div class="text-h6 mt-4">Chargement de la carte...</div>
-            <div class="text-body-2 text--secondary">Initialisation Leaflet</div>
+            <div class="text-h6 mt-4">{{ t('gps.loadingMap') }}</div>
+            <div class="text-body-2 text--secondary">{{ t('gps.initializingLeaflet') }}</div>
           </div>
         </div>
       </div>
@@ -225,9 +229,9 @@
       <!-- Message si pas de GPS -->
       <v-card-text v-else class="text-center py-8">
         <v-icon size="64" color="grey">mdi-map-marker-off</v-icon>
-        <div class="text-h6 mt-4">Position GPS non disponible</div>
+        <div class="text-h6 mt-4">{{ t('gps.positionUnavailable') }}</div>
         <div class="text-body-2 text--secondary mt-2">
-          {{ error || 'Activation de la géolocalisation en cours...' }}
+          {{ error || t('gps.activatingGeolocation') }}
         </div>
         <v-btn
           color="primary"
@@ -236,7 +240,7 @@
           :loading="isTracking"
         >
           <v-icon left>mdi-refresh</v-icon>
-          Réessayer
+          {{ t('gps.retry') }}
         </v-btn>
       </v-card-text>
     </v-card>
@@ -247,7 +251,7 @@
     <v-card>
       <v-card-title class="d-flex align-center">
         <v-icon class="mr-2" :color="syncIndicatorColor">{{ syncIcon }}</v-icon>
-        Synchronisation Cloud
+        {{ t('dialogs.cloudSync') }}
       </v-card-title>
       
       <v-card-text>
@@ -256,19 +260,19 @@
           <v-row>
             <v-col cols="3" class="text-center">
               <div class="text-h4 success--text">{{ syncStats.success }}</div>
-              <div class="text-caption">Synchronisés</div>
+              <div class="text-caption">{{ t('dialogs.synced') }}</div>
             </v-col>
             <v-col cols="3" class="text-center">
               <div class="text-h4 warning--text">{{ syncStats.pending }}</div>
-              <div class="text-caption">En attente</div>
+              <div class="text-caption">{{ t('dialogs.pending') }}</div>
             </v-col>
             <v-col cols="3" class="text-center">
               <div class="text-h4 info--text">{{ syncStats.syncing }}</div>
-              <div class="text-caption">En cours</div>
+              <div class="text-caption">{{ t('dialogs.inProgress') }}</div>
             </v-col>
             <v-col cols="3" class="text-center">
               <div class="text-h4 error--text">{{ syncStats.failed }}</div>
-              <div class="text-caption">Échoués</div>
+              <div class="text-caption">{{ t('dialogs.failed') }}</div>
             </v-col>
           </v-row>
         </div>
@@ -281,16 +285,16 @@
           class="mb-3"
         >
           <span v-if="isOnline">
-            ✅ Connecté - Synchronisation automatique active
+            ✅ {{ t('dialogs.connected') }}
           </span>
           <span v-else>
-            📴 Hors ligne - Les audits seront synchronisés à la reconnexion
+            📴 {{ t('dialogs.offline') }}
           </span>
         </v-alert>
 
         <!-- Dernière sync -->
         <div v-if="lastSync" class="text-caption text--secondary mb-3">
-          Dernière synchronisation: {{ formatTime(lastSync) }}
+          {{ t('dialogs.lastSync') }}: {{ formatTime(lastSync) }}
         </div>
 
         <!-- Actions -->
@@ -303,7 +307,7 @@
             :disabled="!isOnline"
           >
             <v-icon left small>mdi-cloud-sync</v-icon>
-            Synchroniser maintenant
+            {{ t('dialogs.syncNow') }}
           </v-btn>
           
           <v-btn
@@ -313,14 +317,14 @@
             :disabled="syncStats.failed === 0 || !isOnline"
           >
             <v-icon left small>mdi-refresh</v-icon>
-            Réessayer ({{ syncStats.failed }})
+            {{ t('dialogs.retryCount') }} ({{ syncStats.failed }})
           </v-btn>
         </div>
       </v-card-text>
       
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="showSyncDialog = false">Fermer</v-btn>
+        <v-btn text @click="showSyncDialog = false">{{ t('dialogs.close') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -331,7 +335,7 @@
       <v-card-title class="pa-6 text-center">
         <div class="onboarding-icon mb-3">🎯</div>
         <div class="text-h5 font-weight-bold">
-          Bienvenue dans ONUF !
+          {{ t('dialogs.welcomeToOnuf') }}
         </div>
       </v-card-title>
       
@@ -340,9 +344,9 @@
           <div class="onboarding-step mb-4">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h3 class="text-h6 font-weight-semibold mb-2">📍 Activez votre GPS</h3>
+              <h3 class="text-h6 font-weight-semibold mb-2">📍 {{ t('dialogs.activateGPS') }}</h3>
               <p class="text-body-2">
-                Pour contextualiser vos audits de sécurité, l'application a besoin de votre position.
+                {{ t('dialogs.gpsDescription') }}
               </p>
             </div>
           </div>
@@ -350,9 +354,9 @@
           <div class="onboarding-step mb-4">
             <div class="step-number">2</div>
             <div class="step-content">
-              <h3 class="text-h6 font-weight-semibold mb-2">🔍 Observez votre environnement</h3>
+              <h3 class="text-h6 font-weight-semibold mb-2">🔍 {{ t('dialogs.observeEnvironment') }}</h3>
               <p class="text-body-2">
-                Évaluez les aspects de sécurité : éclairage, cheminement, ouverture, ressenti...
+                {{ t('dialogs.observeDescription') }}
               </p>
             </div>
           </div>
@@ -360,9 +364,9 @@
           <div class="onboarding-step mb-4">
             <div class="step-number">3</div>
             <div class="step-content">
-              <h3 class="text-h6 font-weight-semibold mb-2">📱 Répondez aux questions</h3>
+              <h3 class="text-h6 font-weight-semibold mb-2">📱 {{ t('dialogs.answerQuestions') }}</h3>
               <p class="text-body-2">
-                Interface simple avec emojis et choix visuels. Prise de photos optionnelle.
+                {{ t('dialogs.answersDescription') }}
               </p>
             </div>
           </div>
@@ -370,9 +374,9 @@
           <div class="onboarding-step">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h3 class="text-h6 font-weight-semibold mb-2">☁️ Synchronisation automatique</h3>
+              <h3 class="text-h6 font-weight-semibold mb-2">☁️ {{ t('dialogs.autoSync') }}</h3>
               <p class="text-body-2">
-                Vos données sont sauvegardées localement et synchronisées quand possible.
+                {{ t('dialogs.autoSyncDescription') }}
               </p>
             </div>
           </div>
@@ -388,7 +392,7 @@
           @click="startFirstAudit"
         >
           <v-icon start>mdi-rocket-launch</v-icon>
-          Commencer mon premier audit !
+          {{ t('dialogs.startFirstAudit') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -402,6 +406,7 @@ import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
 import { globalGeolocation } from '@/composables/useGeolocation'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
+import { useLang } from '@/composables/useLang' // ✅ NOUVEAU: Import useLang pour RTL
 // ✅ NOUVEAU: Import du composant de changement de langue
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
@@ -424,6 +429,7 @@ export default {
     const router = useRouter()
     const route = useRoute()
     const { t } = useI18n() // ✅ NOUVEAU: Fonction de traduction
+    const { getCurrentLanguageInfo } = useLang() // ✅ NOUVEAU: Fonction pour RTL
     
     // Composables
     const { currentUser, logout: authLogout } = useAuth()
@@ -462,8 +468,12 @@ export default {
     const mapLoading = ref(false)
     
     // Computed
+    const isRTL = computed(() => {
+      return getCurrentLanguageInfo.value?.direction === 'rtl'
+    })
+    
     const appTitle = computed(() => {
-      return 'MANARA'
+      return t('app.title')
     })
     
     const syncIndicatorColor = computed(() => {
@@ -785,11 +795,13 @@ export default {
       const now = new Date()
       const diff = now - date
       
-      if (diff < 60000) return 'À l\'instant'
-      if (diff < 3600000) return `il y a ${Math.floor(diff / 60000)}min`
-      if (diff < 86400000) return `il y a ${Math.floor(diff / 3600000)}h`
+      if (diff < 60000) return t('common.justNow')
+      if (diff < 3600000) return t('common.minutesAgo', { count: Math.floor(diff / 60000) })
+      if (diff < 86400000) return t('common.hoursAgo', { count: Math.floor(diff / 3600000) })
       
-      return date.toLocaleDateString('fr-FR', {
+      // Utiliser le format local de la langue courante
+      const locale = getCurrentLanguageInfo.value?.code || 'fr'
+      return date.toLocaleDateString(locale === 'ar' ? 'ar-MA' : locale === 'en' ? 'en-US' : 'fr-FR', {
         day: '2-digit',
         month: '2-digit',
         hour: '2-digit',
@@ -829,6 +841,7 @@ export default {
       formattedPosition,
       
       // Computed
+      isRTL,
       appTitle,
       mapHeight,
       syncIndicatorColor,
@@ -955,5 +968,35 @@ export default {
 
 .step-content {
   flex: 1;
+}
+
+/* Logo de l'application */
+.app-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* RTL Support */
+.rtl .app-logo {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+/* RTL: Inverser certains éléments directionnels */
+.rtl .v-btn .v-icon {
+  transform: scaleX(-1); /* Inverser les icônes directionnelles */
+}
+
+/* Ne pas inverser certaines icônes neutres */
+.rtl .v-btn .v-icon.mdi-menu,
+.rtl .v-btn .v-icon.mdi-close,
+.rtl .v-btn .v-icon.mdi-refresh,
+.rtl .v-btn .v-icon.mdi-cloud-sync,
+.rtl .v-btn .v-icon.mdi-wifi,
+.rtl .v-btn .v-icon.mdi-wifi-off {
+  transform: none; /* Ces icônes restent normales */
 }
 </style>

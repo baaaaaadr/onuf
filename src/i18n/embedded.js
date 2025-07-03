@@ -9,7 +9,9 @@ export const fr = {
   "navigation": {
     "audit": "Audit",
     "history": "Historique",
-    "myAudits": "Mes Audits"
+    "myAudits": "Mes Audits",
+    "newAudit": "Nouvel Audit",
+    "myCity": "Ma Ville"
   },
   "audit": {
     "title": "Audit de Sécurité",
@@ -328,13 +330,67 @@ export const fr = {
     "yes": "Oui",
     "no": "Non",
     "unknown": "Inconnu",
-    "unavailable": "Non disponible"
+    "unavailable": "Non disponible",
+    "user": "Utilisateur",
+    "justNow": "À l'instant",
+    "minutesAgo": "il y a {count}min",
+    "hoursAgo": "il y a {count}h"
   },
   "errors": {
     "network": "Erreur réseau",
     "unknown": "Erreur inconnue",
     "load_failed": "Échec du chargement",
     "save_failed": "Échec de l'enregistrement"
+  },
+  "menu": {
+    "systemStatus": "État du système",
+    "cloudSync": "Synchronisation Cloud",
+    "networkConnectivity": "Connectivité réseau",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "gpsLocation": "Localisation GPS",
+    "startGuide": "Guide de démarrage",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "gps": {
+    "position": "Position",
+    "precision": "Précision",
+    "quality": "Qualité",
+    "lastUpdate": "Mise à jour",
+    "myPosition": "Ma Position",
+    "coordinates": "Coordonnées",
+    "realPrecision": "Précision réelle",
+    "displayedCircle": "Cercle affiché",
+    "limited": "limité",
+    "loadingMap": "Chargement de la carte...",
+    "initializingLeaflet": "Initialisation Leaflet",
+    "positionUnavailable": "Position GPS non disponible",
+    "activatingGeolocation": "Activation de la géolocalisation en cours...",
+    "retry": "Réessayer"
+  },
+  "dialogs": {
+    "cloudSync": "Synchronisation Cloud",
+    "synced": "Synchronisés",
+    "pending": "En attente",
+    "inProgress": "En cours",
+    "failed": "Échoués",
+    "connected": "Connecté - Synchronisation automatique active",
+    "offline": "Hors ligne - Les audits seront synchronisés à la reconnexion",
+    "lastSync": "Dernière synchronisation",
+    "syncNow": "Synchroniser maintenant",
+    "retryCount": "Réessayer",
+    "close": "Fermer",
+    "welcomeToOnuf": "Bienvenue dans ONUF !",
+    "activateGPS": "Activez votre GPS",
+    "gpsDescription": "Pour contextualiser vos audits de sécurité, l'application a besoin de votre position.",
+    "observeEnvironment": "Observez votre environnement",
+    "observeDescription": "Évaluez les aspects de sécurité : éclairage, cheminement, ouverture, ressenti...",
+    "answerQuestions": "Répondez aux questions",
+    "answersDescription": "Interface simple avec emojis et choix visuels. Prise de photos optionnelle.",
+    "autoSync": "Synchronisation automatique",
+    "autoSyncDescription": "Vos données sont sauvegardées localement et synchronisées quand possible.",
+    "startFirstAudit": "Commencer mon premier audit !"
   }
 }
 
@@ -346,7 +402,9 @@ export const en = {
   "navigation": {
     "audit": "Audit",
     "history": "History",
-    "myAudits": "My Audits"
+    "myAudits": "My Audits",
+    "newAudit": "New Audit",
+    "myCity": "My City"
   },
   "audit": {
     "title": "Security Audit",
@@ -665,13 +723,67 @@ export const en = {
     "yes": "Yes",
     "no": "No",
     "unknown": "Unknown",
-    "unavailable": "Unavailable"
+    "unavailable": "Unavailable",
+    "user": "User",
+    "justNow": "Just now",
+    "minutesAgo": "{count}min ago",
+    "hoursAgo": "{count}h ago"
   },
   "errors": {
     "network": "Network error",
     "unknown": "Unknown error",
     "load_failed": "Load failed",
     "save_failed": "Save failed"
+  },
+  "menu": {
+    "systemStatus": "System Status",
+    "cloudSync": "Cloud Sync",
+    "networkConnectivity": "Network Connectivity",
+    "online": "Online",
+    "offline": "Offline",
+    "gpsLocation": "GPS Location",
+    "startGuide": "Start Guide",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "gps": {
+    "position": "Position",
+    "precision": "Precision",
+    "quality": "Quality",
+    "lastUpdate": "Last Update",
+    "myPosition": "My Position",
+    "coordinates": "Coordinates",
+    "realPrecision": "Real precision",
+    "displayedCircle": "Displayed circle",
+    "limited": "limited",
+    "loadingMap": "Loading map...",
+    "initializingLeaflet": "Initializing Leaflet",
+    "positionUnavailable": "GPS position unavailable",
+    "activatingGeolocation": "Activating geolocation...",
+    "retry": "Retry"
+  },
+  "dialogs": {
+    "cloudSync": "Cloud Sync",
+    "synced": "Synced",
+    "pending": "Pending",
+    "inProgress": "In progress",
+    "failed": "Failed",
+    "connected": "Connected - Automatic sync active",
+    "offline": "Offline - Audits will be synced when reconnected",
+    "lastSync": "Last synchronization",
+    "syncNow": "Sync now",
+    "retryCount": "Retry",
+    "close": "Close",
+    "welcomeToOnuf": "Welcome to ONUF!",
+    "activateGPS": "Activate your GPS",
+    "gpsDescription": "To contextualize your security audits, the app needs your location.",
+    "observeEnvironment": "Observe your environment",
+    "observeDescription": "Assess security aspects: lighting, walkways, openness, feeling...",
+    "answerQuestions": "Answer questions",
+    "answersDescription": "Simple interface with emojis and visual choices. Optional photo capture.",
+    "autoSync": "Automatic synchronization",
+    "autoSyncDescription": "Your data is saved locally and synced when possible.",
+    "startFirstAudit": "Start my first audit!"
   }
 }
 
@@ -683,7 +795,9 @@ export const ar = {
   "navigation": {
     "audit": "تدقيق",
     "history": "السجل",
-    "myAudits": "تدقيقاتي"
+    "myAudits": "تدقيقاتي",
+    "newAudit": "تدقيق جديد",
+    "myCity": "مدينتي"
   },
   "audit": {
     "title": "تدقيق أمني",
@@ -1002,13 +1116,64 @@ export const ar = {
     "yes": "نعم",
     "no": "لا",
     "unknown": "غير معروف",
-    "unavailable": "غير متاح"
+    "unavailable": "غير متاح",
+    "user": "مستخدم"
   },
   "errors": {
     "network": "خطأ في الشبكة",
     "unknown": "خطأ غير معروف",
     "load_failed": "فشل التحميل",
     "save_failed": "فشل الحفظ"
+  },
+  "menu": {
+    "systemStatus": "حالة النظام",
+    "cloudSync": "مزامنة السحابة",
+    "networkConnectivity": "اتصال الشبكة",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "gpsLocation": "تحديد الموقع",
+    "startGuide": "دليل البداية",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "gps": {
+    "position": "الموقع",
+    "precision": "الدقة",
+    "quality": "الجودة",
+    "lastUpdate": "آخر تحديث",
+    "myPosition": "موقعي",
+    "coordinates": "الإحداثيات",
+    "realPrecision": "الدقة الحقيقية",
+    "displayedCircle": "الدائرة المعروضة",
+    "limited": "محدود",
+    "loadingMap": "تحميل الخريطة...",
+    "initializingLeaflet": "تهيئة الخريطة",
+    "positionUnavailable": "موقع GPS غير متاح",
+    "activatingGeolocation": "تفعيل تحديد الموقع...",
+    "retry": "إعادة المحاولة"
+  },
+  "dialogs": {
+    "cloudSync": "مزامنة السحابة",
+    "synced": "متزامن",
+    "pending": "قيد الانتظار",
+    "inProgress": "جاري",
+    "failed": "فشل",
+    "connected": "متصل - مزامنة تلقائية نشطة",
+    "offline": "غير متصل - سيتم مزامنة التدقيقات عند إعادة الاتصال",
+    "lastSync": "آخر مزامنة",
+    "syncNow": "مزامنة الآن",
+    "retryCount": "إعادة المحاولة",
+    "close": "إغلاق",
+    "welcomeToOnuf": "مرحباً بك في ONUF!",
+    "activateGPS": "فعّل نظام تحديد المواقع",
+    "gpsDescription": "لوضع تدقيقات الأمن في سياقها، يحتاج التطبيق إلى موقعك.",
+    "observeEnvironment": "ارصد بيئتك",
+    "observeDescription": "قيّم جوانب الأمن: الإضاءة، الممرات، الانفتاح، الشعور...",
+    "answerQuestions": "أجب على الأسئلة",
+    "answersDescription": "واجهة بسيطة مع رموز تعبيرية وخيارات مرئية. التقاط صور اختياري.",
+    "autoSync": "مزامنة تلقائية",
+    "autoSyncDescription": "يتم حفظ بياناتك محلياً ومزامنتها عند الإمكان.",
+    "startFirstAudit": "ابدأ أول تدقيق لي!"
   }
 }
 

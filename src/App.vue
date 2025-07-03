@@ -339,6 +339,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useSupabase'
 import { useAudits } from '@/composables/useAudits'
 import { getGlobalSyncQueue } from '@/composables/useSyncQueue'
@@ -352,6 +353,7 @@ import { performStartupCleanup } from '@/utils/cleanupUtils'
 // Router
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // Composables
 const { 
@@ -400,11 +402,11 @@ const appVersion = computed(() => import.meta.env.VITE_APP_VERSION || '2.0.0')
 // Titre de la page - ✅ CORRIGÉ: suppression 'dashboard'
 const pageTitle = computed(() => {
   const titles = {
-    'audit': 'Nouvel Audit',
-    'history': 'Mes Audits',
-    'ma-ville': 'Ma Ville'
+    'audit': t('navigation.newAudit'),
+    'history': t('navigation.myAudits'),
+    'ma-ville': t('navigation.myCity')
   }
-  return titles[route.name] || 'ONUF'
+  return titles[route.name] || t('app.title')
 })
 
 // Navigation - ✅ CORRIGÉ: suppression 'dashboard'
