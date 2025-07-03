@@ -350,6 +350,7 @@ export const fr = {
     "offline": "Hors ligne",
     "gpsLocation": "Localisation GPS",
     "startGuide": "Guide de démarrage",
+    "languageSelection": "Langue",
     "profile": "Profil",
     "logout": "Déconnexion"
   },
@@ -743,6 +744,7 @@ export const en = {
     "offline": "Offline",
     "gpsLocation": "GPS Location",
     "startGuide": "Start Guide",
+    "languageSelection": "Language",
     "profile": "Profile",
     "logout": "Logout"
   },
@@ -1133,6 +1135,7 @@ export const ar = {
     "offline": "غير متصل",
     "gpsLocation": "تحديد الموقع",
     "startGuide": "دليل البداية",
+    "languageSelection": "اللغة",
     "profile": "الملف الشخصي",
     "logout": "تسجيل الخروج"
   },

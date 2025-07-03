@@ -1,4 +1,8 @@
-<!-- src/components/StatusBar.vue -->
+    // ✅ NOUVEAU: Ouvrir le panel debug
+    const openDebugPanel = () => {
+      // Déclencher l'événement pour ouvrir le debug panel
+      window.dispatchEvent(new CustomEvent('toggle-debug-panel'))
+    }<!-- src/components/StatusBar.vue -->
 <!-- Barre de statut unifiée avec tous les indicateurs -->
 <template>
   <v-app-bar
@@ -10,31 +14,47 @@
     elevation="2"
   >
     <!-- Ligne principale -->
-    <div class="d-flex align-center justify-space-between w-100 px-2" :class="{ 'flex-row-reverse': isRTL }">
-      <!-- Gauche: Logo + Titre -->
-      <div class="d-flex align-center">
+    <div class="d-flex align-center justify-space-between w-100 px-2">
+      <!-- Logo + Titre -->
+      <div class="d-flex align-center" :class="{ 'order-2 pr-4': isRTL, 'pl-2': !isRTL }">
         <v-btn
           icon
           @click="goBack"
           v-if="showBackButton"
-          class="mr-2"
+          :class="isRTL ? 'ml-2' : 'mr-2'"
         >
-          <v-icon>mdi-arrow-left</v-icon>
+          <v-icon>{{ isRTL ? 'mdi-arrow-right' : 'mdi-arrow-left' }}</v-icon>
         </v-btn>
         
-        <img 
-          src="@/assets/logo.svg" 
-          alt="ONUF Logo" 
-          class="app-logo mr-4"
-        />
-        <div>
-          <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
-          <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
-        </div>
+        <!-- En RTL: Titre puis Logo -->
+        <template v-if="isRTL">
+          <div class="text-right">
+            <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
+            <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
+          </div>
+          <img 
+            src="@/assets/logo.svg" 
+            alt="ONUF Logo" 
+            class="app-logo ml-4"
+          />
+        </template>
+        
+        <!-- En LTR: Logo puis Titre -->
+        <template v-else>
+          <img 
+            src="@/assets/logo.svg" 
+            alt="ONUF Logo" 
+            class="app-logo mr-4"
+          />
+          <div>
+            <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
+            <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
+          </div>
+        </template>
       </div>
 
-      <!-- Droite: Boutons Navigation + Indicateurs -->
-      <div class="d-flex align-center gap-2">
+      <!-- Boutons Navigation + Indicateurs -->
+      <div class="d-flex align-center gap-2" :class="{ 'order-1': isRTL }">
         
 
         
@@ -96,7 +116,7 @@
             <v-divider class="my-2" />
             
             <!-- ✅ NOUVEAU: Sélecteur de langue -->
-            <v-list-subheader>Langue / Language / اللغة</v-list-subheader>
+            <v-list-subheader>{{ t('menu.languageSelection') }}</v-list-subheader>
             
             <LanguageSwitcher 
               variant="list" 
@@ -108,11 +128,11 @@
             <!-- Section Utilisateur -->
             <v-list-subheader>{{ currentUser?.display_name || currentUser?.username || t('common.user') }}</v-list-subheader>
             
-            <v-list-item @click="$router.push('/profile')">
+            <v-list-item @click="openDebugPanel">
               <template v-slot:prepend>
-                <v-icon>mdi-account-settings</v-icon>
+                <v-icon>mdi-bug</v-icon>
               </template>
-              <v-list-item-title>{{ t('menu.profile') }}</v-list-item-title>
+              <v-list-item-title>{{ t('menu.debug') }}</v-list-item-title>
             </v-list-item>
             
             <v-list-item @click="logout">
@@ -498,17 +518,17 @@ export default {
     })
     
     const syncStatusText = computed(() => {
-      if (syncStats.syncing > 0) return 'Synchronisation en cours...'
-      if (syncStats.failed > 0) return `${syncStats.failed} audit(s) échoué(s)`
-      if (syncStats.pending > 0) return `${syncStats.pending} audit(s) en attente`
-      return 'Tous les audits sont synchronisés'
+      if (syncStats.syncing > 0) return t('sync.status.syncing')
+      if (syncStats.failed > 0) return t('sync.messages.error') + ` (${syncStats.failed})`
+      if (syncStats.pending > 0) return t('common.pending') + ` (${syncStats.pending})`
+      return t('sync.messages.success')
     })
     
     const gpsStatusText = computed(() => {
       if (currentPosition?.value) {
-        return `Précision: ${formattedPosition?.value?.accuracy || 'Inconnue'}`
+        return t('location.accuracy') + ': ' + (formattedPosition?.value?.accuracy || t('common.unknown'))
       }
-      return error?.value || 'Activation en cours...'
+      return error?.value || t('location.requesting')
     })
     
     const networkColor = computed(() => {
@@ -881,9 +901,7 @@ export default {
   right: 0;
 }
 
-.gap-2 > * + * {
-  margin-left: 8px;
-}
+/* Déjà défini plus bas dans RTL */
 
 .gps-details .row {
   margin-bottom: 8px;
@@ -979,24 +997,66 @@ export default {
   flex-shrink: 0;
 }
 
-/* RTL Support */
-.rtl .app-logo {
+/* Support RTL amélioré */
+.order-1 {
+  order: 1;
+}
+
+.order-2 {
+  order: 2;
+}
+
+/* Gaps responsive pour RTL */
+.gap-2 > * + * {
+  margin-left: 8px;
+}
+
+.gap-2.order-1 > * + * {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+/* Text alignment pour RTL */
+.text-right {
+  text-align: right;
+}
+
+/* Marges dynamiques pour RTL */
+.ml-2 {
+  margin-left: 8px !important;
+}
+
+.ml-4 {
+  margin-left: 16px !important;
+}
+
+/* Ajustements spécifiques pour le RTL */
+[dir="rtl"] .app-logo {
   margin-left: 0;
   margin-right: 4px;
 }
 
-/* RTL: Inverser certains éléments directionnels */
-.rtl .v-btn .v-icon {
-  transform: scaleX(-1); /* Inverser les icônes directionnelles */
+[dir="rtl"] .gap-2 > * + * {
+  margin-left: 0;
+  margin-right: 8px;
 }
 
-/* Ne pas inverser certaines icônes neutres */
-.rtl .v-btn .v-icon.mdi-menu,
-.rtl .v-btn .v-icon.mdi-close,
-.rtl .v-btn .v-icon.mdi-refresh,
-.rtl .v-btn .v-icon.mdi-cloud-sync,
-.rtl .v-btn .v-icon.mdi-wifi,
-.rtl .v-btn .v-icon.mdi-wifi-off {
-  transform: none; /* Ces icônes restent normales */
+/* Support spécifique pour les menus en RTL */
+[dir="rtl"] .v-list-subheader {
+  text-align: right;
+}
+
+[dir="rtl"] .v-list-item-title {
+  text-align: right;
+}
+
+[dir="rtl"] .v-list-item-subtitle {
+  text-align: right;
+}
+
+/* Ajustement pour les icônes en RTL */
+[dir="rtl"] .v-list-item__prepend {
+  margin-left: 16px;
+  margin-right: 0;
 }
 </style>
