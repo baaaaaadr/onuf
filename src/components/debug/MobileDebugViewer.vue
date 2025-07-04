@@ -1,19 +1,6 @@
 <!-- src/components/debug/MobileDebugViewer.vue -->
 <template>
-  <!-- Bouton debug flottant -->
-  <v-btn
-    v-if="showDebugButton"
-    icon
-    size="small"
-    color="error"
-    class="debug-btn"
-    @click="showDebug = !showDebug"
-    :style="{ bottom: debugBtnPosition }"
-  >
-    🐛
-  </v-btn>
-
-  <!-- Panel debug fullscreen -->
+  <!-- Panel debug fullscreen (ouvert depuis le menu StatusBar) -->
   <v-dialog
     v-model="showDebug"
     fullscreen
@@ -22,7 +9,7 @@
   >
     <v-card>
       <!-- Header -->
-      <v-toolbar color="error" dark>
+      <v-toolbar color="primary" dark>
         <v-toolbar-title>🐛 Debug Mobile - ONUF</v-toolbar-title>
         <v-spacer />
         <v-btn icon @click="refreshData">
@@ -250,32 +237,12 @@ try {
   console.warn('useI18n non disponible dans debug viewer')
 }
 
+// ✅ NOUVEAU: Écouter l'événement du menu pour ouvrir le debug
+const handleToggleDebug = () => {
+  showDebug.value = !showDebug.value
+}
+
 // Computed
-const isDevelopment = computed(() => {
-  return import.meta.env.MODE === 'development' || forceShow.value
-})
-
-// ✅ CORRIGÉ: Condition pour afficher le bouton
-const showDebugButton = computed(() => {
-  // Toujours afficher en développement
-  if (import.meta.env.MODE === 'development') return true
-  
-  // En production, vérifier plusieurs conditions
-  if (forceShow.value) return true
-  
-  // ✅ NOUVEAU: Afficher si un paramètre debug est présent dans l'URL
-  const urlParams = new URLSearchParams(window.location.search)
-  if (urlParams.get('debug') === 'true') return true
-  
-  // ✅ NOUVEAU: Afficher si un flag est défini dans localStorage
-  if (localStorage.getItem('onuf-debug-enabled') === 'true') return true
-  
-  return false
-})
-
-const debugBtnPosition = computed(() => {
-  return '120px' // Au-dessus de la navigation
-})
 
 const currentLocale = computed(() => {
   return i18n?.locale?.value || 'non disponible'
@@ -511,11 +478,8 @@ const captureErrors = () => {
 
 // Lifecycle
 onMounted(() => {
-  // ✅ NOUVEAU: Vérifier l'URL pour activer le debug
-  const urlParams = new URLSearchParams(window.location.search)
-  if (urlParams.get('debug') === 'true') {
-    localStorage.setItem('onuf-debug-enabled', 'true')
-  }
+  // ✅ NOUVEAU: Écouter l'événement du menu pour ouvrir le debug
+  window.addEventListener('toggle-debug-panel', handleToggleDebug)
   
   // Récupérer l'état forcé
   forceShow.value = localStorage.getItem('onuf-debug-force') === 'true'
@@ -557,13 +521,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.debug-btn {
-  position: fixed !important;
-  right: 20px;
-  z-index: 2000;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
-}
-
 .debug-section {
   font-family: monospace;
   font-size: 14px;

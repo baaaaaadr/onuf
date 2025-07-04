@@ -330,7 +330,7 @@
         </template>
       </v-snackbar>
 
-      <!-- Mobile Debug Viewer -->
+      <!-- Mobile Debug Viewer (intégré dans le menu StatusBar) -->
       <MobileDebugViewer />
       
       <!-- Instructions PWA -->

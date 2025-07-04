@@ -6,33 +6,8 @@ import App from './App.vue'
 import router from './router'
 import i18n from './plugins/i18n' // Import du plugin i18n
 
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import '@mdi/font/css/materialdesignicons.css'
-
-import './assets/styles/rtl-support.css'
-
-const vuetify = createVuetify({
-  components,
-  directives,
-  icons: { defaultSet: 'mdi', aliases, sets: { mdi } },
-  theme: {
-    defaultTheme: 'light',
-    themes: {
-      light: {
-        colors: {
-          primary: '#D4A574', secondary: '#8BC34A', accent: '#FF9800', error: '#F44336',
-          warning: '#FF9800', info: '#2196F3', success: '#4CAF50', background: '#FAFAFA', surface: '#FFFFFF',
-        },
-      },
-    },
-  },
-  rtl: false,
-});
+import vuetify from './plugins/vuetify' // Configuration centralisée
+import './assets/styles/rtl-support.css' // Styles RTL
 
 const app = createApp(App);
 app.use(router);
@@ -83,31 +58,7 @@ if (typeof window !== 'undefined') {
 
 app.mount('#app');
 
-// ✅ PWA Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-      .then((registration) => {
-        console.log('✅ SW registered: ', registration);
-        
-        // 🔄 Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🆕 New content available, please refresh!');
-              // ✅ NOUVEAU: Auto-refresh pour éviter les erreurs de cache
-              if (confirm('Nouvelle version disponible. Actualiser maintenant ?')) {
-                window.location.reload();
-              }
-            }
-          });
-        });
-      })
-      .catch((registrationError) => {
-        console.log('❌ SW registration failed: ', registrationError);
-      });
-  });
-}
+// ✅ PWA Service Worker Registration - Géré automatiquement par Vite PWA
+// Le Service Worker est géré par vite-plugin-pwa, pas besoin d'enregistrement manuel
 
 console.log('✅ ONUF PWA démarré avec plugin i18n isolé.');

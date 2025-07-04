@@ -60,7 +60,7 @@ const vuetify = createVuetify({
     themes: {
       light: {
         colors: {
-          primary: '#D4A574',
+          primary: '#F3C348', // Couleur ONUF selon charte graphique
           secondary: '#8BC34A',
           accent: '#FF9800',
           error: '#F44336',

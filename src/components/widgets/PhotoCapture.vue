@@ -648,6 +648,18 @@ watch(() => props.modelValue, (newValue) => {
 <style scoped>
 .photo-capture {
   width: 100%;
+  
+  /* Variables CSS conformes à la charte graphique ONUF */
+  --onuf-primary: #F3C348;
+  --onuf-primary-light: #F9D876;
+  --onuf-surface-light: #F5F3F0;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --radius-md: 12px;
+  --border-color: #E6E3DB;
 }
 
 /* État vide */

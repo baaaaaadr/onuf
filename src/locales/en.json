@@ -244,6 +244,7 @@
     "networkConnectivity": "Network Connectivity",
     "gpsLocation": "GPS Geolocation",
     "startGuide": "Getting Started Guide",
+    "debug": "Debug",
     "profile": "Profile",
     "logout": "Logout",
     "online": "Online",

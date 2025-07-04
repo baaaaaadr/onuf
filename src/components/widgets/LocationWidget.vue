@@ -611,6 +611,21 @@ watch(() => props.modelValue, (newValue) => {
 .location-widget {
   width: 100%;
   position: relative;
+  
+  /* Variables CSS conformes à la charte graphique ONUF */
+  --onuf-primary: #F3C348;
+  --onuf-secondary: #F9D876;
+  --onuf-surface-light: #F5F3F0;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* États */

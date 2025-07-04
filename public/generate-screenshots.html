@@ -35,7 +35,7 @@
     }
     
     button {
-      background: #D4A574;
+      background: #F3C348; /* Couleur ONUF selon charte graphique */
       color: white;
       border: none;
       padding: 12px 24px;
@@ -83,7 +83,7 @@
       ctx.fillRect(0, 0, 540, 720);
       
       // Header
-      ctx.fillStyle = '#D4A574';
+      ctx.fillStyle = '#F3C348'; // Couleur ONUF
       ctx.fillRect(0, 0, 540, 80);
       
       // Logo
@@ -141,7 +141,7 @@
       });
       
       // Bottom navigation hint
-      ctx.fillStyle = '#D4A574';
+      ctx.fillStyle = '#F3C348'; // Couleur ONUF
       ctx.fillRect(0, 660, 540, 60);
       
       // Nav icons
@@ -159,7 +159,7 @@
       ctx.fillRect(0, 0, 720, 540);
       
       // Header
-      ctx.fillStyle = '#D4A574';
+      ctx.fillStyle = '#F3C348'; // Couleur ONUF
       ctx.fillRect(0, 0, 720, 80);
       
       // Logo & Title
@@ -219,7 +219,7 @@
       ctx.lineTo(340, 420);
       ctx.lineTo(480, 350);
       ctx.lineTo(620, 320);
-      ctx.strokeStyle = '#D4A574';
+      ctx.strokeStyle = '#F3C348'; // Couleur ONUF
       ctx.lineWidth = 3;
       ctx.stroke();
       
@@ -228,7 +228,7 @@
       points.forEach(([x, y]) => {
         ctx.beginPath();
         ctx.arc(x, y, 6, 0, 2 * Math.PI);
-        ctx.fillStyle = '#D4A574';
+        ctx.fillStyle = '#F3C348'; // Couleur ONUF
         ctx.fill();
       });
     }

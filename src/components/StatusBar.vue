@@ -1,8 +1,4 @@
-    // ✅ NOUVEAU: Ouvrir le panel debug
-    const openDebugPanel = () => {
-      // Déclencher l'événement pour ouvrir le debug panel
-      window.dispatchEvent(new CustomEvent('toggle-debug-panel'))
-    }<!-- src/components/StatusBar.vue -->
+<!-- src/components/StatusBar.vue -->
 <!-- Barre de statut unifiée avec tous les indicateurs -->
 <template>
   <v-app-bar
@@ -28,14 +24,14 @@
         
         <!-- En RTL: Titre puis Logo -->
         <template v-if="isRTL">
-          <div class="text-right">
+          <div class="text-right mr-2">
             <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
             <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
           </div>
           <img 
             src="@/assets/logo.svg" 
             alt="ONUF Logo" 
-            class="app-logo ml-4"
+            class="app-logo ml-6"
           />
         </template>
         
@@ -44,9 +40,9 @@
           <img 
             src="@/assets/logo.svg" 
             alt="ONUF Logo" 
-            class="app-logo mr-4"
+            class="app-logo mr-6"
           />
-          <div>
+          <div class="ml-2">
             <div class="text-h6 font-weight-bold">{{ appTitle }}</div>
             <div class="text-caption opacity-80" v-if="pageTitle">{{ pageTitle }}</div>
           </div>

@@ -1,6 +1,7 @@
 // Configuration Vuetify pour ONUF PWA - Thème Redesign v2.0
 // Mise à jour : Phase 1 du redesign - CORRECTION ERREURS AFFICHAGE
 
+import 'vuetify/styles' // Import des styles Vuetify
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -27,7 +28,7 @@ const onufLightTheme = {
     'surface-light': '#F8F7F5',
     'surface-variant': '#E6E3DB',
     
-    // Primary - Jaune doré
+    // Primary - Jaune doré (charte graphique ONUF)
     primary: '#F3C348',
     'primary-darken-1': '#E5A716',
     'primary-lighten-1': '#F9D876',
