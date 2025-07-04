@@ -6,6 +6,20 @@ export const fr = {
     "title": "MANARA",
     "description": "Application d'audit de sécurité urbaine"
   },
+  "pwa": {
+    "installApp": "Installer l'application",
+    "installed": "Application installée",
+    "installDescription": "Ajouter à l'écran d'accueil",
+    "installPrompt": "Installer ONUF sur cet appareil",
+    "installBenefits": "Accès rapide et mode hors-ligne",
+    "install": "Installer",
+    "installAvailable": "Installation disponible",
+    "instructions": {
+      "ios": "Pour installer : Touchez l'icône Partager puis 'Sur l'écran d'accueil'",
+      "android": "Pour installer : Menu ≡ puis 'Ajouter à l'écran d'accueil'",
+      "desktop": "Pour installer : Cliquez sur l'icône + dans la barre d'adresse"
+    }
+  },
   "navigation": {
     "audit": "Audit",
     "history": "Historique",
@@ -334,7 +348,8 @@ export const fr = {
     "user": "Utilisateur",
     "justNow": "À l'instant",
     "minutesAgo": "il y a {count}min",
-    "hoursAgo": "il y a {count}h"
+    "hoursAgo": "il y a {count}h",
+    "later": "Plus tard"
   },
   "errors": {
     "network": "Erreur réseau",
@@ -399,6 +414,20 @@ export const en = {
   "app": {
     "title": "MANARA",
     "description": "Urban security audit application"
+  },
+  "pwa": {
+    "installApp": "Install app",
+    "installed": "App installed",
+    "installDescription": "Add to home screen",
+    "installPrompt": "Install ONUF on this device",
+    "installBenefits": "Quick access and offline mode",
+    "install": "Install",
+    "installAvailable": "Installation available",
+    "instructions": {
+      "ios": "To install: Tap the Share icon then 'Add to Home Screen'",
+      "android": "To install: Menu ≡ then 'Add to home screen'",
+      "desktop": "To install: Click the + icon in the address bar"
+    }
   },
   "navigation": {
     "audit": "Audit",
@@ -728,7 +757,8 @@ export const en = {
     "user": "User",
     "justNow": "Just now",
     "minutesAgo": "{count}min ago",
-    "hoursAgo": "{count}h ago"
+    "hoursAgo": "{count}h ago",
+    "later": "Later"
   },
   "errors": {
     "network": "Network error",
@@ -791,8 +821,22 @@ export const en = {
 
 export const ar = {
   "app": {
-    "title": "منارة",
+    "title": "مناره",
     "description": "تطبيق تدقيق الأمن الحضري"
+  },
+  "pwa": {
+    "installApp": "تثبيت التطبيق",
+    "installed": "تم تثبيت التطبيق",
+    "installDescription": "إضافة إلى الشاشة الرئيسية",
+    "installPrompt": "تثبيت ONUF على هذا الجهاز",
+    "installBenefits": "وصول سريع ووضع غير متصل",
+    "install": "تثبيت",
+    "installAvailable": "التثبيت متاح",
+    "instructions": {
+      "ios": "للتثبيت: اضغط على أيقونة المشاركة ثم 'إضافة إلى الشاشة الرئيسية'",
+      "android": "للتثبيت: القائمة ≡ ثم 'إضافة إلى الشاشة الرئيسية'",
+      "desktop": "للتثبيت: انقر على أيقونة + في شريط العنوان"
+    }
   },
   "navigation": {
     "audit": "تدقيق",

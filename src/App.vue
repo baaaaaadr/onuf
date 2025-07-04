@@ -332,6 +332,12 @@
 
       <!-- Mobile Debug Viewer -->
       <MobileDebugViewer />
+      
+      <!-- Instructions PWA -->
+      <PWAInstructions />
+      
+      <!-- Banner PWA automatique -->
+      <PWABanner />
     </div>
   </v-app>
 </template>
@@ -348,6 +354,8 @@ import BottomNav from '@/components/navigation/BottomNav.vue'
 import PageTransition from '@/components/transitions/PageTransition.vue'
 import SwipeNavigation from '@/components/navigation/SwipeNavigation.vue'
 import MobileDebugViewer from '@/components/debug/MobileDebugViewer.vue'
+import PWAInstructions from '@/components/PWAInstructions.vue'
+import PWABanner from '@/components/PWABanner.vue'
 import { performStartupCleanup } from '@/utils/cleanupUtils'
 
 // Router

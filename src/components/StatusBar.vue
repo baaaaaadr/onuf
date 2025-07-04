@@ -105,6 +105,11 @@
             
             <v-divider class="my-2" />
             
+            <!-- ✅ NOUVEAU: Installation PWA -->
+            <PWAInstaller variant="menu" @installed="handlePWAInstalled" @dismissed="handlePWADismissed" />
+            
+            <v-divider class="my-2" />
+            
             <!-- Guide de démarrage -->
             <v-list-item @click="showOnboarding = true">
               <template v-slot:prepend>
@@ -427,13 +432,15 @@ import { globalGeolocation } from '@/composables/useGeolocation'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n' // ✅ NOUVEAU: Import i18n
 import { useLang } from '@/composables/useLang' // ✅ NOUVEAU: Import useLang pour RTL
-// ✅ NOUVEAU: Import du composant de changement de langue
+// ✅ NOUVEAU: Import du composant de changement de langue et PWA
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+import PWAInstaller from '@/components/PWAInstaller.vue'
 
 export default {
   name: 'StatusBar',
   components: {
-    LanguageSwitcher // ✅ NOUVEAU: Enregistrer le composant
+    LanguageSwitcher, // ✅ NOUVEAU: Enregistrer le composant
+    PWAInstaller // ✅ NOUVEAU: Enregistrer le composant PWA
   },
   props: {
     pageTitle: {
@@ -835,6 +842,17 @@ export default {
       // Le composable useLang s'occupe déjà de tout
     }
     
+    // ✅ NOUVEAU: Gestionnaires PWA
+    const handlePWAInstalled = () => {
+      console.log('📱 PWA installée avec succès depuis le menu')
+      // Optionnel: afficher un message de succès
+    }
+    
+    const handlePWADismissed = () => {
+      console.log('🙅 Utilisateur a rejeté l\'installation PWA')
+      // Optionnel: tracker l'événement
+    }
+    
     return {
       // Data
       currentUser,
@@ -883,6 +901,8 @@ export default {
       retryFailed,
       formatTime,
       handleLanguageChange, // ✅ NOUVEAU: Ajouter la méthode au return
+      handlePWAInstalled, // ✅ NOUVEAU: Gestionnaire PWA
+      handlePWADismissed, // ✅ NOUVEAU: Gestionnaire PWA
       t // ✅ NOUVEAU: Fonction de traduction
     }
   }

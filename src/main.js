@@ -61,8 +61,17 @@ if (typeof window !== 'undefined') {
       } else {
         console.error(`❌ Langue non supportée: ${locale}`);
       }
+    },
+    // ✅ NOUVEAU: Fonction d'installation PWA globale
+    installPWA: () => {
+      const installEvent = new CustomEvent('manual-pwa-install');
+      window.dispatchEvent(installEvent);
     }
   };
+  
+  // ✅ NOUVEAU: Aussi exposer installPWA directement
+  window.installPWA = window.__onuf.installPWA;
+  
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('debug') === 'true' || localStorage.getItem('onuf-debug-enabled') === 'true') {
     setTimeout(() => {
@@ -87,7 +96,10 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               console.log('🆕 New content available, please refresh!');
-              // Optionnel: afficher une notification à l'utilisateur
+              // ✅ NOUVEAU: Auto-refresh pour éviter les erreurs de cache
+              if (confirm('Nouvelle version disponible. Actualiser maintenant ?')) {
+                window.location.reload();
+              }
             }
           });
         });
