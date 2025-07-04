@@ -44,6 +44,7 @@
           <v-tab value="logs">📝 Logs</v-tab>
           <v-tab value="network">🌐 Réseau</v-tab>
           <v-tab value="storage">💾 Storage</v-tab>
+          <v-tab value="pwa">📱 PWA</v-tab>
         </v-tabs>
 
         <v-tabs-window v-model="activeTab">

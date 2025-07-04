@@ -1,29 +1,29 @@
 <!-- src/components/PWAInstaller.vue -->
-<!-- Composant pour gérer l'installation PWA -->
+<!-- Composant pour gérer l'installation PWA - Version corrigée -->
 <template>
   <div v-if="showInstaller">
     <!-- Option 1: Bouton dans menu -->
     <v-list-item 
       v-if="variant === 'menu'"
-      @click="installPWA"
-      :disabled="!canInstall"
+      @click="handleInstallClick"
+      :disabled="isInstalled"
     >
       <template v-slot:prepend>
-        <v-icon :color="canInstall ? 'success' : 'grey'">
-          {{ isInstalled ? 'mdi-check-circle' : 'mdi-download' }}
+        <v-icon :color="getIconColor">
+          {{ getIcon }}
         </v-icon>
       </template>
       <v-list-item-title>
-        {{ isInstalled ? t('pwa.installed') : t('pwa.installApp') }}
+        {{ getTitle }}
       </v-list-item-title>
       <v-list-item-subtitle v-if="!isInstalled">
-        {{ t('pwa.installDescription') }}
+        {{ getSubtitle }}
       </v-list-item-subtitle>
     </v-list-item>
 
     <!-- Option 2: Banner en bas d'écran -->
     <v-banner
-      v-if="variant === 'banner' && canInstall && !bannerDismissed"
+      v-if="variant === 'banner' && shouldShowBanner"
       sticky
       elevation="8"
       color="primary"
@@ -53,7 +53,7 @@
         <v-btn
           variant="elevated"
           size="small"
-          @click="installPWA"
+          @click="handleInstallClick"
           :loading="installing"
         >
           <v-icon start>mdi-download</v-icon>
@@ -80,7 +80,7 @@
         <v-btn
           variant="text"
           size="small"
-          @click="installPWA"
+          @click="handleInstallClick"
           :loading="installing"
         >
           {{ t('pwa.install') }}
@@ -104,7 +104,7 @@ export default {
   props: {
     variant: {
       type: String,
-      default: 'menu', // 'menu', 'banner', 'snackbar'
+      default: 'menu',
       validator: (value) => ['menu', 'banner', 'snackbar'].includes(value)
     },
     autoShow: {
@@ -118,172 +118,220 @@ export default {
     
     // État
     const deferredPrompt = ref(null)
-    const canInstall = ref(false)
+    const isInstallable = ref(false)
     const isInstalled = ref(false)
     const installing = ref(false)
     const showSnackbar = ref(false)
     const bannerDismissed = ref(false)
+    const platform = ref('unknown')
     
     // Computed
     const showInstaller = computed(() => {
+      // Toujours montrer dans le menu
       if (props.variant === 'menu') return true
-      if (props.variant === 'banner') return canInstall.value && !bannerDismissed.value
-      if (props.variant === 'snackbar') return canInstall.value
-      return false
+      
+      // Pour banner et snackbar, montrer si installable et non installé
+      return isInstallable.value && !isInstalled.value
     })
     
-    // Détection du prompt d'installation
-    const handleBeforeInstallPrompt = (e) => {
-      console.log('✅ PWA installable détectée')
-      e.preventDefault()
-      deferredPrompt.value = e
-      canInstall.value = true
-      
-      // Auto-affichage selon le variant
-      if (props.autoShow) {
-        if (props.variant === 'snackbar') {
-          setTimeout(() => {
-            showSnackbar.value = true
-          }, 3000) // Attendre 3s avant d'afficher
-        }
+    const shouldShowBanner = computed(() => {
+      return isInstallable.value && !isInstalled.value && !bannerDismissed.value
+    })
+    
+    const getIcon = computed(() => {
+      if (isInstalled.value) return 'mdi-check-circle'
+      if (platform.value === 'ios') return 'mdi-share'
+      if (platform.value === 'android') return 'mdi-download'
+      return 'mdi-download'
+    })
+    
+    const getIconColor = computed(() => {
+      if (isInstalled.value) return 'success'
+      if (isInstallable.value) return 'primary'
+      return 'grey'
+    })
+    
+    const getTitle = computed(() => {
+      if (isInstalled.value) return t('pwa.installed')
+      return t('pwa.installApp')
+    })
+    
+    const getSubtitle = computed(() => {
+      if (isInstalled.value) return ''
+      if (platform.value === 'ios') return t('pwa.installDescription') + ' (iOS)'
+      if (platform.value === 'android') return t('pwa.installDescription') + ' (Android)'
+      return t('pwa.installDescription')
+    })
+    
+    // Détection de la plateforme
+    const detectPlatform = () => {
+      const ua = navigator.userAgent
+      if (/iPad|iPhone|iPod/.test(ua)) {
+        platform.value = 'ios'
+      } else if (/Android/.test(ua)) {
+        platform.value = 'android'
+      } else if (/Windows/.test(ua)) {
+        platform.value = 'windows'
+      } else if (/Mac/.test(ua)) {
+        platform.value = 'mac'
+      } else {
+        platform.value = 'desktop'
       }
     }
     
-    // ✅ NOUVEAU: Forcer la détection PWA si criteria réunis
-    const forcePWADetection = () => {
-      // Vérifier critères PWA de base
-      const hasSW = 'serviceWorker' in navigator
-      const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost'
-      const hasManifest = document.querySelector('link[rel="manifest"]')
-      
-      console.log('🔧 Vérification critères PWA:', {
-        serviceWorker: hasSW,
-        https: isHTTPS,
-        manifest: !!hasManifest,
-        userAgent: navigator.userAgent.includes('Chrome')
-      })
-      
-      // Si tous les critères sont réunis mais pas de prompt
-      if (hasSW && isHTTPS && hasManifest && !deferredPrompt.value) {
-        console.log('📱 Critères PWA réunis - Forçage de la détection')
-        canInstall.value = true
-        
-        // En mode développement, toujours permettre le test
-        if (import.meta.env.DEV || location.hostname === 'localhost') {
-          console.log('🔧 Mode dev: Installation PWA forcée')
-        }
-      }
-    }
-    
-    // Détection si PWA installable
+    // Vérifier si l'app est installée
     const checkIfInstalled = () => {
-      // Méthode 1: display-mode
+      // Méthode 1: Mode standalone
       if (window.matchMedia('(display-mode: standalone)').matches) {
         isInstalled.value = true
         return true
       }
       
-      // Méthode 2: navigator.standalone (iOS)
-      if (window.navigator.standalone === true) {
+      // Méthode 2: iOS navigator.standalone
+      if ('standalone' in window.navigator && window.navigator.standalone) {
         isInstalled.value = true
         return true
       }
       
-      // Méthode 3: document.referrer (Android)
+      // Méthode 3: URL params (pour les raccourcis)
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('utm_source') === 'pwa') {
+        isInstalled.value = true
+        return true
+      }
+      
+      // Méthode 4: Vérifier le referer
       if (document.referrer.includes('android-app://')) {
         isInstalled.value = true
         return true
       }
       
-      // ✅ NOUVEAU: En développement, toujours permettre le test
-      if (import.meta.env.DEV) {
-        console.log('🔧 Mode développement: PWA installable forcée pour test')
-        canInstall.value = true
-      }
-      
       return false
     }
     
-    // Installation de la PWA
-    const installPWA = async () => {
-      if (!deferredPrompt.value) {
-        console.log('💡 Pas de prompt d\'installation disponible')
-        
-        // Fallback: afficher instructions manuelles
-        showManualInstallInstructions()
+    // Vérifier si l'app est installable
+    const checkInstallability = () => {
+      // D'abord vérifier si déjà installée
+      if (checkIfInstalled()) {
+        isInstallable.value = false
         return
       }
       
-      installing.value = true
+      // Critères de base pour une PWA
+      const isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
+      const hasServiceWorker = 'serviceWorker' in navigator
+      const hasManifest = document.querySelector('link[rel="manifest"]')
       
-      try {
-        // Afficher le prompt
-        deferredPrompt.value.prompt()
+      // Si tous les critères sont remplis, l'app est installable
+      if (isSecure && hasServiceWorker && hasManifest) {
+        isInstallable.value = true
         
-        // Attendre la réponse utilisateur
-        const { outcome } = await deferredPrompt.value.userChoice
-        
-        console.log(`📱 Installation PWA: ${outcome}`)
-        
-        if (outcome === 'accepted') {
-          isInstalled.value = true
-          canInstall.value = false
-          showSnackbar.value = false
-          bannerDismissed.value = true
-          
-          emit('installed')
-          
-          // Message de succès
-          this.$nextTick(() => {
-            if (window.navigator.vibrate) {
-              window.navigator.vibrate([100, 50, 100])
-            }
-          })
+        // ✅ IMPORTANT: Sur Chrome mobile, même sans beforeinstallprompt,
+        // l'option "Add to Home Screen" est disponible dans le menu
+        if (platform.value === 'android' && /Chrome/.test(navigator.userAgent)) {
+          console.log('📱 Chrome Android détecté - Installation via menu disponible')
         }
-        
-        // Nettoyer le prompt
-        deferredPrompt.value = null
-        
-      } catch (error) {
-        console.error('❌ Erreur installation PWA:', error)
-      } finally {
-        installing.value = false
+      }
+      
+      console.log('🔍 Vérification installabilité:', {
+        isSecure,
+        hasServiceWorker,
+        hasManifest,
+        isInstallable: isInstallable.value,
+        platform: platform.value
+      })
+    }
+    
+    // Gestionnaire du prompt d'installation natif
+    const handleBeforeInstallPrompt = (e) => {
+      console.log('✅ beforeinstallprompt capturé!')
+      e.preventDefault()
+      deferredPrompt.value = e
+      isInstallable.value = true
+      
+      // Auto-affichage du banner/snackbar après un délai
+      if (props.autoShow && props.variant !== 'menu') {
+        setTimeout(() => {
+          if (props.variant === 'banner') {
+            // Banner s'affiche automatiquement via computed
+          } else if (props.variant === 'snackbar') {
+            showSnackbar.value = true
+          }
+        }, 2000)
       }
     }
     
-    // Instructions manuelles pour installation
-    const showManualInstallInstructions = () => {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-      const isAndroid = /Android/.test(navigator.userAgent)
-      const isDesktop = !isIOS && !isAndroid
-      
-      let instructions = ''
-      
-      if (isIOS) {
-        instructions = t('pwa.instructions.ios')
-      } else if (isAndroid) {
-        instructions = t('pwa.instructions.android')
+    // Gestionnaire du clic sur installer
+    const handleInstallClick = async () => {
+      // Si on a le prompt natif, l'utiliser
+      if (deferredPrompt.value) {
+        installing.value = true
+        
+        try {
+          deferredPrompt.value.prompt()
+          const { outcome } = await deferredPrompt.value.userChoice
+          
+          console.log(`📱 Choix utilisateur: ${outcome}`)
+          
+          if (outcome === 'accepted') {
+            isInstalled.value = true
+            isInstallable.value = false
+            showSnackbar.value = false
+            bannerDismissed.value = true
+            
+            emit('installed')
+            
+            // Feedback
+            if (window.navigator.vibrate) {
+              window.navigator.vibrate([100, 50, 100])
+            }
+          }
+          
+          deferredPrompt.value = null
+        } catch (error) {
+          console.error('❌ Erreur installation:', error)
+        } finally {
+          installing.value = false
+        }
       } else {
-        instructions = t('pwa.instructions.desktop')
+        // Sinon, afficher les instructions manuelles
+        showManualInstructions()
+      }
+    }
+    
+    // Afficher les instructions manuelles
+    const showManualInstructions = () => {
+      let message = ''
+      let icon = ''
+      
+      switch (platform.value) {
+        case 'ios':
+          message = `iOS Safari:\n1. Touchez l'icône Partager 􀈂\n2. Choisissez "Sur l'écran d'accueil" 􀥐\n3. Touchez "Ajouter"`
+          icon = 'mdi-share'
+          break
+          
+        case 'android':
+          message = `Chrome Android:\n1. Touchez le menu ⋮\n2. Choisissez "Ajouter à l'écran d'accueil"\n3. Confirmez l'installation\n\nOU cherchez l'icône + dans la barre d'adresse`
+          icon = 'mdi-menu'
+          break
+          
+        case 'windows':
+        case 'mac':
+        case 'desktop':
+        default:
+          message = `Chrome/Edge Desktop:\n1. Cliquez sur l'icône + dans la barre d'adresse\n2. OU Menu → "Installer ONUF"\n3. OU F12 → Application → Manifest → Install`
+          icon = 'mdi-plus'
+          break
       }
       
-      // ✅ NOUVEAU: Instructions détaillées selon la plateforme
-      const detailedInstructions = {
-        ios: 'iOS: Touchez l\'icône Partager 📤 puis "Sur l\'\u00e9cran d\'accueil"',
-        android: 'Android: Menu ⋱ puis "Ajouter à l\'\u00e9cran d\'accueil" OU icône + dans la barre d\'adresse',
-        desktop: 'Desktop: Menu Chrome → "Installer ONUF" OU icône + dans la barre d\'adresse OU DevTools F12 → Application → Manifest → Install'
-      }
-      
-      const platform = isIOS ? 'ios' : isAndroid ? 'android' : 'desktop'
-      console.log('📱 Instructions d\'installation:', detailedInstructions[platform])
-      
-      // Créer un snackbar avec instructions
+      // Émettre un événement pour afficher les instructions
       const event = new CustomEvent('show-install-instructions', {
-        detail: { 
-          instructions: detailedInstructions[platform], 
-          isIOS, 
-          isAndroid,
-          isDesktop 
+        detail: {
+          instructions: message,
+          isIOS: platform.value === 'ios',
+          isAndroid: platform.value === 'android',
+          isDesktop: !['ios', 'android'].includes(platform.value),
+          platform: platform.value
         }
       })
       window.dispatchEvent(event)
@@ -294,80 +342,77 @@ export default {
       bannerDismissed.value = true
       emit('dismissed')
       
-      // Stocker la préférence
+      // Sauvegarder la préférence
       localStorage.setItem('onuf-pwa-banner-dismissed', Date.now().toString())
     }
     
-    // Vérifier si banner précédemment rejeté
-    const checkBannerDismissed = () => {
+    // Vérifier si le banner a été rejeté
+    const checkBannerPreference = () => {
       const dismissed = localStorage.getItem('onuf-pwa-banner-dismissed')
       if (dismissed) {
         const dismissedTime = parseInt(dismissed)
         const oneWeek = 7 * 24 * 60 * 60 * 1000
         
-        // Réafficher après une semaine
         if (Date.now() - dismissedTime < oneWeek) {
           bannerDismissed.value = true
         }
       }
     }
     
-    // Gestionnaire changement de display mode
-    const handleDisplayModeChange = (e) => {
-      if (e.matches) {
-        isInstalled.value = true
-        canInstall.value = false
-        console.log('✅ PWA installée - Mode standalone détecté')
-      }
-    }
-    
+    // Lifecycle
     onMounted(() => {
-      // Vérifier si déjà installée
-      checkIfInstalled()
-      checkBannerDismissed()
+      detectPlatform()
+      checkInstallability()
+      checkBannerPreference()
       
       // Écouter les événements
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.addEventListener('manual-pwa-install', handleInstallClick)
       
-      // ✅ NOUVEAU: Écouter l'événement d'installation manuelle
-      window.addEventListener('manual-pwa-install', installPWA)
-      
-      // Écouter changement de display mode
+      // Écouter les changements de display mode
       const displayModeQuery = window.matchMedia('(display-mode: standalone)')
-      displayModeQuery.addListener(handleDisplayModeChange)
-      
-      // ✅ NOUVEAU: Forcer détection après 2s si pas de prompt
-      setTimeout(() => {
-        if (!deferredPrompt.value && !isInstalled.value) {
-          forcePWADetection()
+      displayModeQuery.addEventListener('change', (e) => {
+        if (e.matches) {
+          isInstalled.value = true
+          isInstallable.value = false
+          console.log('✅ PWA installée détectée')
         }
-      }, 2000)
+      })
       
-      // Debug info
-      console.log('🔧 PWAInstaller initialisé:', {
+      // Re-vérifier l'installabilité après un délai
+      setTimeout(() => {
+        checkInstallability()
+      }, 1000)
+      
+      console.log('🔧 PWAInstaller monté:', {
         variant: props.variant,
-        canInstall: canInstall.value,
-        isInstalled: isInstalled.value,
-        standalone: window.matchMedia('(display-mode: standalone)').matches
+        platform: platform.value,
+        isInstallable: isInstallable.value,
+        isInstalled: isInstalled.value
       })
     })
     
     onUnmounted(() => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('manual-pwa-install', installPWA)
+      window.removeEventListener('manual-pwa-install', handleInstallClick)
     })
     
     return {
       // État
-      canInstall,
       isInstalled,
       installing,
       showSnackbar,
-      bannerDismissed,
       showInstaller,
+      shouldShowBanner,
+      
+      // Computed
+      getIcon,
+      getIconColor,
+      getTitle,
+      getSubtitle,
       
       // Méthodes
-      installPWA,
+      handleInstallClick,
       dismissBanner,
       
       // Utils
@@ -385,10 +430,6 @@ export default {
   right: 0;
   z-index: 1000;
   border-radius: 12px 12px 0 0 !important;
-}
-
-/* Animations pour le banner */
-.pwa-install-banner {
   animation: slideUpBanner 0.3s ease-out;
 }
 
@@ -403,14 +444,13 @@ export default {
   }
 }
 
-/* Responsive pour mobile */
+/* Responsive */
 @media (max-width: 600px) {
   .pwa-install-banner :deep(.v-banner__text) {
     font-size: 0.875rem;
   }
   
   .pwa-install-banner :deep(.v-banner__actions) {
-    flex-direction: column;
     gap: 8px;
   }
 }

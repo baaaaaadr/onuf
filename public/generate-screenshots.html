@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Générateur de Screenshots ONUF</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .screenshot {
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    button {
+      background: #D4A574;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    
+    button:hover {
+      background: #C09564;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Générateur de Screenshots ONUF PWA</h1>
+    <p>Cliquez sur les boutons pour télécharger les screenshots requis pour l'installation PWA.</p>
+    
+    <div class="screenshot">
+      <h3>Screenshot 1 - Mobile (540x720)</h3>
+      <canvas id="screenshot1" width="540" height="720"></canvas>
+      <button onclick="downloadScreenshot('screenshot1', 'screenshot-1.png')">
+        📥 Télécharger Screenshot 1
+      </button>
+    </div>
+    
+    <div class="screenshot">
+      <h3>Screenshot 2 - Tablette (720x540)</h3>
+      <canvas id="screenshot2" width="720" height="540"></canvas>
+      <button onclick="downloadScreenshot('screenshot2', 'screenshot-2.png')">
+        📥 Télécharger Screenshot 2
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    // Fonction pour dessiner les screenshots
+    function drawScreenshot1() {
+      const canvas = document.getElementById('screenshot1');
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      ctx.fillStyle = '#FAFAFA';
+      ctx.fillRect(0, 0, 540, 720);
+      
+      // Header
+      ctx.fillStyle = '#D4A574';
+      ctx.fillRect(0, 0, 540, 80);
+      
+      // Logo
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 32px Arial';
+      ctx.fillText('ONUF', 20, 50);
+      
+      // Title
+      ctx.font = '24px Arial';
+      ctx.fillStyle = '#333333';
+      ctx.fillText('Audit Sécurité Urbaine', 20, 120);
+      
+      // Simulation de sections d'audit
+      const sections = [
+        { icon: '💡', title: 'Éclairage', color: '#4CAF50' },
+        { icon: '🚶', title: 'Cheminement', color: '#2196F3' },
+        { icon: '🚦', title: 'Signalisation', color: '#FF9800' },
+        { icon: '♿', title: 'Accessibilité', color: '#9C27B0' }
+      ];
+      
+      sections.forEach((section, index) => {
+        const y = 180 + (index * 120);
+        
+        // Card
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(20, y, 500, 100);
+        
+        // Shadow
+        ctx.shadowColor = 'rgba(0,0,0,0.1)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 2;
+        
+        // Border
+        ctx.strokeStyle = '#E0E0E0';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(20, y, 500, 100);
+        
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        
+        // Icon
+        ctx.font = '36px Arial';
+        ctx.fillText(section.icon, 40, y + 60);
+        
+        // Title
+        ctx.fillStyle = '#333333';
+        ctx.font = '20px Arial';
+        ctx.fillText(section.title, 100, y + 45);
+        
+        // Progress indicator
+        ctx.fillStyle = section.color;
+        ctx.fillRect(100, y + 60, 380, 8);
+        ctx.fillStyle = '#E0E0E0';
+        ctx.fillRect(100 + 380 * 0.7, y + 60, 380 * 0.3, 8);
+      });
+      
+      // Bottom navigation hint
+      ctx.fillStyle = '#D4A574';
+      ctx.fillRect(0, 660, 540, 60);
+      
+      // Nav icons
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '24px Arial';
+      ctx.fillText('🏠  📋  📊  ℹ️', 180, 695);
+    }
+    
+    function drawScreenshot2() {
+      const canvas = document.getElementById('screenshot2');
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      ctx.fillStyle = '#FAFAFA';
+      ctx.fillRect(0, 0, 720, 540);
+      
+      // Header
+      ctx.fillStyle = '#D4A574';
+      ctx.fillRect(0, 0, 720, 80);
+      
+      // Logo & Title
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 32px Arial';
+      ctx.fillText('ONUF', 20, 50);
+      ctx.font = '20px Arial';
+      ctx.fillText('Tableau de Bord', 120, 50);
+      
+      // Stats cards
+      const stats = [
+        { label: 'Audits Total', value: '127', color: '#4CAF50' },
+        { label: 'Ce Mois', value: '23', color: '#2196F3' },
+        { label: 'En Attente', value: '5', color: '#FF9800' }
+      ];
+      
+      stats.forEach((stat, index) => {
+        const x = 20 + (index * 230);
+        const y = 120;
+        
+        // Card
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(x, y, 210, 120);
+        
+        // Border
+        ctx.strokeStyle = stat.color;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, 210, 4);
+        
+        // Label
+        ctx.fillStyle = '#666666';
+        ctx.font = '16px Arial';
+        ctx.fillText(stat.label, x + 20, y + 35);
+        
+        // Value
+        ctx.fillStyle = stat.color;
+        ctx.font = 'bold 48px Arial';
+        ctx.fillText(stat.value, x + 20, y + 85);
+      });
+      
+      // Chart area
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(20, 260, 680, 240);
+      ctx.strokeStyle = '#E0E0E0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(20, 260, 680, 240);
+      
+      // Chart title
+      ctx.fillStyle = '#333333';
+      ctx.font = '18px Arial';
+      ctx.fillText('Évolution des Audits', 40, 290);
+      
+      // Simple chart
+      ctx.beginPath();
+      ctx.moveTo(60, 450);
+      ctx.lineTo(200, 400);
+      ctx.lineTo(340, 420);
+      ctx.lineTo(480, 350);
+      ctx.lineTo(620, 320);
+      ctx.strokeStyle = '#D4A574';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      
+      // Points
+      const points = [[60, 450], [200, 400], [340, 420], [480, 350], [620, 320]];
+      points.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = '#D4A574';
+        ctx.fill();
+      });
+    }
+    
+    // Dessiner les screenshots au chargement
+    window.onload = function() {
+      drawScreenshot1();
+      drawScreenshot2();
+    };
+    
+    // Fonction de téléchargement
+    function downloadScreenshot(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>

@@ -82,7 +82,54 @@ export default defineConfig({
         id: '/',
         edge_side_panel: {
           preferred_width: 400
-        }
+        },
+        
+        // ✅ NOUVEAUX CHAMPS REQUIS PAR CHROME 2025
+        shortcuts: [
+          {
+            name: 'Nouvel Audit',
+            short_name: 'Audit',
+            description: 'Créer un nouvel audit de sécurité',
+            url: '/audit?action=new',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Historique',
+            short_name: 'Historique',
+            description: 'Voir l\'historique des audits',
+            url: '/historique',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          }
+        ],
+        
+        // ✅ SCREENSHOTS REQUIS (Chrome 2025)
+        screenshots: [
+          {
+            src: '/screenshot-1.png',
+            type: 'image/png',
+            sizes: '540x720',
+            form_factor: 'narrow'
+          },
+          {
+            src: '/screenshot-2.png',
+            type: 'image/png',
+            sizes: '720x540',
+            form_factor: 'wide'
+          }
+        ],
+        
+        // ✅ LAUNCH HANDLER pour réutiliser l'instance
+        launch_handler: {
+          client_mode: 'auto'
+        },
+        
+        // ✅ PROTOCOL HANDLERS (optionnel mais améliore l'installabilité)
+        protocol_handlers: [
+          {
+            protocol: 'web+onuf',
+            url: '/?audit=%s'
+          }
+        ]
       },
       devOptions: {
         enabled: true,
