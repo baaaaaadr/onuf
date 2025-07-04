@@ -56,7 +56,8 @@ export default defineConfig({
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'pwa-512x512.png',
@@ -76,17 +77,12 @@ export default defineConfig({
         dir: 'auto',
         prefer_related_applications: false,
         display_override: ['window-controls-overlay', 'standalone'],
-        launch_handler: {
-          client_mode: 'navigate-existing'
-        },
-        screenshots: [
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            form_factor: 'narrow'
-          }
-        ]
+        
+        // ✅ CRITIQUES pour l'installation:
+        id: '/',
+        edge_side_panel: {
+          preferred_width: 400
+        }
       },
       devOptions: {
         enabled: true,

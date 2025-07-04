@@ -149,6 +149,32 @@ export default {
       }
     }
     
+    // ✅ NOUVEAU: Forcer la détection PWA si criteria réunis
+    const forcePWADetection = () => {
+      // Vérifier critères PWA de base
+      const hasSW = 'serviceWorker' in navigator
+      const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost'
+      const hasManifest = document.querySelector('link[rel="manifest"]')
+      
+      console.log('🔧 Vérification critères PWA:', {
+        serviceWorker: hasSW,
+        https: isHTTPS,
+        manifest: !!hasManifest,
+        userAgent: navigator.userAgent.includes('Chrome')
+      })
+      
+      // Si tous les critères sont réunis mais pas de prompt
+      if (hasSW && isHTTPS && hasManifest && !deferredPrompt.value) {
+        console.log('📱 Critères PWA réunis - Forçage de la détection')
+        canInstall.value = true
+        
+        // En mode développement, toujours permettre le test
+        if (import.meta.env.DEV || location.hostname === 'localhost') {
+          console.log('🔧 Mode dev: Installation PWA forcée')
+        }
+      }
+    }
+    
     // Détection si PWA installable
     const checkIfInstalled = () => {
       // Méthode 1: display-mode
@@ -229,6 +255,7 @@ export default {
     const showManualInstallInstructions = () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
       const isAndroid = /Android/.test(navigator.userAgent)
+      const isDesktop = !isIOS && !isAndroid
       
       let instructions = ''
       
@@ -240,9 +267,24 @@ export default {
         instructions = t('pwa.instructions.desktop')
       }
       
+      // ✅ NOUVEAU: Instructions détaillées selon la plateforme
+      const detailedInstructions = {
+        ios: 'iOS: Touchez l\'icône Partager 📤 puis "Sur l\'\u00e9cran d\'accueil"',
+        android: 'Android: Menu ⋱ puis "Ajouter à l\'\u00e9cran d\'accueil" OU icône + dans la barre d\'adresse',
+        desktop: 'Desktop: Menu Chrome → "Installer ONUF" OU icône + dans la barre d\'adresse OU DevTools F12 → Application → Manifest → Install'
+      }
+      
+      const platform = isIOS ? 'ios' : isAndroid ? 'android' : 'desktop'
+      console.log('📱 Instructions d\'installation:', detailedInstructions[platform])
+      
       // Créer un snackbar avec instructions
       const event = new CustomEvent('show-install-instructions', {
-        detail: { instructions, isIOS, isAndroid }
+        detail: { 
+          instructions: detailedInstructions[platform], 
+          isIOS, 
+          isAndroid,
+          isDesktop 
+        }
       })
       window.dispatchEvent(event)
     }
@@ -293,6 +335,13 @@ export default {
       // Écouter changement de display mode
       const displayModeQuery = window.matchMedia('(display-mode: standalone)')
       displayModeQuery.addListener(handleDisplayModeChange)
+      
+      // ✅ NOUVEAU: Forcer détection après 2s si pas de prompt
+      setTimeout(() => {
+        if (!deferredPrompt.value && !isInstalled.value) {
+          forcePWADetection()
+        }
+      }, 2000)
       
       // Debug info
       console.log('🔧 PWAInstaller initialisé:', {
