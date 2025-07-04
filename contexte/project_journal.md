@@ -2,7 +2,15 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
-- **04/07/2025** : ✅ **RECONFIGURATION PWA COMPLÈTE + BOUTON INSTALLATION** - Résolution complète du problème d'installation PWA
+- **04/07/2025** : ✅ **RÉSOLUTION DÉFINITIVE DU PROBLÈME PWA** - Installation restaurée avec diagnostic complet
+  - **Cause identifiée** : Chrome 2025 exige screenshots et shortcuts dans le manifest pour le prompt automatique
+  - **Manifest mis à jour** : Ajout de screenshots, shortcuts, launch_handler et protocol_handlers
+  - **PWAInstaller corrigé** : Détection intelligente de la plateforme et installation même sans beforeinstallprompt
+  - **PWADiagnostic ajouté** : Outil complet pour diagnostiquer les problèmes d'installation PWA
+  - **Générateur de screenshots** : Outil HTML pour créer les screenshots requis (public/generate-screenshots.html)
+  - **Installation manuelle fonctionnelle** : Instructions détaillées par plateforme quand le prompt n'est pas disponible
+  - **Debug PWA intégré** : Nouvel onglet PWA dans MobileDebugViewer avec diagnostic en temps réel
+- **04/07/2025** : ✅ **RECONFIGURATION PWA COMPLÈTE + BOUTON INSTALLATION** - Configuration initiale PWA
   - Génération automatique des 5 icônes manquantes (64x64, 144x144, 180x180, maskable-512x512, safari-svg)
   - Configuration vite.config.js optimisée avec cache Supabase et icônes maskable
   - Meta tags HTML complets pour iOS/Android/Windows

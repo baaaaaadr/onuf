@@ -199,6 +199,11 @@
               </v-card>
             </v-container>
           </v-tabs-window-item>
+          
+          <!-- Tab PWA -->
+          <v-tabs-window-item value="pwa">
+            <PWADiagnostic />
+          </v-tabs-window-item>
         </v-tabs-window>
       </v-card-text>
 
@@ -227,6 +232,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import PWADiagnostic from './PWADiagnostic.vue'
 
 // État
 const showDebug = ref(false)
