@@ -2,6 +2,12 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
+- **04/07/2025** : ✅ **RECONFIGURATION PWA COMPLÈTE** - Résolution du problème d'installation PWA post-i18n
+  - Génération automatique des 5 icônes manquantes (64x64, 144x144, 180x180, maskable-512x512, safari-svg)
+  - Configuration vite.config.js optimisée avec cache Supabase et icônes maskable
+  - Meta tags HTML complets pour iOS/Android/Windows
+  - Service Worker registration automatique avec détection de mises à jour
+  - PWA maintenant installable sur tous navigateurs mobile et desktop
 - **03/07/2025** : ✅ **AJOUT DU LOGO DANS LE HEADER** - Remplacement de l'icône mdi-map-marker-check par le logo.svg pour renforcer l'identité de marque
 - **03/07/2025** : ✅ **OPTIMISATION DU LOGO** - Agrandissement (36px), espacement amélioré (mr-3, margin-left: 4px) et padding conteneur (px-2)
 - **03/07/2025** : Migration complète du système de gestion vers une structure centralisée dans le dossier `/contexte`

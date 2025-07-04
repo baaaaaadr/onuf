@@ -73,4 +73,29 @@ if (typeof window !== 'undefined') {
 }
 
 app.mount('#app');
+
+// ✅ PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then((registration) => {
+        console.log('✅ SW registered: ', registration);
+        
+        // 🔄 Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('🆕 New content available, please refresh!');
+              // Optionnel: afficher une notification à l'utilisateur
+            }
+          });
+        });
+      })
+      .catch((registrationError) => {
+        console.log('❌ SW registration failed: ', registrationError);
+      });
+  });
+}
+
 console.log('✅ ONUF PWA démarré avec plugin i18n isolé.');
