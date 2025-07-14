@@ -1,7 +1,25 @@
 // Configuration des lieux disponibles pour l'audit
+// Utilise les clés i18n pour supporter les traductions
 export const locations = [
+  { key: 'ahlaka', labelKey: 'neighborhoods.ahlaka' },
+  { key: 'aitElMouden', labelKey: 'neighborhoods.aitElMouden' },
+  { key: 'aitTaoukt', labelKey: 'neighborhoods.aitTaoukt' },
+  { key: 'ighilOuderdour', labelKey: 'neighborhoods.ighilOuderdour' },
+  { key: 'imounsiss', labelKey: 'neighborhoods.imounsiss' }
+]
+
+// Fonction helper pour obtenir les quartiers traduits
+export const getTranslatedLocations = (t) => {
+  return locations.map(location => ({
+    key: location.key,
+    label: t(location.labelKey)
+  }))
+}
+
+// Garde compatibilité pour l'ancien format (fallback)
+export const locationLabels = [
   'Ahlaka',
-  'Aït El Mouden',
+  'Aït El Mouden', 
   'Aït Taoukt',
   'Ighil Ouderdour',
   'Imounsiss'

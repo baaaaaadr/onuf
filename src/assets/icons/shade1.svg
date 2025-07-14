@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="shade1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344.1 438.8">
+  <!-- Aucun ombrage (négatif) -->
+  <!-- Soleil intense -->
+  <circle cx="172" cy="172" r="60" fill="#ffeb3b" stroke="#ff6b6b" stroke-width="6"/>
+  <!-- Rayons du soleil -->
+  <g stroke="#ff6b6b" stroke-width="4" stroke-linecap="round">
+    <line x1="172" y1="80" x2="172" y2="40"/>
+    <line x1="172" y1="264" x2="172" y2="304"/>
+    <line x1="80" y1="172" x2="40" y2="172"/>
+    <line x1="264" y1="172" x2="304" y2="172"/>
+    <line x1="117" y1="117" x2="87" y2="87"/>
+    <line x1="227" y1="227" x2="257" y2="257"/>
+    <line x1="227" y1="117" x2="257" y2="87"/>
+    <line x1="117" y1="227" x2="87" y2="257"/>
+  </g>
+  <!-- Personne souffrant de la chaleur -->
+  <g fill="#50758d">
+    <circle cx="172" cy="320" r="20"/>
+    <rect x="162" y="340" width="20" height="40" rx="5"/>
+    <rect x="152" y="350" width="10" height="30" rx="3"/>
+    <rect x="182" y="350" width="10" height="30" rx="3"/>
+  </g>
+  <!-- Gouttes de sueur -->
+  <g fill="#4fc3f7">
+    <ellipse cx="195" cy="315" rx="3" ry="5"/>
+    <ellipse cx="200" cy="325" rx="3" ry="5"/>
+  </g>
+</svg>

@@ -134,14 +134,24 @@ export const fr = {
           "veryClose": "Très proche"
         }
       },
-      "formalSecurity": {
-        "title": "Sécurité Formelle",
-        "description": "La présence visible de la police ou de gardiens de sécurité.",
+      "strayDogs": {
+        "title": "Chiens errants",
+        "description": "La présence de chiens errants dans la zone.",
         "options": {
-          "none": "Aucune",
-          "weak": "Faible",
-          "medium": "Moyenne",
-          "high": "Élevée"
+          "many": "Beaucoup",
+          "some": "Quelques-uns",
+          "few": "Peu",
+          "none": "Aucun"
+        }
+      },
+      "shade": {
+        "title": "Ombrage",
+        "description": "La présence d'ombre naturelle ou artificielle pour se protéger du soleil.",
+        "options": {
+          "none": "Aucun",
+          "little": "Peu",
+          "moderate": "Modéré",
+          "abundant": "Abondant"
         }
       },
       "signage": {
@@ -191,6 +201,11 @@ export const fr = {
           "description": "Documentez votre audit avec des photos",
           "takePhoto": "Prendre une photo",
           "chooseFromGallery": "Choisir depuis la galerie"
+        },
+        "gallery": {
+          "photo": "Photo",
+          "add": "Ajouter une photo",
+          "processing": "Traitement en cours..."
         }
       }
     },
@@ -319,7 +334,29 @@ export const fr = {
     "unavailable": "Localisation non disponible",
     "timeout": "Délai de localisation dépassé",
     "accuracy": "Précision",
-    "title": "Localisation GPS"
+    "title": "Localisation GPS",
+    "required": "Localisation requise",
+    "activateMessage": "Activez la géolocalisation pour continuer",
+    "getPosition": "Obtenir ma position",
+    "searching": "Recherche de votre position...",
+    "searchingOffline": "La recherche GPS peut prendre plus de temps en mode hors-ligne. Veuillez patienter...",
+    "refreshing": "Actualisation de votre position...",
+    "unknownPosition": "Position inconnue",
+    "notSupported": "Géolocalisation non supportée",
+    "permissionDenied": "Permission de géolocalisation refusée",
+    "outsideZone": "Position en dehors de la zone d'audit autorisée (Agadir)",
+    "gpsError": "Erreur de géolocalisation",
+    "permissionRefused": "Permission refusée",
+    "positionUnavailable": "Position indisponible",
+    "timeoutExpired": "Délai d'attente dépassé",
+    "myPosition": "Ma position",
+    "positionCopied": "Position copiée !",
+    "gpsDetails": "Détails GPS",
+    "precision": "Précision :",
+    "altitude": "Altitude :",
+    "speed": "Vitesse :",
+    "direction": "Direction :",
+    "timestamp": "Timestamp :"
   },
   "common": {
     "loading": "Chargement...",
@@ -355,7 +392,8 @@ export const fr = {
     "network": "Erreur réseau",
     "unknown": "Erreur inconnue",
     "load_failed": "Échec du chargement",
-    "save_failed": "Échec de l'enregistrement"
+    "save_failed": "Échec de l'enregistrement",
+    "gpsUnavailable": "Localisation GPS non disponible"
   },
   "menu": {
     "systemStatus": "État du système",
@@ -367,7 +405,8 @@ export const fr = {
     "startGuide": "Guide de démarrage",
     "languageSelection": "Langue",
     "profile": "Profil",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "debug": "Debug"
   },
   "gps": {
     "position": "Position",
@@ -384,6 +423,13 @@ export const fr = {
     "positionUnavailable": "Position GPS non disponible",
     "activatingGeolocation": "Activation de la géolocalisation en cours...",
     "retry": "Réessayer"
+  },
+  "neighborhoods": {
+    "ahlaka": "Ahlaka",
+    "aitElMouden": "Aït El Mouden",
+    "aitTaoukt": "Aït Taoukt",
+    "ighilOuderdour": "Ighil Ouderdour",
+    "imounsiss": "Imounsiss"
   },
   "dialogs": {
     "cloudSync": "Synchronisation Cloud",
@@ -543,14 +589,24 @@ export const en = {
           "veryClose": "Very close"
         }
       },
-      "formalSecurity": {
-        "title": "Formal Security",
-        "description": "Visible presence of police or security guards.",
+      "strayDogs": {
+        "title": "Stray Dogs",
+        "description": "Presence of stray dogs in the area.",
+        "options": {
+          "many": "Many",
+          "some": "Some",
+          "few": "Few",
+          "none": "None"
+        }
+      },
+      "shade": {
+        "title": "Shade",
+        "description": "Presence of natural or artificial shade for sun protection.",
         "options": {
           "none": "None",
-          "weak": "Weak",
-          "medium": "Medium",
-          "high": "High"
+          "little": "Little",
+          "moderate": "Moderate",
+          "abundant": "Abundant"
         }
       },
       "signage": {
@@ -600,6 +656,11 @@ export const en = {
           "description": "Document your audit with photos",
           "takePhoto": "Take a photo",
           "chooseFromGallery": "Choose from gallery"
+        },
+        "gallery": {
+          "photo": "Photo",
+          "add": "Add photo",
+          "processing": "Processing..."
         }
       }
     },
@@ -728,7 +789,29 @@ export const en = {
     "unavailable": "Location unavailable",
     "timeout": "Location timeout",
     "accuracy": "Accuracy",
-    "title": "GPS Location"
+    "title": "GPS Location",
+    "required": "Location required",
+    "activateMessage": "Activate geolocation to continue",
+    "getPosition": "Get my position",
+    "searching": "Searching for your position...",
+    "searchingOffline": "GPS search may take longer in offline mode. Please wait...",
+    "refreshing": "Refreshing your position...",
+    "unknownPosition": "Unknown position",
+    "notSupported": "Geolocation not supported",
+    "permissionDenied": "Geolocation permission denied",
+    "outsideZone": "Position outside authorized audit zone (Agadir)",
+    "gpsError": "Geolocation error",
+    "permissionRefused": "Permission denied",
+    "positionUnavailable": "Position unavailable",
+    "timeoutExpired": "Timeout expired",
+    "myPosition": "My position",
+    "positionCopied": "Position copied!",
+    "gpsDetails": "GPS Details",
+    "precision": "Precision:",
+    "altitude": "Altitude:",
+    "speed": "Speed:",
+    "direction": "Direction:",
+    "timestamp": "Timestamp:"
   },
   "common": {
     "loading": "Loading...",
@@ -764,7 +847,8 @@ export const en = {
     "network": "Network error",
     "unknown": "Unknown error",
     "load_failed": "Load failed",
-    "save_failed": "Save failed"
+    "save_failed": "Save failed",
+    "gpsUnavailable": "GPS location not available"
   },
   "menu": {
     "systemStatus": "System Status",
@@ -776,7 +860,8 @@ export const en = {
     "startGuide": "Start Guide",
     "languageSelection": "Language",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "debug": "Debug"
   },
   "gps": {
     "position": "Position",
@@ -793,6 +878,13 @@ export const en = {
     "positionUnavailable": "GPS position unavailable",
     "activatingGeolocation": "Activating geolocation...",
     "retry": "Retry"
+  },
+  "neighborhoods": {
+    "ahlaka": "Ahlaka",
+    "aitElMouden": "Aït El Mouden",
+    "aitTaoukt": "Aït Taoukt",
+    "ighilOuderdour": "Ighil Ouderdour",
+    "imounsiss": "Imounsiss"
   },
   "dialogs": {
     "cloudSync": "Cloud Sync",
@@ -952,14 +1044,24 @@ export const ar = {
           "veryClose": "قريب جداً"
         }
       },
-      "formalSecurity": {
-        "title": "الأمن الرسمي",
-        "description": "الوجود المرئي للشرطة أو حراس الأمن.",
+      "strayDogs": {
+        "title": "الكلاب الضالة",
+        "description": "وجود الكلاب الضالة في المنطقة.",
+        "options": {
+          "many": "كثير",
+          "some": "بعض",
+          "few": "قليل",
+          "none": "لا يوجد"
+        }
+      },
+      "shade": {
+        "title": "الظل",
+        "description": "وجود ظل طبيعي أو اصطناعي للحماية من الشمس.",
         "options": {
           "none": "معدوم",
-          "weak": "ضعيف",
-          "medium": "متوسط",
-          "high": "عالي"
+          "little": "قليل",
+          "moderate": "متوسط",
+          "abundant": "وفير"
         }
       },
       "signage": {
@@ -1009,6 +1111,11 @@ export const ar = {
           "description": "وثق تدقيقك بالصور",
           "takePhoto": "التقاط صورة",
           "chooseFromGallery": "اختر من المعرض"
+        },
+        "gallery": {
+          "photo": "صورة",
+          "add": "إضافة صورة",
+          "processing": "جاري المعالجة..."
         }
       }
     },
@@ -1137,7 +1244,29 @@ export const ar = {
     "unavailable": "الموقع غير متاح",
     "timeout": "انتهت مهلة الموقع",
     "accuracy": "الدقة",
-    "title": "تحديد الموقع"
+    "title": "تحديد الموقع",
+    "required": "تحديد الموقع مطلوب",
+    "activateMessage": "فعّل تحديد الموقع للمتابعة",
+    "getPosition": "احصل على موقعي",
+    "searching": "البحث عن موقعك...",
+    "searchingOffline": "قد يستغرق البحث عن GPS وقتاً أطول في الوضع غير المتصل. يرجى الانتظار...",
+    "refreshing": "تحديث موقعك...",
+    "unknownPosition": "موقع غير معروف",
+    "notSupported": "تحديد الموقع غير مدعوم",
+    "permissionDenied": "تم رفض إذن تحديد الموقع",
+    "outsideZone": "الموقع خارج منطقة التدقيق المصرح بها (أكادير)",
+    "gpsError": "خطأ في تحديد الموقع",
+    "permissionRefused": "تم رفض الإذن",
+    "positionUnavailable": "الموقع غير متاح",
+    "timeoutExpired": "انتهى الوقت المحدد",
+    "myPosition": "موقعي",
+    "positionCopied": "تم نسخ الموقع!",
+    "gpsDetails": "تفاصيل GPS",
+    "precision": "الدقة:",
+    "altitude": "الارتفاع:",
+    "speed": "السرعة:",
+    "direction": "الاتجاه:",
+    "timestamp": "الطابع الزمني:"
   },
   "common": {
     "loading": "جاري التحميل...",
@@ -1169,7 +1298,8 @@ export const ar = {
     "network": "خطأ في الشبكة",
     "unknown": "خطأ غير معروف",
     "load_failed": "فشل التحميل",
-    "save_failed": "فشل الحفظ"
+    "save_failed": "فشل الحفظ",
+    "gpsUnavailable": "موقع GPS غير متاح"
   },
   "menu": {
     "systemStatus": "حالة النظام",
@@ -1181,7 +1311,8 @@ export const ar = {
     "startGuide": "دليل البداية",
     "languageSelection": "اللغة",
     "profile": "الملف الشخصي",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "debug": "تصحيح الأخطاء"
   },
   "gps": {
     "position": "الموقع",
@@ -1198,6 +1329,13 @@ export const ar = {
     "positionUnavailable": "موقع GPS غير متاح",
     "activatingGeolocation": "تفعيل تحديد الموقع...",
     "retry": "إعادة المحاولة"
+  },
+  "neighborhoods": {
+    "ahlaka": "أحلاكا",
+    "aitElMouden": "آيت الموذن",
+    "aitTaoukt": "آيت تاوكت",
+    "ighilOuderdour": "إغيل أودردور",
+    "imounsiss": "إمونسيس"
   },
   "dialogs": {
     "cloudSync": "مزامنة السحابة",

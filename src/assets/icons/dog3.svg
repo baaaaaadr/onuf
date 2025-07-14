@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="dog3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344.1 438.8">
+  <!-- Peu de chiens (acceptable) -->
+  <g fill="#f39c12">
+    <!-- Un seul chien -->
+    <path d="M172,200 Q162,180 152,200 L152,250 L157,255 L157,280 L162,280 L162,255 L172,255 L172,280 L177,280 L177,255 L182,250 L182,200 Q172,180 172,200 Z M157,195 C157,192 159,190 162,190 C165,190 167,192 167,195 C167,198 165,200 162,200 C159,200 157,198 157,195 Z"/>
+  </g>
+  <!-- Symbole OK modéré -->
+  <circle cx="172" cy="320" r="30" fill="#f39c12" stroke="#000" stroke-width="2"/>
+  <path d="M162,320 L167,325 L182,310" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+</svg>

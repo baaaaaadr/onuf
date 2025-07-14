@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="shade3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344.1 438.8">
+  <!-- Ombrage modéré -->
+  <!-- Soleil doux -->
+  <circle cx="280" cy="80" r="40" fill="#ffd93d" opacity="0.8"/>
+  <!-- Arbre moyen -->
+  <g>
+    <!-- Feuillage -->
+    <circle cx="172" cy="180" r="60" fill="#66bb6a"/>
+    <circle cx="142" cy="160" r="40" fill="#81c784"/>
+    <circle cx="202" cy="160" r="40" fill="#81c784"/>
+    <!-- Tronc -->
+    <rect x="162" y="180" width="20" height="80" fill="#795548" rx="2"/>
+  </g>
+  <!-- Zone d'ombre moyenne -->
+  <ellipse cx="172" cy="270" rx="80" ry="20" fill="#bdbdbd" opacity="0.6"/>
+  <!-- Personne à l'ombre -->
+  <g fill="#50758d">
+    <circle cx="172" cy="220" r="20"/>
+    <rect x="162" y="240" width="20" height="40" rx="5"/>
+    <rect x="152" y="250" width="10" height="30" rx="3"/>
+    <rect x="182" y="250" width="10" height="30" rx="3"/>
+  </g>
+  <!-- Banc -->
+  <rect x="132" y="260" width="80" height="5" fill="#8d6e63"/>
+  <rect x="140" y="265" width="5" height="20" fill="#8d6e63"/>
+  <rect x="199" y="265" width="5" height="20" fill="#8d6e63"/>
+</svg>

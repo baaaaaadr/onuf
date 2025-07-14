@@ -40,6 +40,14 @@ import police1 from '@/assets/icons/police1.svg'
 import police2 from '@/assets/icons/police2.svg'
 import police3 from '@/assets/icons/police3.svg'
 import police4 from '@/assets/icons/police4.svg'
+import dog1 from '@/assets/icons/dog1.svg'
+import dog2 from '@/assets/icons/dog2.svg'
+import dog3 from '@/assets/icons/dog3.svg'
+import dog4 from '@/assets/icons/dog4.svg'
+import shade1 from '@/assets/icons/shade1.svg'
+import shade2 from '@/assets/icons/shade2.svg'
+import shade3 from '@/assets/icons/shade3.svg'
+import shade4 from '@/assets/icons/shade4.svg'
 
 // ✅ NOUVEAU: Configuration basée sur des clés i18n
 export const questionsConfig = [
@@ -395,40 +403,79 @@ export const questionsConfig = [
     ]
   },
   {
-    id: 'formalSecurity',
-    titleKey: 'audit.sections.formalSecurity.title',
-    descriptionKey: 'audit.sections.formalSecurity.description',
+    id: 'strayDogs',
+    titleKey: 'audit.sections.strayDogs.title',
+    descriptionKey: 'audit.sections.strayDogs.description',
     options: [
       { 
         value: 1, 
-        textKey: 'audit.sections.formalSecurity.options.none',
-        svgPath: police1,
-        emoji: '❌', 
-        icon: 'mdi-shield-off', 
+        textKey: 'audit.sections.strayDogs.options.many',
+        svgPath: dog1,
+        emoji: '🐕‍🦺', 
+        icon: 'mdi-dog-side', 
         color: 'grey-lighten-1' 
       },
       { 
         value: 2, 
-        textKey: 'audit.sections.formalSecurity.options.weak',
-        svgPath: police2,
-        emoji: '👮', 
-        icon: 'mdi-shield-outline', 
+        textKey: 'audit.sections.strayDogs.options.some',
+        svgPath: dog2,
+        emoji: '🐕', 
+        icon: 'mdi-dog', 
         color: 'red-darken-1' 
       },
       { 
         value: 3, 
-        textKey: 'audit.sections.formalSecurity.options.medium',
-        svgPath: police3,
-        emoji: '🚓', 
-        icon: 'mdi-shield-check', 
+        textKey: 'audit.sections.strayDogs.options.few',
+        svgPath: dog3,
+        emoji: '🐶', 
+        icon: 'mdi-paw-outline', 
         color: 'orange-darken-1' 
       },
       { 
         value: 4, 
-        textKey: 'audit.sections.formalSecurity.options.high',
-        svgPath: police4,
-        emoji: '🚔', 
-        icon: 'mdi-shield-star', 
+        textKey: 'audit.sections.strayDogs.options.none',
+        svgPath: dog4,
+        emoji: '✅', 
+        icon: 'mdi-check-circle', 
+        color: 'green-darken-1' 
+      },
+    ]
+  },
+  {
+    id: 'shade',
+    titleKey: 'audit.sections.shade.title',
+    descriptionKey: 'audit.sections.shade.description',
+    options: [
+      { 
+        value: 1, 
+        textKey: 'audit.sections.shade.options.none',
+        svgPath: shade1,
+        emoji: '☀️', 
+        icon: 'mdi-weather-sunny', 
+        color: 'grey-lighten-1' 
+      },
+      { 
+        value: 2, 
+        textKey: 'audit.sections.shade.options.little',
+        svgPath: shade2,
+        emoji: '🌤️', 
+        icon: 'mdi-weather-partly-cloudy', 
+        color: 'red-darken-1' 
+      },
+      { 
+        value: 3, 
+        textKey: 'audit.sections.shade.options.moderate',
+        svgPath: shade3,
+        emoji: '🌳', 
+        icon: 'mdi-tree', 
+        color: 'orange-darken-1' 
+      },
+      { 
+        value: 4, 
+        textKey: 'audit.sections.shade.options.abundant',
+        svgPath: shade4,
+        emoji: '🌲', 
+        icon: 'mdi-pine-tree', 
         color: 'green-darken-1' 
       },
     ]

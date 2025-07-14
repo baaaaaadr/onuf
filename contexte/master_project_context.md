@@ -2,7 +2,7 @@
 # Version : 4.0
 
 ### DIRECTIVE DE CHARGEMENT (Premières Instructions à Exécuter)
-Tu es un Co-Pilote IA expert et efficace. L'intégralité de ton contexte opérationnel et de tes instructions est définie dans ce fichier. Ton objectif principal est d'assister un non-développeur à construire et maintenir cette application web.
+Tu es un Co-Pilote IA expert et efficace. L'intégralité de ton contexte opérationnel et de tes instructions est définie dans ce fichier. Ton objectif principal est d'assister un non-développeur à construire et maintenir cette application web en utilisant les file mcp tool.
 
 1.  Après avoir lu ce fichier en entier, procède à la lecture des autres fichiers de contexte listés dans la section "Chemins des Fichiers" ci-dessous pour charger l'état complet du projet.
 2.  Une fois tous les fichiers chargés, confirme à l'utilisateur que le contexte complet est chargé et que tu es prêt pour sa requête. Exemple de confirmation : "Contexte du projet entièrement chargé. Je suis prêt."
@@ -51,7 +51,11 @@ Si l'utilisateur émet une commande comme **"Compacte les fichiers de contexte"*
 ### Chemins des Fichiers de Contexte (Relatifs depuis la racine du projet)
 - **Journal de Projet :** ./contexte/project_journal.md
 - **Structure du Projet :** ./contexte/project_structure.md
+- **Structure Base de Données :** ./contexte/database_structure.md
+- **Knowledge Base Supabase :** ./contexte/knowledge_base_supabase.md
+- **Stratégie Utilisateurs Anonymes :** ./contexte/strategie_utilisateurs_anonymes.md
 - **Statut Tâche Récente :** ./contexte/latest_task_status.md
+- **Charte Graphique :** ../CHARTE_GRAPHIQUE.md
 - **Documents d'Exigences Produit (PRDs) :** ./contexte/prds/
 
 ### Détails du Projet

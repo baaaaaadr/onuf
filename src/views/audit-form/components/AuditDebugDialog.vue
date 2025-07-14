@@ -165,7 +165,7 @@ const answeredQuestions = computed(() => {
   const questionFields = [
     'lighting', 'walkpath', 'openness', 'feeling',
     'peoplePresence', 'cleanliness', 'naturalSurveillance',
-    'spaceDiversity', 'transportAccess', 'formalSecurity'
+    'spaceDiversity', 'transportAccess', 'strayDogs', 'shade'
   ]
   
   return questionFields.filter(field => {
@@ -175,7 +175,7 @@ const answeredQuestions = computed(() => {
 })
 
 const totalQuestions = computed(() => {
-  return props.questions.length || 10
+  return props.questions.length || 11
 })
 
 const gpsStatus = computed(() => {

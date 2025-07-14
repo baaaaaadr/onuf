@@ -19,21 +19,53 @@ class MobileDebugLogger {
     const originalLog = console.log
     const originalError = console.error
     const originalWarn = console.warn
+    
+    // Protéger contre les boucles infinies
+    let isLogging = false
 
     console.log = (...args) => {
-      this.addLog('log', args)
+      if (!isLogging && this.shouldLog(args)) {
+        isLogging = true
+        this.addLog('log', args)
+        isLogging = false
+      }
       originalLog.apply(console, args)
     }
 
     console.error = (...args) => {
-      this.addLog('error', args)
+      if (!isLogging && this.shouldLog(args)) {
+        isLogging = true
+        this.addLog('error', args)
+        isLogging = false
+      }
       originalError.apply(console, args)
     }
 
     console.warn = (...args) => {
-      this.addLog('warn', args)
+      if (!isLogging && this.shouldLog(args)) {
+        isLogging = true
+        this.addLog('warn', args)
+        isLogging = false
+      }
       originalWarn.apply(console, args)
     }
+  }
+  
+  // Méthode pour filtrer les messages qui pourraient causer des boucles
+  shouldLog(args) {
+    const message = args.join(' ')
+    
+    // Ignorer les messages i18n qui peuvent causer des boucles
+    if (message.includes('[intlify]') || 
+        message.includes('Not found') && message.includes('key in') ||
+        message.includes('Fall back to translate') ||
+        message.includes('audit.photos.widget.gallery') || // ✅ Filtre toute la section gallery photos
+        message.includes('menu.debug') || // ✅ Filtre menu debug
+        message.includes('errors.gpsUnavailable')) { // ✅ Filtre erreur GPS
+      return false
+    }
+    
+    return true
   }
 
   setupErrorHandlers() {
@@ -59,36 +91,45 @@ class MobileDebugLogger {
 
   addLog(type, args) {
     if (!this.isEnabled.value) return
-
-    const timestamp = new Date().toISOString()
-    const message = args.map(arg => {
-      if (typeof arg === 'object') {
-        try {
-          return JSON.stringify(arg, null, 2)
-        } catch (e) {
-          return '[Circular Object]'
+    
+    try {
+      const timestamp = new Date().toISOString()
+      const message = args.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2)
+          } catch (e) {
+            return '[Circular Object]'
+          }
         }
+        return String(arg)
+      }).join(' ')
+
+      const logEntry = {
+        id: Date.now() + Math.random(),
+        timestamp,
+        type,
+        message,
+        stack: new Error().stack
       }
-      return String(arg)
-    }).join(' ')
 
-    const logEntry = {
-      id: Date.now() + Math.random(),
-      timestamp,
-      type,
-      message,
-      stack: new Error().stack
+      this.logs.value.unshift(logEntry)
+
+      // Limiter le nombre de logs
+      if (this.logs.value.length > this.maxLogs) {
+        this.logs.value = this.logs.value.slice(0, this.maxLogs)
+      }
+
+      // Sauvegarder en localStorage de manière asynchrone pour éviter les blocages
+      setTimeout(() => this.saveToLocalStorage(), 0)
+    } catch (error) {
+      // En cas d'erreur dans addLog, ne pas re-logger pour éviter la boucle
+      // Juste désactiver temporairement le debug
+      this.isEnabled.value = false
+      setTimeout(() => {
+        this.isEnabled.value = true
+      }, 1000)
     }
-
-    this.logs.value.unshift(logEntry)
-
-    // Limiter le nombre de logs
-    if (this.logs.value.length > this.maxLogs) {
-      this.logs.value = this.logs.value.slice(0, this.maxLogs)
-    }
-
-    // Sauvegarder en localStorage
-    this.saveToLocalStorage()
   }
 
   saveToLocalStorage() {

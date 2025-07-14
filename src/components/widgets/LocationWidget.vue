@@ -7,9 +7,9 @@
         <div class="pulse-ring"></div>
       </div>
       
-      <h3 class="text-h6 mt-3 mb-2">Localisation requise</h3>
+      <h3 class="text-h6 mt-3 mb-2">{{ t('location.required') }}</h3>
       <p class="text-body-2 text-medium-emphasis mb-4">
-        Activez la géolocalisation pour continuer
+        {{ t('location.activateMessage') }}
       </p>
       
       <v-btn
@@ -21,7 +21,7 @@
         class="locate-btn"
       >
         <v-icon start>mdi-crosshairs-gps</v-icon>
-        Obtenir ma position
+        {{ t('location.getPosition') }}
       </v-btn>
     </div>
 
@@ -98,7 +98,7 @@
             class="mr-2"
           >
             <v-icon start size="small">mdi-map</v-icon>
-            Ouvrir dans Maps
+            {{ t('common.openInMaps') }}
           </v-btn>
           
           <v-btn
@@ -108,7 +108,7 @@
             @click="shareLocation"
           >
             <v-icon start size="small">mdi-share</v-icon>
-            Partager
+            {{ t('common.share') }}
           </v-btn>
         </div>
 
@@ -121,28 +121,28 @@
           <v-expansion-panel>
             <v-expansion-panel-title>
               <v-icon class="mr-2" size="small" color="grey-darken-2">mdi-information</v-icon>
-              <span class="text-grey-darken-2">Détails GPS</span>
+              <span class="text-grey-darken-2">{{ t('location.gpsDetails') }}</span>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <div class="gps-details">
                 <div class="detail-row">
-                  <span class="detail-label">Précision :</span>
+                  <span class="detail-label">{{ t('location.precision') }}</span>
                   <span class="detail-value">{{ accuracy }}m</span>
                 </div>
                 <div class="detail-row" v-if="altitude">
-                  <span class="detail-label">Altitude :</span>
+                  <span class="detail-label">{{ t('location.altitude') }}</span>
                   <span class="detail-value">{{ Math.round(altitude) }}m</span>
                 </div>
                 <div class="detail-row" v-if="speed">
-                  <span class="detail-label">Vitesse :</span>
+                  <span class="detail-label">{{ t('location.speed') }}</span>
                   <span class="detail-value">{{ (speed * 3.6).toFixed(1) }} km/h</span>
                 </div>
                 <div class="detail-row" v-if="heading">
-                  <span class="detail-label">Direction :</span>
+                  <span class="detail-label">{{ t('location.direction') }}</span>
                   <span class="detail-value">{{ Math.round(heading) }}°</span>
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">Timestamp :</span>
+                  <span class="detail-label">{{ t('location.timestamp') }}</span>
                   <span class="detail-value">{{ formatTime(timestamp) }}</span>
                 </div>
               </div>
@@ -165,7 +165,7 @@
           variant="text"
           @click="snackbar = false"
         >
-          Fermer
+          {{ t('common.close') }}
         </v-btn>
       </template>
     </v-snackbar>
@@ -174,6 +174,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n' // ✅ Ajout pour les traductions
+
+const { t } = useI18n() // ✅ Fonction de traduction
 
 // Props
 const props = defineProps({
@@ -223,7 +226,7 @@ const AGADIR_BOUNDS = {
 
 // État
 const loading = ref(false)
-const loadingMessage = ref('Recherche de votre position...') // Message dynamique pour le feedback progressif
+const loadingMessage = ref(t('location.searching')) // Message dynamique pour le feedback progressif
 const refreshing = ref(false)
 const coordinates = ref({ lat: null, lng: null })
 const accuracy = ref(null)
@@ -231,7 +234,7 @@ const altitude = ref(null)
 const speed = ref(null)
 const heading = ref(null)
 const timestamp = ref(null)
-const locationName = ref('Position inconnue')
+const locationName = ref(t('location.unknownPosition'))
 const mapContainer = ref(null)
 const map = ref(null)
 const marker = ref(null)
@@ -267,17 +270,17 @@ const isWithinAllowedArea = (lat, lng) => {
 // Méthodes
 const requestLocation = async () => {
   if (!navigator.geolocation) {
-    showError('Géolocalisation non supportée')
+    showError(t('location.notSupported'))
     return
   }
 
   loading.value = true
   // Message initial
-  loadingMessage.value = 'Recherche de votre position...'
+  loadingMessage.value = t('location.searching')
   
   // Mettre en place un minuteur pour changer le message après 10 secondes
   const feedbackTimeout = setTimeout(() => {
-    loadingMessage.value = 'La recherche GPS peut prendre plus de temps en mode hors-ligne. Veuillez patienter...'
+    loadingMessage.value = t('location.searchingOffline')
   }, 10000) // 10 secondes
   
   const options = {
@@ -304,7 +307,7 @@ const requestLocation = async () => {
       const result = await navigator.permissions.query({ name: 'geolocation' })
       if (result.state === 'denied') {
         clearTimeout(feedbackTimeout)
-        showError('Permission de géolocalisation refusée')
+        showError(t('location.permissionDenied'))
         loading.value = false
         return
       }
@@ -335,7 +338,7 @@ const handleSuccess = async (position) => {
   
   // ===== VÉRIFICATION DE LA ZONE GÉOGRAPHIQUE =====
   if (!isWithinAllowedArea(latitude, longitude)) {
-    showError('Position en dehors de la zone d\'audit autorisée (Agadir)')
+    showError(t('location.outsideZone'))
     loading.value = false
     refreshing.value = false
     return
@@ -373,16 +376,16 @@ const handleError = (error) => {
   loading.value = false
   refreshing.value = false
 
-  let message = 'Erreur de géolocalisation'
+  let message = t('location.gpsError')
   switch (error.code) {
     case error.PERMISSION_DENIED:
-      message = 'Permission refusée'
+      message = t('location.permissionRefused')
       break
     case error.POSITION_UNAVAILABLE:
-      message = 'Position indisponible'
+      message = t('location.positionUnavailable')
       break
     case error.TIMEOUT:
-      message = 'Délai d\'attente dépassé'
+      message = t('location.timeoutExpired')
       break
   }
 
@@ -524,7 +527,7 @@ const updateMap = async () => {
 const refreshLocation = () => {
   refreshing.value = true
   // Réinitialiser le message pour le refresh
-  loadingMessage.value = 'Actualisation de votre position...'
+  loadingMessage.value = t('location.refreshing')
   requestLocation()
 }
 
@@ -546,12 +549,12 @@ const openInMaps = () => {
 
 const shareLocation = async () => {
   const { lat, lng } = coordinates.value
-  const text = `📍 Ma position : ${locationName.value}\n${lat.toFixed(6)}, ${lng.toFixed(6)}`
+  const text = `📍 ${t('location.myPosition')} : ${locationName.value}\n${lat.toFixed(6)}, ${lng.toFixed(6)}`
 
   if (navigator.share) {
     try {
       await navigator.share({
-        title: 'Ma position',
+        title: t('location.myPosition'),
         text: text,
         url: `https://maps.google.com/maps?q=${lat},${lng}`
       })
@@ -562,7 +565,7 @@ const shareLocation = async () => {
     // Fallback : copier dans le presse-papier
     try {
       await navigator.clipboard.writeText(text)
-      showSuccess('Position copiée !')
+      showSuccess(t('location.positionCopied'))
     } catch (error) {
       console.error('Erreur copie:', error)
     }

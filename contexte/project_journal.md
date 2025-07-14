@@ -2,6 +2,32 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
+- **14/07/2025** : ✅ **MODIFICATION QUESTIONS D'AUDIT + FIN DÉCONNEXION AUTO + CORRECTION SYNC**
+  - **Question "présence policière" transformée en "chiens errants"** : Réutilisation ID existant
+  - **Nouvelle question "ombrage" ajoutée** : Protection solaire importante à Agadir  
+  - **Déconnexion automatique désactivée** : registerType passé de 'autoUpdate' à 'prompt'
+  - **Traductions complètes** : FR/EN/AR pour les 2 nouvelles questions
+  - **Icônes SVG créées** : dog1-4.svg et shade1-4.svg dans /assets/icons/
+  - **Correction erreur sync 400** : Tous les fichiers JS mis à jour avec nouveaux noms
+- **07/07/2025** : ✅ **CLÉ PHOTOCAPTURE "PROCESSING" + DIAGNOSTIC SUPABASE** - Résolution bêtes noires
+  - **Clé processing ajoutée** : audit.photos.widget.gallery.processing (FR/EN/AR)
+  - **Filtre anti-boucle optimisé** : Couvre toute la section gallery photos
+  - **Problème Supabase identifié** : Erreur 406 spécifique à agent01 (fonctionne avec admin)
+  - **Guide investigation créé** : debug_supabase_agent01.md avec requêtes SQL diagnostic
+  - **Hypothèse** : Problème de rôle/permissions entre admin et field_user
+- **07/07/2025** : ✅ **LOCATIONWIDGET ENTIÈREMENT TRADUIT** - Finalisation de l'internationalisation
+  - **Correction nom quartier** : "إموانسيس" → "إمونسيس" (suppression "وا")
+  - **LocationWidget 100% i18n** : 25+ clés traduites dans section "location"
+  - **Clé GPS manquante ajoutée** : errors.gpsUnavailable pour résoudre boucle d'erreurs
+  - **Composant modernisé** : useI18n() intégré + tous textes hardcodés remplacés
+  - **Test GPS en arabe complet** : Boutons, messages, détails techniques traduits
+- **07/07/2025** : ✅ **CORRECTION MAJEURE QUARTIERS + DEBUG** - Résolution complète problèmes i18n
+  - **Quartiers en arabe fonctionnels** : Ajout traductions AR pour les 5 quartiers d'Agadir
+  - **Système locations.js modernisé** : Support complet i18n avec getTranslatedLocations()
+  - **v-select corrigé** : Ajout item-title/item-value pour dropdown fonctionnel
+  - **Boucle infinie debug résolue** : Protection anti-récursion + filtrage messages i18n
+  - **Couleurs différenciées** : Header audit en jaune plus clair (#F9D876 vs #F3C348)
+  - **Page de test créée** : test-neighborhoods.html pour validation traductions
 - **04/07/2025** : ✅ **RÉSOLUTION DÉFINITIVE DU PROBLÈME PWA** - Installation restaurée avec diagnostic complet
   - **Cause identifiée** : Chrome 2025 exige screenshots et shortcuts dans le manifest pour le prompt automatique
   - **Manifest mis à jour** : Ajout de screenshots, shortcuts, launch_handler et protocol_handlers

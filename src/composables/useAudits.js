@@ -129,7 +129,8 @@ export const useAudits = () => {
         natural_surveillance: auditData.naturalSurveillance,
         space_diversity: auditData.spaceDiversity,
         transport_access: auditData.transportAccess,
-        formal_security: auditData.formalSecurity,
+        stray_dogs: auditData.strayDogs,
+        shade: auditData.shade,
         comment: auditData.comment,
         total_photos: auditData.photos?.length || 0,
         ui_language: 'fr',
@@ -755,7 +756,8 @@ export const useAudits = () => {
           audit.natural_surveillance || audit.naturalSurveillance,
           audit.space_diversity || audit.spaceDiversity,
           audit.transport_access || audit.transportAccess,
-          audit.formal_security || audit.formalSecurity
+          audit.stray_dogs || audit.strayDogs,
+          audit.shade
         ].filter(s => s !== null && s !== undefined)
         
         if (scores.length > 0) {

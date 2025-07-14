@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="shade2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 344.1 438.8">
+  <!-- Peu d'ombrage -->
+  <!-- Soleil partiellement couvert -->
+  <circle cx="172" cy="120" r="50" fill="#ffd93d" stroke="#ff9f43" stroke-width="4"/>
+  <!-- Petit arbre -->
+  <g fill="#8bc34a">
+    <circle cx="100" cy="250" r="30"/>
+    <rect x="95" y="250" width="10" height="50" fill="#795548"/>
+  </g>
+  <!-- Zone d'ombre petite -->
+  <ellipse cx="100" cy="305" rx="40" ry="10" fill="#ddd" opacity="0.5"/>
+  <!-- Personne au soleil -->
+  <g fill="#50758d">
+    <circle cx="200" cy="260" r="20"/>
+    <rect x="190" y="280" width="20" height="40" rx="5"/>
+    <rect x="180" y="290" width="10" height="30" rx="3"/>
+    <rect x="210" y="290" width="10" height="30" rx="3"/>
+  </g>
+  <!-- Quelques rayons -->
+  <g stroke="#ff9f43" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <line x1="172" y1="50" x2="172" y2="20"/>
+    <line x1="230" y1="120" x2="260" y2="120"/>
+    <line x1="210" y1="80" x2="235" y2="55"/>
+  </g>
+</svg>

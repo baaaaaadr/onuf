@@ -1,0 +1,191 @@
+<!-- Test des traductions des quartiers - ONUF -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Traductions Quartiers - ONUF</title>
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .language-header {
+            background: #F3C348;
+            color: #181611;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .neighborhood-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .neighborhood-item:last-child {
+            border-bottom: none;
+        }
+        .key {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #F44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test des Traductions des Quartiers</h1>
+    
+    <div class="test-section">
+        <h2>📋 Résultats du Test</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="language-header">🇫🇷 Français</div>
+        <div id="fr-neighborhoods"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="language-header">🇺🇸 English</div>
+        <div id="en-neighborhoods"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="language-header">🇸🇦 العربية</div>
+        <div id="ar-neighborhoods"></div>
+    </div>
+
+    <script>
+        // Simulation des traductions (copiées depuis embedded.js)
+        const translations = {
+            fr: {
+                "ahlaka": "Ahlaka",
+                "aitElMouden": "Aït El Mouden",
+                "aitTaoukt": "Aït Taoukt",
+                "ighilOuderdour": "Ighil Ouderdour",
+                "imounsiss": "Imounsiss"
+            },
+            en: {
+                "ahlaka": "Ahlaka",
+                "aitElMouden": "Aït El Mouden",
+                "aitTaoukt": "Aït Taoukt",
+                "ighilOuderdour": "Ighil Ouderdour",
+                "imounsiss": "Imounsiss"
+            },
+            ar: {
+                "ahlaka": "أحلاكا",
+                "aitElMouden": "آيت الموذن",
+                "aitTaoukt": "آيت تاوكت",
+                "ighilOuderdour": "إغيل أودردور",
+                "imounsiss": "إمونسيس"
+            }
+        }
+
+        // Configuration des quartiers (copiée depuis locations.js)
+        const locations = [
+            { key: 'ahlaka', labelKey: 'neighborhoods.ahlaka' },
+            { key: 'aitElMouden', labelKey: 'neighborhoods.aitElMouden' },
+            { key: 'aitTaoukt', labelKey: 'neighborhoods.aitTaoukt' },
+            { key: 'ighilOuderdour', labelKey: 'neighborhoods.ighilOuderdour' },
+            { key: 'imounsiss', labelKey: 'neighborhoods.imounsiss' }
+        ]
+
+        // Fonction pour afficher les quartiers dans une langue
+        function displayNeighborhoods(lang, containerId) {
+            const container = document.getElementById(containerId)
+            const neighborhoodsData = translations[lang]
+            
+            if (!neighborhoodsData) {
+                container.innerHTML = '<div class="error">❌ Traductions manquantes</div>'
+                return false
+            }
+
+            let html = ''
+            let allTranslated = true
+
+            locations.forEach(location => {
+                const translatedName = neighborhoodsData[location.key]
+                if (!translatedName) {
+                    allTranslated = false
+                    html += `<div class="neighborhood-item">
+                        <span class="error">❌ ${location.key}</span>
+                        <span class="key">MANQUANT</span>
+                    </div>`
+                } else {
+                    html += `<div class="neighborhood-item">
+                        <span>${translatedName}</span>
+                        <span class="key">${location.key}</span>
+                    </div>`
+                }
+            })
+
+            container.innerHTML = html
+            return allTranslated
+        }
+
+        // Effectuer les tests
+        function runTests() {
+            const results = {
+                fr: displayNeighborhoods('fr', 'fr-neighborhoods'),
+                en: displayNeighborhoods('en', 'en-neighborhoods'),
+                ar: displayNeighborhoods('ar', 'ar-neighborhoods')
+            }
+
+            // Afficher le résumé
+            const resultsContainer = document.getElementById('test-results')
+            let summary = ''
+
+            Object.keys(results).forEach(lang => {
+                const status = results[lang] ? 'success' : 'error'
+                const icon = results[lang] ? '✅' : '❌'
+                const text = results[lang] ? 'Toutes les traductions présentes' : 'Traductions manquantes'
+                
+                summary += `<div class="neighborhood-item">
+                    <span>${icon} ${lang.toUpperCase()}</span>
+                    <span class="${status}">${text}</span>
+                </div>`
+            })
+
+            const allPassed = Object.values(results).every(r => r)
+            const globalStatus = allPassed ? 'success' : 'error'
+            const globalIcon = allPassed ? '🎉' : '⚠️'
+            const globalText = allPassed ? 'Tous les tests passés !' : 'Certains tests ont échoué'
+
+            resultsContainer.innerHTML = `
+                <div class="neighborhood-item ${globalStatus}" style="font-size: 18px; margin-bottom: 15px;">
+                    <span>${globalIcon} ${globalText}</span>
+                </div>
+                ${summary}
+            `
+        }
+
+        // Lancer les tests au chargement
+        runTests()
+
+        console.log('🧪 Test des traductions terminé. Vérifiez les résultats ci-dessus.')
+        console.log('📝 Pour ONUF: Les traductions des quartiers sont maintenant disponibles en 3 langues!')
+    </script>
+</body>
+</html>

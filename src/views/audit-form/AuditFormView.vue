@@ -44,6 +44,8 @@
           <v-select
             v-model="formData.location"
             :items="availableLocations"
+            item-title="title"
+            item-value="value"
             :label="t('audit.neighborhood.select')"
             variant="outlined"
             prepend-inner-icon="mdi-map-marker"
@@ -214,7 +216,7 @@ export default {
       loadLocations,
       updateFormData,
       fillTestData
-    } = useAuditForm(questions)
+    } = useAuditForm(questions, t) // ✅ Passer la fonction de traduction
     
     // Submission
     const {
@@ -277,7 +279,7 @@ export default {
       const questionFields = [
         'lighting', 'walkpath', 'openness', 'feeling',
         'peoplePresence', 'cleanliness', 'naturalSurveillance',
-        'spaceDiversity', 'transportAccess', 'formalSecurity'
+        'spaceDiversity', 'transportAccess', 'strayDogs', 'shade'
       ]
       
       const hasAtLeastOneAnswer = questionFields.some(field => {
@@ -308,7 +310,7 @@ export default {
         const questionFields = [
           'lighting', 'walkpath', 'openness', 'feeling',
           'peoplePresence', 'cleanliness', 'naturalSurveillance',
-          'spaceDiversity', 'transportAccess', 'formalSecurity'
+          'spaceDiversity', 'transportAccess', 'strayDogs', 'shade'
         ]
         const hasAtLeastOneAnswer = questionFields.some(field => {
           const value = formData.value[field]
@@ -459,9 +461,12 @@ export default {
 
 /* ==== Header ==== */
 .audit-header {
-  background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 100%);
+  /* Utilise une couleur plus claire pour différencier du header principal de l'app */
+  background: var(--primary-gold-light); /* #F9D876 - plus clair que le header principal */
   padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xl);
   margin-bottom: var(--spacing-lg);
+  /* Ajouter une bordure subtile pour plus de définition */
+  border-bottom: 1px solid rgba(243, 195, 72, 0.3);
 }
 
 .header-content {

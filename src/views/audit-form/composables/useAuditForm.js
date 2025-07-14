@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
-import { locations } from '../config/locations'
+import { getTranslatedLocations, locationLabels } from '../config/locations'
 
-export function useAuditForm(questions) {
+export function useAuditForm(questions, t) {
   // Form data state
   const formData = ref({
     // Questions d'audit
@@ -14,7 +14,8 @@ export function useAuditForm(questions) {
     naturalSurveillance: null,
     spaceDiversity: null,
     transportAccess: null,
-    formalSecurity: null,
+    strayDogs: null,
+    shade: null,
     // Location data
     location: '',
     coordinates: { lat: null, lng: null },
@@ -28,7 +29,23 @@ export function useAuditForm(questions) {
   // Other state
   const valid = ref(false)
   const loading = ref(false)
-  const availableLocations = ref([...locations])
+  
+  // Computed property pour les locations traduites
+  const availableLocations = computed(() => {
+    if (t) {
+      // Utiliser le nouveau système de traduction
+      return getTranslatedLocations(t).map(location => ({
+        title: location.label,
+        value: location.key
+      }))
+    } else {
+      // Fallback vers l'ancien système
+      return locationLabels.map(label => ({
+        title: label,
+        value: label
+      }))
+    }
+  })
 
   // Initialize form data
   const initializeFormData = () => {
@@ -43,7 +60,8 @@ export function useAuditForm(questions) {
       naturalSurveillance: null,
       spaceDiversity: null,
       transportAccess: null,
-      formalSecurity: null,
+      strayDogs: null,
+      shade: null,
       location: '',
       coordinates: { lat: null, lng: null },
       locationAccuracy: null,
@@ -82,8 +100,9 @@ export function useAuditForm(questions) {
       naturalSurveillance: 3,
       spaceDiversity: 4,
       transportAccess: 5,
-      formalSecurity: 2,
-      location: 'Ahlaka',
+      strayDogs: 2,
+      shade: 3,
+      location: 'ahlaka', // Utilise la clé au lieu du label
       coordinates: { lat: 30.4152, lng: -9.5715 },
       locationAccuracy: 10,
       gpsDetails: null,
