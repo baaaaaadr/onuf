@@ -216,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import PWADiagnostic from './PWADiagnostic.vue'
@@ -239,6 +239,7 @@ try {
 
 // ✅ NOUVEAU: Écouter l'événement du menu pour ouvrir le debug
 const handleToggleDebug = () => {
+  console.log('🐛 Toggle debug panel:', !showDebug.value)
   showDebug.value = !showDebug.value
 }
 
@@ -493,17 +494,53 @@ onMounted(() => {
   const originalWarn = console.warn
   
   console.log = (...args) => {
-    addLog('log', args.join(' '))
+    // Convertir les objets en string de façon sûre
+    const message = args.map(arg => {
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          return JSON.stringify(arg)
+        } catch (e) {
+          return '[Object]'
+        }
+      }
+      return String(arg)
+    }).join(' ')
+    
+    addLog('log', message)
     originalLog(...args)
   }
   
   console.error = (...args) => {
-    addLog('error', args.join(' '))
+    // Convertir les objets en string de façon sûre
+    const message = args.map(arg => {
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          return JSON.stringify(arg)
+        } catch (e) {
+          return '[Object]'
+        }
+      }
+      return String(arg)
+    }).join(' ')
+    
+    addLog('error', message)
     originalError(...args)
   }
   
   console.warn = (...args) => {
-    addLog('warn', args.join(' '))
+    // Convertir les objets en string de façon sûre
+    const message = args.map(arg => {
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          return JSON.stringify(arg)
+        } catch (e) {
+          return '[Object]'
+        }
+      }
+      return String(arg)
+    }).join(' ')
+    
+    addLog('warn', message)
     originalWarn(...args)
   }
   
@@ -517,6 +554,12 @@ onMounted(() => {
     testTranslation('audit.title')
     testTranslation('navigation.audit')
   })
+})
+
+// Cleanup
+onUnmounted(() => {
+  // ✅ NOUVEAU: Nettoyer l'event listener
+  window.removeEventListener('toggle-debug-panel', handleToggleDebug)
 })
 </script>
 

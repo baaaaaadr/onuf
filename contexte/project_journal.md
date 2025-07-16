@@ -2,6 +2,12 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
+- **16/07/2025** : ✅ **CORRECTION DÉCONNEXION AUTOMATIQUE AU REFRESH + FIX ERREUR MENU**
+  - **Problème 1** : La fonction initAuth() n'était jamais appelée au démarrage
+  - **Solution 1** : Ajout de initAuth() dans main.js pour restaurer la session depuis localStorage
+  - **Problème 2** : Erreur "Cannot convert object to primitive value" lors du clic sur menu sandwich
+  - **Solution 2** : Correction de MobileDebugViewer (conversion sûre des objets en string) + ajout méthode openDebugPanel manquante dans StatusBar
+  - **Résultat** : L'utilisateur reste connecté après refresh et le menu fonctionne correctement
 - **14/07/2025** : ✅ **MODIFICATION QUESTIONS D'AUDIT + FIN DÉCONNEXION AUTO + CORRECTION SYNC**
   - **Question "présence policière" transformée en "chiens errants"** : Réutilisation ID existant
   - **Nouvelle question "ombrage" ajoutée** : Protection solaire importante à Agadir  

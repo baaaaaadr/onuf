@@ -5,9 +5,13 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import i18n from './plugins/i18n' // Import du plugin i18n
+import { initAuth } from './composables/useSupabase' // Import de la fonction initAuth
 
 import vuetify from './plugins/vuetify' // Configuration centralisée
 import './assets/styles/rtl-support.css' // Styles RTL
+
+// Initialiser l'authentification au démarrage
+initAuth()
 
 const app = createApp(App);
 app.use(router);

@@ -849,6 +849,13 @@ export default {
       // Optionnel: tracker l'événement
     }
     
+    // ✅ AJOUT: Méthode pour ouvrir le panel debug
+    const openDebugPanel = () => {
+      console.log('🐛 Ouverture du panel debug')
+      // Émettre un événement pour que MobileDebugViewer l'intercepte
+      window.dispatchEvent(new Event('toggle-debug-panel'))
+    }
+    
     return {
       // Data
       currentUser,
@@ -899,6 +906,7 @@ export default {
       handleLanguageChange, // ✅ NOUVEAU: Ajouter la méthode au return
       handlePWAInstalled, // ✅ NOUVEAU: Gestionnaire PWA
       handlePWADismissed, // ✅ NOUVEAU: Gestionnaire PWA
+      openDebugPanel, // ✅ AJOUT: Méthode pour ouvrir le panel debug
       t // ✅ NOUVEAU: Fonction de traduction
     }
   }
