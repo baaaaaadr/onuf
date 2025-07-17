@@ -136,6 +136,14 @@
               <v-list-item-title>{{ t('menu.debug') }}</v-list-item-title>
             </v-list-item>
             
+            <v-list-item @click="forceUpdateApp" :loading="isForceUpdating">
+              <template v-slot:prepend>
+                <v-icon>mdi-refresh-circle</v-icon>
+              </template>
+              <v-list-item-title>{{ t('menu.forceUpdate') }}</v-list-item-title>
+              <v-list-item-subtitle v-if="!isForceUpdating">{{ t('menu.forceUpdateDescription') }}</v-list-item-subtitle>
+            </v-list-item>
+            
             <v-list-item @click="logout">
               <template v-slot:prepend>
                 <v-icon>mdi-logout</v-icon>
@@ -482,6 +490,7 @@ export default {
     const showSyncDialog = ref(false)
     const showGpsDetails = ref(false)
     const showOnboarding = ref(false)
+    const isForceUpdating = ref(false)
     
     // ✅ NOUVEAU: Variables pour la carte GPS
     const mapContainer = ref(null)
@@ -856,6 +865,70 @@ export default {
       window.dispatchEvent(new Event('toggle-debug-panel'))
     }
     
+    // ✅ NOUVEAU: Méthode pour forcer la mise à jour de l'application
+    const forceUpdateApp = async () => {
+      if (isForceUpdating.value) return
+      
+      try {
+        isForceUpdating.value = true
+        console.log('🔄 Début du force update...')
+        
+        // 1. Vider le cache du Service Worker
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations()
+          for (const registration of registrations) {
+            console.log('🧹 Nettoyage Service Worker:', registration.scope)
+            await registration.unregister()
+          }
+        }
+        
+        // 2. Vider les caches du navigateur
+        if ('caches' in window) {
+          const cacheNames = await caches.keys()
+          for (const cacheName of cacheNames) {
+            console.log('🧹 Suppression cache:', cacheName)
+            await caches.delete(cacheName)
+          }
+        }
+        
+        // 3. Vider le localStorage (sauf données utilisateur critiques)
+        const keysToPreserve = [
+          'onuf_user',
+          'onuf_token', 
+          'manara_skip_intro',
+          'onuf_current_language'
+        ]
+        
+        const allKeys = Object.keys(localStorage)
+        for (const key of allKeys) {
+          if (!keysToPreserve.includes(key)) {
+            localStorage.removeItem(key)
+            console.log('🧹 Suppression localStorage:', key)
+          }
+        }
+        
+        // 4. Vider le sessionStorage
+        sessionStorage.clear()
+        console.log('🧹 sessionStorage vidé')
+        
+        // 5. Attendre un peu pour laisser le temps aux opérations
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        console.log('✅ Cache vidé - Rechargement...')
+        
+        // 6. Recharger l'application en forçant le réseau
+        // location.reload(true) est déprécié, utiliser cette méthode
+        window.location.href = window.location.href + '?_t=' + Date.now()
+        
+      } catch (error) {
+        console.error('❌ Erreur lors du force update:', error)
+        isForceUpdating.value = false
+        
+        // Fallback: rechargement simple
+        window.location.reload()
+      }
+    }
+    
     return {
       // Data
       currentUser,
@@ -865,6 +938,7 @@ export default {
       mapContainer,
       mapInstance,
       mapLoading,
+      isForceUpdating,
       
       // Sync
       syncStats,
@@ -907,6 +981,7 @@ export default {
       handlePWAInstalled, // ✅ NOUVEAU: Gestionnaire PWA
       handlePWADismissed, // ✅ NOUVEAU: Gestionnaire PWA
       openDebugPanel, // ✅ AJOUT: Méthode pour ouvrir le panel debug
+      forceUpdateApp, // ✅ NOUVEAU: Méthode pour forcer la mise à jour
       t // ✅ NOUVEAU: Fonction de traduction
     }
   }

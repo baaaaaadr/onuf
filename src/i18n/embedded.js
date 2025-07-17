@@ -406,7 +406,9 @@ export const fr = {
     "languageSelection": "Langue",
     "profile": "Profil",
     "logout": "Déconnexion",
-    "debug": "Debug"
+    "debug": "Debug",
+    "forceUpdate": "Force Update",
+    "forceUpdateDescription": "Recharger depuis le réseau"
   },
   "gps": {
     "position": "Position",
@@ -861,7 +863,9 @@ export const en = {
     "languageSelection": "Language",
     "profile": "Profile",
     "logout": "Logout",
-    "debug": "Debug"
+    "debug": "Debug",
+    "forceUpdate": "Force Update",
+    "forceUpdateDescription": "Reload from network"
   },
   "gps": {
     "position": "Position",
@@ -1312,7 +1316,9 @@ export const ar = {
     "languageSelection": "اللغة",
     "profile": "الملف الشخصي",
     "logout": "تسجيل الخروج",
-    "debug": "تصحيح الأخطاء"
+    "debug": "تصحيح الأخطاء",
+    "forceUpdate": "إجبار التحديث",
+    "forceUpdateDescription": "إعادة تحميل من الشبكة"
   },
   "gps": {
     "position": "الموقع",
