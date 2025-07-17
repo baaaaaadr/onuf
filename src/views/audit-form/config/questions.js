@@ -49,47 +49,9 @@ import shade2 from '@/assets/icons/shade2.svg'
 import shade3 from '@/assets/icons/shade3.svg'
 import shade4 from '@/assets/icons/shade4.svg'
 
-// ✅ NOUVEAU: Configuration basée sur des clés i18n
+// ✅ NOUVEAU: Configuration basée sur des clés i18n - ORDRE MODIFIÉ
 export const questionsConfig = [
-  {
-    id: 'lighting',
-    titleKey: 'audit.sections.lighting.title',
-    descriptionKey: 'audit.sections.lighting.description',
-    options: [
-      { 
-        value: 1, 
-        textKey: 'audit.sections.lighting.options.none',
-        svgPath: lumi1,
-        emoji: '🌑', 
-        icon: 'mdi-lightbulb-off-outline', 
-        color: 'grey-lighten-1'
-      },
-      { 
-        value: 2, 
-        textKey: 'audit.sections.lighting.options.weak',
-        svgPath: lumi2,
-        emoji: '🌒', 
-        icon: 'mdi-lightbulb-outline', 
-        color: 'red-darken-1'
-      },
-      { 
-        value: 3, 
-        textKey: 'audit.sections.lighting.options.sufficient',
-        svgPath: lumi3,
-        emoji: '🌕', 
-        icon: 'mdi-lightbulb-on-outline', 
-        color: 'orange-darken-1'
-      },
-      { 
-        value: 4, 
-        textKey: 'audit.sections.lighting.options.excellent',
-        svgPath: lumi4,
-        emoji: '☀️', 
-        icon: 'mdi-lightbulb-on', 
-        color: 'green-darken-1'
-      },
-    ]
-  },
+  // 1. Trottoirs et voies piétonnes (walkpath)
   {
     id: 'walkpath',
     titleKey: 'audit.sections.walkways.title',
@@ -129,6 +91,47 @@ export const questionsConfig = [
       },
     ]
   },
+  // 2. Éclairage (lighting)
+  {
+    id: 'lighting',
+    titleKey: 'audit.sections.lighting.title',
+    descriptionKey: 'audit.sections.lighting.description',
+    options: [
+      { 
+        value: 1, 
+        textKey: 'audit.sections.lighting.options.none',
+        svgPath: lumi1,
+        emoji: '🌑', 
+        icon: 'mdi-lightbulb-off-outline', 
+        color: 'grey-lighten-1'
+      },
+      { 
+        value: 2, 
+        textKey: 'audit.sections.lighting.options.weak',
+        svgPath: lumi2,
+        emoji: '🌒', 
+        icon: 'mdi-lightbulb-outline', 
+        color: 'red-darken-1'
+      },
+      { 
+        value: 3, 
+        textKey: 'audit.sections.lighting.options.sufficient',
+        svgPath: lumi3,
+        emoji: '🌕', 
+        icon: 'mdi-lightbulb-on-outline', 
+        color: 'orange-darken-1'
+      },
+      { 
+        value: 4, 
+        textKey: 'audit.sections.lighting.options.excellent',
+        svgPath: lumi4,
+        emoji: '☀️', 
+        icon: 'mdi-lightbulb-on', 
+        color: 'green-darken-1'
+      },
+    ]
+  },
+  // 3. Visibilité et dégagement (openness)
   {
     id: 'openness',
     titleKey: 'audit.sections.openness.title',
@@ -168,45 +171,47 @@ export const questionsConfig = [
       },
     ]
   },
+  // 4. Ombre et protection solaire (shade)
   {
-    id: 'feeling',
-    titleKey: 'audit.sections.feeling.title',
-    descriptionKey: 'audit.sections.feeling.description',
+    id: 'shade',
+    titleKey: 'audit.sections.shade.title',
+    descriptionKey: 'audit.sections.shade.description',
     options: [
       { 
         value: 1, 
-        textKey: 'audit.sections.feeling.options.scary',
-        svgPath: feeling1,
-        emoji: '😰', 
-        icon: 'mdi-emoticon-dead-outline', 
+        textKey: 'audit.sections.shade.options.none',
+        svgPath: shade1,
+        emoji: '☀️', 
+        icon: 'mdi-weather-sunny', 
         color: 'grey-lighten-1' 
       },
       { 
         value: 2, 
-        textKey: 'audit.sections.feeling.options.uncomfortable',
-        svgPath: feeling2,
-        emoji: '😟', 
-        icon: 'mdi-emoticon-sad-outline', 
+        textKey: 'audit.sections.shade.options.little',
+        svgPath: shade2,
+        emoji: '🌤️', 
+        icon: 'mdi-weather-partly-cloudy', 
         color: 'red-darken-1' 
       },
       { 
         value: 3, 
-        textKey: 'audit.sections.feeling.options.acceptable',
-        svgPath: feeling3,
-        emoji: '😐', 
-        icon: 'mdi-emoticon-neutral-outline', 
+        textKey: 'audit.sections.shade.options.moderate',
+        svgPath: shade3,
+        emoji: '🌳', 
+        icon: 'mdi-tree', 
         color: 'orange-darken-1' 
       },
       { 
         value: 4, 
-        textKey: 'audit.sections.feeling.options.comfortable',
-        svgPath: feeling4,
-        emoji: '😊', 
-        icon: 'mdi-emoticon-happy-outline', 
+        textKey: 'audit.sections.shade.options.abundant',
+        svgPath: shade4,
+        emoji: '🌲', 
+        icon: 'mdi-pine-tree', 
         color: 'green-darken-1' 
       },
     ]
   },
+  // 5. Présence humaine (peoplePresence)
   {
     id: 'peoplePresence',
     titleKey: 'audit.sections.humanPresence.title',
@@ -246,84 +251,7 @@ export const questionsConfig = [
       },
     ]
   },
-  {
-    id: 'cleanliness',
-    titleKey: 'audit.sections.cleanliness.title',
-    descriptionKey: 'audit.sections.cleanliness.description',
-    options: [
-      { 
-        value: 1, 
-        textKey: 'audit.sections.cleanliness.options.veryDirty',
-        svgPath: clean1,
-        emoji: '🗑️', 
-        icon: 'mdi-delete-variant', 
-        color: 'grey-lighten-1' 
-      },
-      { 
-        value: 2, 
-        textKey: 'audit.sections.cleanliness.options.dirty',
-        svgPath: clean2,
-        emoji: '🧽', 
-        icon: 'mdi-broom', 
-        color: 'red-darken-1' 
-      },
-      { 
-        value: 3, 
-        textKey: 'audit.sections.cleanliness.options.clean',
-        svgPath: clean3,
-        emoji: '🧼', 
-        icon: 'mdi-spray', 
-        color: 'orange-darken-1' 
-      },
-      { 
-        value: 4, 
-        textKey: 'audit.sections.cleanliness.options.veryClean',
-        svgPath: clean4,
-        emoji: '✨', 
-        icon: 'mdi-star-circle', 
-        color: 'green-darken-1' 
-      },
-    ]
-  },
-  {
-    id: 'naturalSurveillance',
-    titleKey: 'audit.sections.naturalSurveillance.title',
-    descriptionKey: 'audit.sections.naturalSurveillance.description',
-    options: [
-      { 
-        value: 1, 
-        textKey: 'audit.sections.naturalSurveillance.options.none',
-        svgPath: surveillance1,
-        emoji: '🏚️', 
-        icon: 'mdi-eye-off', 
-        color: 'grey-lighten-1' 
-      },
-      { 
-        value: 2, 
-        textKey: 'audit.sections.naturalSurveillance.options.weak',
-        svgPath: surveillance2,
-        emoji: '🏢', 
-        icon: 'mdi-eye-outline', 
-        color: 'red-darken-1' 
-      },
-      { 
-        value: 3, 
-        textKey: 'audit.sections.naturalSurveillance.options.medium',
-        svgPath: surveillance3,
-        emoji: '🏘️', 
-        icon: 'mdi-eye', 
-        color: 'orange-darken-1' 
-      },
-      { 
-        value: 4, 
-        textKey: 'audit.sections.naturalSurveillance.options.high',
-        svgPath: surveillance4,
-        emoji: '🏪', 
-        icon: 'mdi-eye-circle', 
-        color: 'green-darken-1' 
-      },
-    ]
-  },
+  // 6. Mixité des genres (spaceDiversity)
   {
     id: 'spaceDiversity',
     titleKey: 'audit.sections.spaceDiversity.title',
@@ -363,45 +291,47 @@ export const questionsConfig = [
       },
     ]
   },
+  // 7. Surveillance naturelle (naturalSurveillance)
   {
-    id: 'transportAccess',
-    titleKey: 'audit.sections.transportAccess.title',
-    descriptionKey: 'audit.sections.transportAccess.description',
+    id: 'naturalSurveillance',
+    titleKey: 'audit.sections.naturalSurveillance.title',
+    descriptionKey: 'audit.sections.naturalSurveillance.description',
     options: [
       { 
         value: 1, 
-        textKey: 'audit.sections.transportAccess.options.inaccessible',
-        svgPath: bus1,
-        emoji: '🚫', 
-        icon: 'mdi-bus-alert', 
+        textKey: 'audit.sections.naturalSurveillance.options.none',
+        svgPath: surveillance1,
+        emoji: '🏚️', 
+        icon: 'mdi-eye-off', 
         color: 'grey-lighten-1' 
       },
       { 
         value: 2, 
-        textKey: 'audit.sections.transportAccess.options.far',
-        svgPath: bus2,
-        emoji: '🚶‍♂️', 
-        icon: 'mdi-bus-clock', 
+        textKey: 'audit.sections.naturalSurveillance.options.weak',
+        svgPath: surveillance2,
+        emoji: '🏢', 
+        icon: 'mdi-eye-outline', 
         color: 'red-darken-1' 
       },
       { 
         value: 3, 
-        textKey: 'audit.sections.transportAccess.options.close',
-        svgPath: bus3,
-        emoji: '🚏', 
-        icon: 'mdi-bus-stop', 
+        textKey: 'audit.sections.naturalSurveillance.options.medium',
+        svgPath: surveillance3,
+        emoji: '🏘️', 
+        icon: 'mdi-eye', 
         color: 'orange-darken-1' 
       },
       { 
         value: 4, 
-        textKey: 'audit.sections.transportAccess.options.veryClose',
-        svgPath: bus4,
-        emoji: '🚌', 
-        icon: 'mdi-bus-multiple', 
+        textKey: 'audit.sections.naturalSurveillance.options.high',
+        svgPath: surveillance4,
+        emoji: '🏪', 
+        icon: 'mdi-eye-circle', 
         color: 'green-darken-1' 
       },
     ]
   },
+  // 8. Présence de chiens errants (strayDogs)
   {
     id: 'strayDogs',
     titleKey: 'audit.sections.strayDogs.title',
@@ -441,41 +371,122 @@ export const questionsConfig = [
       },
     ]
   },
+  // 9. Propreté (cleanliness)
   {
-    id: 'shade',
-    titleKey: 'audit.sections.shade.title',
-    descriptionKey: 'audit.sections.shade.description',
+    id: 'cleanliness',
+    titleKey: 'audit.sections.cleanliness.title',
+    descriptionKey: 'audit.sections.cleanliness.description',
     options: [
       { 
         value: 1, 
-        textKey: 'audit.sections.shade.options.none',
-        svgPath: shade1,
-        emoji: '☀️', 
-        icon: 'mdi-weather-sunny', 
+        textKey: 'audit.sections.cleanliness.options.veryDirty',
+        svgPath: clean1,
+        emoji: '🗑️', 
+        icon: 'mdi-delete-variant', 
         color: 'grey-lighten-1' 
       },
       { 
         value: 2, 
-        textKey: 'audit.sections.shade.options.little',
-        svgPath: shade2,
-        emoji: '🌤️', 
-        icon: 'mdi-weather-partly-cloudy', 
+        textKey: 'audit.sections.cleanliness.options.dirty',
+        svgPath: clean2,
+        emoji: '🧽', 
+        icon: 'mdi-broom', 
         color: 'red-darken-1' 
       },
       { 
         value: 3, 
-        textKey: 'audit.sections.shade.options.moderate',
-        svgPath: shade3,
-        emoji: '🌳', 
-        icon: 'mdi-tree', 
+        textKey: 'audit.sections.cleanliness.options.clean',
+        svgPath: clean3,
+        emoji: '🧼', 
+        icon: 'mdi-spray', 
         color: 'orange-darken-1' 
       },
       { 
         value: 4, 
-        textKey: 'audit.sections.shade.options.abundant',
-        svgPath: shade4,
-        emoji: '🌲', 
-        icon: 'mdi-pine-tree', 
+        textKey: 'audit.sections.cleanliness.options.veryClean',
+        svgPath: clean4,
+        emoji: '✨', 
+        icon: 'mdi-star-circle', 
+        color: 'green-darken-1' 
+      },
+    ]
+  },
+  // 10. Accès aux transports (transportAccess)
+  {
+    id: 'transportAccess',
+    titleKey: 'audit.sections.transportAccess.title',
+    descriptionKey: 'audit.sections.transportAccess.description',
+    options: [
+      { 
+        value: 1, 
+        textKey: 'audit.sections.transportAccess.options.inaccessible',
+        svgPath: bus1,
+        emoji: '🚫', 
+        icon: 'mdi-bus-alert', 
+        color: 'grey-lighten-1' 
+      },
+      { 
+        value: 2, 
+        textKey: 'audit.sections.transportAccess.options.far',
+        svgPath: bus2,
+        emoji: '🚶‍♂️', 
+        icon: 'mdi-bus-clock', 
+        color: 'red-darken-1' 
+      },
+      { 
+        value: 3, 
+        textKey: 'audit.sections.transportAccess.options.close',
+        svgPath: bus3,
+        emoji: '🚏', 
+        icon: 'mdi-bus-stop', 
+        color: 'orange-darken-1' 
+      },
+      { 
+        value: 4, 
+        textKey: 'audit.sections.transportAccess.options.veryClose',
+        svgPath: bus4,
+        emoji: '🚌', 
+        icon: 'mdi-bus-multiple', 
+        color: 'green-darken-1' 
+      },
+    ]
+  },
+  // 11. Sensation de sécurité (feeling)
+  {
+    id: 'feeling',
+    titleKey: 'audit.sections.feeling.title',
+    descriptionKey: 'audit.sections.feeling.description',
+    options: [
+      { 
+        value: 1, 
+        textKey: 'audit.sections.feeling.options.scary',
+        svgPath: feeling1,
+        emoji: '😰', 
+        icon: 'mdi-emoticon-dead-outline', 
+        color: 'grey-lighten-1' 
+      },
+      { 
+        value: 2, 
+        textKey: 'audit.sections.feeling.options.uncomfortable',
+        svgPath: feeling2,
+        emoji: '😟', 
+        icon: 'mdi-emoticon-sad-outline', 
+        color: 'red-darken-1' 
+      },
+      { 
+        value: 3, 
+        textKey: 'audit.sections.feeling.options.acceptable',
+        svgPath: feeling3,
+        emoji: '😐', 
+        icon: 'mdi-emoticon-neutral-outline', 
+        color: 'orange-darken-1' 
+      },
+      { 
+        value: 4, 
+        textKey: 'audit.sections.feeling.options.comfortable',
+        svgPath: feeling4,
+        emoji: '😊', 
+        icon: 'mdi-emoticon-happy-outline', 
         color: 'green-darken-1' 
       },
     ]

@@ -1,7 +1,5 @@
-# 📋 Statut de la Tâche Récente
+# Statut de la Dernière Tâche
 
-## ✅ Tâche Complétée
-Correction de la déconnexion automatique au refresh + Fix de l'erreur du menu sandwich
+**Tâche Complétée:** Réorganisation de l'ordre des 11 questions d'audit selon les spécifications utilisateur
 
-## 🎯 Prochaine Étape  
-Tester que tout fonctionne correctement : l'authentification persiste après refresh et le menu s'ouvre sans erreur
+**Prochaine Étape:** Tester l'affichage des questions dans l'application pour confirmer le bon fonctionnement
