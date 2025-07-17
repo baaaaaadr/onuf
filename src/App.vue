@@ -10,7 +10,11 @@
               <!-- Logo et titre -->
               <v-card-title class="text-center pa-8">
                 <div class="login-logo mb-4">
-                  🛡️
+                  <img 
+                    src="@/assets/logo.svg" 
+                    alt="MANARA Logo" 
+                    class="manara-login-logo"
+                  />
                 </div>
                 <div class="text-h4 font-weight-bold text-primary mb-2">
                   MANARA
@@ -733,6 +737,16 @@ watch(isAuthenticated, (authenticated) => {
 .login-logo {
   font-size: 3rem;
   line-height: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.manara-login-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .login-btn {
