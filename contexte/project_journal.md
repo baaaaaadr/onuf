@@ -2,6 +2,15 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
+- **17/07/2025** : ✅ **CORRECTION DUPLICATION AUDITS APRÈS SYNCHRONISATION + ICÔNE SYNC**
+  - **Problème 1** : Après synchronisation offline→online, l'audit apparaissait en double au lieu de passer au statut "Sync"
+  - **Problème 2** : L'icône orange "Local" restait même après synchronisation réussie avec Supabase
+  - **Solution 1** : Amélioration markLocalAuditAsSynced() pour utiliser cloudId comme ID principal
+  - **Solution 2** : Renforcement mergeAudits() avec détection des cloudId utilisés comme ID principal
+  - **Solution 3** : Amélioration AuditCard.vue avec détection multi-conditions du statut sync (synced, source, cloudId)
+  - **Solution 4** : Ajout réactivité forcée avec syncUpdateKey + listeners d'événements temps réel
+  - **Solution 5** : Timing optimisé avec délai 100ms pour assurer mise à jour localStorage avant événement UI
+  - **Résultat** : L'audit local devient "Sync" avec icône verte INSTANTANÉMENT après synchronisation, sans duplication
 - **16/07/2025** : ✅ **CORRECTION DÉCONNEXION AUTOMATIQUE AU REFRESH + FIX ERREUR MENU**
   - **Problème 1** : La fonction initAuth() n'était jamais appelée au démarrage
   - **Solution 1** : Ajout de initAuth() dans main.js pour restaurer la session depuis localStorage

@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { reverseGeocode } from '@/services/geocoding.js'
 
 const props = defineProps({
@@ -145,9 +145,44 @@ const emit = defineEmits(['click', 'view', 'share', 'delete'])
 
 const hover = ref(false)
 const enrichedLocation = ref(null)
+// ✅ NOUVEAU: Réactivité forcée pour les mises à jour de sync
+const syncUpdateKey = ref(0)
+
+// ✅ NOUVEAU: Écouter les événements de synchronisation
+const handleAuditSynced = (event) => {
+  const { localId, cloudId } = event.detail
+  // Si cet audit est concerné, forcer la mise à jour
+  if (props.audit.id === localId || props.audit.localId === localId || props.audit.id === cloudId) {
+    console.log('✅ AuditCard: Synchronisation détectée pour cet audit', { localId, cloudId, auditId: props.audit.id })
+    
+    // ✅ NOUVEAU: Vérifier les nouvelles données dans localStorage
+    try {
+      const allLocalAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
+      const updatedAudit = allLocalAudits.find(a => 
+        a.id === cloudId || a.cloudId === cloudId || a.id === localId || a.localId === localId
+      )
+      
+      if (updatedAudit) {
+        console.log('✅ Données audit mises à jour détectées:', {
+          synced: updatedAudit.synced,
+          source: updatedAudit.source,
+          cloudId: updatedAudit.cloudId
+        })
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur lecture localStorage pour audit sync:', error)
+    }
+    
+    // Forcer la mise à jour de l'interface
+    syncUpdateKey.value++
+  }
+}
 
 // Enrichir l'audit avec le géocodage si nécessaire
 onMounted(async () => {
+  // Écouter les événements de synchronisation
+  window.addEventListener('onuf-audit-synced', handleAuditSynced)
+  
   // Si pas de nearby_info mais des coordonnées, faire le géocodage
   if ((!props.audit.nearby_info || props.audit.nearby_info === '') && 
       props.audit.latitude && props.audit.longitude &&
@@ -159,6 +194,11 @@ onMounted(async () => {
       console.warn('Géocodage échoué pour audit:', props.audit.id)
     }
   }
+})
+
+onUnmounted(() => {
+  // Nettoyer les listeners
+  window.removeEventListener('onuf-audit-synced', handleAuditSynced)
 })
 
 // Classes dynamiques
@@ -293,14 +333,25 @@ const photosCount = computed(() => {
   return props.audit.total_photos || 0
 })
 
-// Statut de synchronisation
+// Statut de synchronisation AMÉLIORÉ
 const syncStatus = computed(() => {
-  if (props.audit.synced || props.audit.source === 'cloud') {
+  // ✅ NOUVEAU: Utiliser syncUpdateKey pour forcer la réactivité
+  syncUpdateKey.value // Déclencheur de réactivité
+  
+  // ✅ PRIORITÉ 1: Vérifier si synchronisé (plusieurs conditions)
+  if (props.audit.synced || 
+      props.audit.source === 'cloud' || 
+      props.audit.source === 'local_synced' ||
+      (props.audit.cloudId && props.audit.cloudId !== null)) {
     return { color: 'success', icon: 'mdi-cloud-check', text: 'Sync' }
   }
+  
+  // ✅ PRIORITÉ 2: Vérifier erreurs de sync
   if (props.audit.sync_error) {
     return { color: 'error', icon: 'mdi-cloud-alert', text: 'Erreur' }
   }
+  
+  // ✅ PRIORITÉ 3: Par défaut = Local
   return { color: 'warning', icon: 'mdi-cloud-clock', text: 'Local' }
 })
 

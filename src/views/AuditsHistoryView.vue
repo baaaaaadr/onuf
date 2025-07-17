@@ -1079,6 +1079,14 @@ const setupAutoRefresh = () => {
     }
   })
   
+  // ✅ NOUVEAU: Écouter l'événement de synchronisation pour refresh immédiat
+  const handleAuditSynced = async (event) => {
+    console.log('✅ Audit synchronisé détecté - Refresh automatique', event.detail)
+    await loadAudits()
+  }
+  
+  window.addEventListener('onuf-audit-synced', handleAuditSynced)
+  
   // Refresh périodique si des audits en attente
   const autoRefreshInterval = setInterval(async () => {
     if (isOnline.value && (safeSyncStats.value.pending > 0 || safeSyncStats.value.syncing > 0)) {
@@ -1087,11 +1095,12 @@ const setupAutoRefresh = () => {
     }
   }, 10000) // Toutes les 10 secondes
   
-  return autoRefreshInterval
+  return { autoRefreshInterval, handleAuditSynced }
 }
 
 // Lifecycle
 let autoRefreshInterval = null
+let handleAuditSynced = null
 
 onMounted(() => {
   console.log('📊 AuditsHistoryView montée avec succès!')
@@ -1104,7 +1113,9 @@ onMounted(() => {
   loadAudits()
   
   // ✅ NOUVEAU: Configurer auto-refresh
-  autoRefreshInterval = setupAutoRefresh()
+  const refreshSetup = setupAutoRefresh()
+  autoRefreshInterval = refreshSetup.autoRefreshInterval
+  handleAuditSynced = refreshSetup.handleAuditSynced
   
   // Écouter événements de force reload
   window.addEventListener('onuf-force-reload', loadAudits)
@@ -1114,6 +1125,9 @@ onUnmounted(() => {
   // Nettoyer les intervals et listeners
   if (autoRefreshInterval) {
     clearInterval(autoRefreshInterval)
+  }
+  if (handleAuditSynced) {
+    window.removeEventListener('onuf-audit-synced', handleAuditSynced)
   }
   window.removeEventListener('onuf-force-reload', loadAudits)
 })

@@ -743,7 +743,7 @@ watch(isAuthenticated, (authenticated) => {
 }
 
 .manara-login-logo {
-  height: 48px;
+  height: 96px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));

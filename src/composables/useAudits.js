@@ -41,30 +41,40 @@ export const useAudits = () => {
     return data?.publicUrl || null
   }
 
-  // ✅ NOUVEAU: Marquer un audit local comme synchronisé (stratégie Local-First)
+  // ✅ CORRIGÉ: Marquer un audit local comme synchronisé (stratégie Local-First)
   const markLocalAuditAsSynced = async (localId, cloudId) => {
     try {
       const localAudits = JSON.parse(localStorage.getItem('onuf_audits_local') || '[]')
       
+      // ✅ NOUVELLE LOGIQUE: Chercher par plusieurs critères pour éviter les doublons
       const auditIndex = localAudits.findIndex(audit => 
-        audit.id === localId || audit.localId === localId
+        audit.id === localId || 
+        audit.localId === localId
       )
       
       if (auditIndex >= 0) {
-        // ✅ SIMPLE: Juste marquer comme synchronisé, GARDER en local
+        // ✅ MISE À JOUR: Marquer comme synchronisé ET ajouter cloudId
         localAudits[auditIndex] = {
           ...localAudits[auditIndex],
-          synced: true,
+          id: cloudId, // ✅ CRUCIAL: Utiliser cloudId comme ID principal
           cloudId: cloudId,
+          synced: true,
           syncedAt: new Date().toISOString(),
-          localOnly: false
+          localOnly: false,
+          source: 'local_synced' // ✅ NOUVEAU: Marquer comme local synchronisé
         }
         
         localStorage.setItem('onuf_audits_local', JSON.stringify(localAudits))
-        console.log(`✅ Audit ${localId} marqué synchronisé (garde en local + cloudId: ${cloudId})`)
+        console.log(`✅ Audit ${localId} marqué synchronisé (ID cloud: ${cloudId})`)
+        
+        return true
+      } else {
+        console.warn(`⚠️ Audit local non trouvé pour marquer comme synchronisé: ${localId}`)
+        return false
       }
     } catch (error) {
       console.error('❌ Erreur marquage sync:', error)
+      return false
     }
   }
 
@@ -116,9 +126,8 @@ export const useAudits = () => {
         longitude: longitude,
         location_text: auditData.location || 'Position non disponible',
         location_accuracy: auditData.locationAccuracy || auditData.accuracy || 999999, // ✅ CORRIGÉ: Valeur par défaut valide
-        nearby_info: auditData.nearbyInfo,
-        // ✅ NOUVEAU: Utiliser nearby_info pour stocker le géocodage inverse
-        nearby_info: geocodeResult?.displayName || auditData.address || auditData.location || null,
+        // ✅ CORRIGÉ: Utiliser nearby_info pour stocker le géocodage inverse
+        nearby_info: geocodeResult?.displayName || auditData.address || auditData.location || auditData.nearbyInfo || null,
         lighting: auditData.lighting,
         walkpath: auditData.walkpath,
         openness: auditData.openness,
@@ -168,7 +177,17 @@ export const useAudits = () => {
       }
 
       // ✅ NOUVEAU: Marquer l'audit local comme synchronisé
-      await markLocalAuditAsSynced(auditData.id || auditData.localId, audit.id)
+      const markResult = await markLocalAuditAsSynced(auditData.id || auditData.localId, audit.id)
+      
+      // ✅ NOUVEAU: Attendre un peu pour que les données soient bien mises à jour
+      if (markResult) {
+        setTimeout(() => {
+          console.log('✅ Déclenchement événement audit-synced avec délai')
+          window.dispatchEvent(new CustomEvent('onuf-audit-synced', { 
+            detail: { localId: auditData.id || auditData.localId, cloudId: audit.id } 
+          }))
+        }, 100) // Petit délai pour s'assurer que localStorage est à jour
+      }
 
       console.log('☁️ Audit synchronisé avec succès:', audit.id)
       return { success: true, audit }
@@ -501,17 +520,24 @@ export const useAudits = () => {
     localAudits.forEach(audit => {
       const enrichedAudit = {
         ...audit,
-        source: 'local',
+        source: audit.synced ? 'local_synced' : 'local',
         localOnly: !audit.synced,
         synced: audit.synced || false
       }
       
       merged.push(enrichedAudit)
       
-      // ✅ CORRIGÉ: Enregistrer les cloudId pour éviter doublons
+      // ✅ NOUVEAU: Enregistrer les cloudId pour éviter doublons
       if (audit.cloudId) {
         processedCloudIds.add(audit.cloudId)
         console.log(`🔗 Local audit ${audit.id} lié au cloudId: ${audit.cloudId}`)
+      }
+      
+      // ✅ CRUCIAL: Si l'audit local utilise un cloudId comme ID principal, l'enregistrer aussi
+      if (audit.id && audit.id.length > 20 && !audit.id.startsWith('audit_')) {
+        // Probablement un cloudId utilisé comme ID principal
+        processedCloudIds.add(audit.id)
+        console.log(`🔗 Local audit utilise cloudId comme ID principal: ${audit.id}`)
       }
     })
     
@@ -544,6 +570,11 @@ export const useAudits = () => {
     })
     
     console.log(`✅ Fusion terminée: ${sorted.length} audits total (${localAudits.length} locaux + ${cloudAudits.length} cloud)`)
+    console.log(`🔍 Debug fusion:`, {
+      processedCloudIds: Array.from(processedCloudIds),
+      finalCount: sorted.length
+    })
+    
     return sorted
   }
 
