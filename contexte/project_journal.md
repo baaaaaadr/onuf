@@ -2,6 +2,14 @@
 # Historique Chronologique des Développements
 
 ## Juillet 2025 - Migration vers le Système 4.0
+- **17/07/2025** : ✅ **MISE À JOUR AUDITCARD POUR 11 QUESTIONS + CHIENS ERRANTS**
+  - **Changement** : Passage de 10 à 11 questions avec remplacement "présence policière" par "chiens errants"
+  - **Questions finales** : Éclairage, Cheminement, Ouverture, Ressenti, Présence humaine, Propreté, Surveillance naturelle, Mixité espace, Accès transports, Chiens errants, Ombrage
+  - **Mise à jour AuditCard.vue** : Affichage des 11 questions avec emojis adaptés (🐕 chiens, 🌳 ombrage)
+  - **Recalcul moyennes** : Score global recalculé sur les 11 questions dans AuditCard et useAudits
+  - **Styles adaptatifs** : CSS optimisé pour affichage compact des 11 scores visuels sur mobile
+  - **Traductions** : Utilisation des traductions existantes pour strayDogs et shade
+  - **Résultat** : AuditCard affiche correctement les 11 questions avec moyenne précise
 - **17/07/2025** : ✅ **CORRECTION DUPLICATION AUDITS APRÈS SYNCHRONISATION + ICÔNE SYNC**
   - **Problème 1** : Après synchronisation offline→online, l'audit apparaissait en double au lieu de passer au statut "Sync"
   - **Problème 2** : L'icône orange "Local" restait même après synchronisation réussie avec Supabase

@@ -267,7 +267,7 @@ const formattedDate = computed(() => {
   })
 })
 
-// Items de score avec emojis - afficher 6 critères principaux
+// Items de score avec emojis - afficher les 11 critères complets
 const scoreItems = computed(() => [
   { 
     key: 'lighting', 
@@ -282,10 +282,28 @@ const scoreItems = computed(() => [
     color: getScoreColor(props.audit.walkpath || 0)
   },
   { 
+    key: 'openness', 
+    emoji: '🕳️', 
+    value: props.audit.openness || 0,
+    color: getScoreColor(props.audit.openness || 0)
+  },
+  { 
     key: 'feeling', 
     emoji: '😊', 
     value: props.audit.feeling || 0,
     color: getScoreColor(props.audit.feeling || 0)
+  },
+  { 
+    key: 'people_presence', 
+    emoji: '👥', 
+    value: props.audit.people_presence || props.audit.peoplePresence || 0,
+    color: getScoreColor(props.audit.people_presence || props.audit.peoplePresence || 0)
+  },
+  { 
+    key: 'cleanliness', 
+    emoji: '🧹', 
+    value: props.audit.cleanliness || 0,
+    color: getScoreColor(props.audit.cleanliness || 0)
   },
   { 
     key: 'natural_surveillance', 
@@ -294,20 +312,32 @@ const scoreItems = computed(() => [
     color: getScoreColor(props.audit.natural_surveillance || props.audit.naturalSurveillance || 0)
   },
   { 
+    key: 'space_diversity', 
+    emoji: '👨‍👩‍👧‍👦', 
+    value: props.audit.space_diversity || props.audit.spaceDiversity || 0,
+    color: getScoreColor(props.audit.space_diversity || props.audit.spaceDiversity || 0)
+  },
+  { 
     key: 'transport_access', 
     emoji: '🚌', 
     value: props.audit.transport_access || props.audit.transportAccess || 0,
     color: getScoreColor(props.audit.transport_access || props.audit.transportAccess || 0)
   },
   { 
-    key: 'formal_security', 
-    emoji: '👮', 
-    value: props.audit.formal_security || props.audit.formalSecurity || 0,
-    color: getScoreColor(props.audit.formal_security || props.audit.formalSecurity || 0)
+    key: 'stray_dogs', 
+    emoji: '🐕', 
+    value: props.audit.stray_dogs || props.audit.strayDogs || 0,
+    color: getScoreColor(props.audit.stray_dogs || props.audit.strayDogs || 0)
+  },
+  { 
+    key: 'shade', 
+    emoji: '🌳', 
+    value: props.audit.shade || 0,
+    color: getScoreColor(props.audit.shade || 0)
   }
 ])
 
-// Score global
+// Score global recalculé sur les 11 questions
 const globalScore = computed(() => {
   const scores = [
     props.audit.lighting,
@@ -319,7 +349,8 @@ const globalScore = computed(() => {
     props.audit.natural_surveillance || props.audit.naturalSurveillance,
     props.audit.space_diversity || props.audit.spaceDiversity,
     props.audit.transport_access || props.audit.transportAccess,
-    props.audit.formal_security || props.audit.formalSecurity
+    props.audit.stray_dogs || props.audit.strayDogs,
+    props.audit.shade
   ].filter(score => score > 0)
   
   if (scores.length === 0) return 0
@@ -450,37 +481,62 @@ const handleClick = () => {
   -webkit-box-orient: vertical;
 }
 
-/* Scores visuels */
+/* Scores visuels - Adaptation pour 11 questions */
 .scores-visual {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   padding: var(--spacing-sm) 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .score-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .score-emoji {
-  font-size: 16px;
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
 .score-dots {
   display: flex;
-  gap: 2px;
+  gap: 1px;
 }
 
 .score-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   transition: all var(--transition-fast);
 }
 
 .score-dot--filled {
   transform: scale(1.1);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 374px) {
+  .scores-visual {
+    gap: var(--spacing-xs);
+  }
+  
+  .score-item {
+    flex: 0 0 calc(20% - 2px);
+  }
+  
+  .score-emoji {
+    font-size: 10px;
+  }
+  
+  .score-dot {
+    width: 5px;
+    height: 5px;
+  }
 }
 
 /* Footer */

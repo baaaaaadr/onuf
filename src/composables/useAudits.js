@@ -776,7 +776,7 @@ export const useAudits = () => {
       let scoredAudits = 0
       
       userAudits.forEach(audit => {
-        // Calculer un score simple basé sur les réponses (0-100) pour 10 questions
+        // Calculer un score simple basé sur les réponses (0-100) pour 11 questions
         const scores = [
           audit.lighting,
           audit.walkpath,

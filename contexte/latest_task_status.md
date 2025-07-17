@@ -1,5 +1,5 @@
 # Statut de la Dernière Tâche
 
-**Tâche Complétée:** Correction complète du problème d'icône orange "Local" qui restait après synchronisation - L'icône passe maintenant instantanément au vert "Sync"
+**Tâche Complétée:** Mise à jour complète de l'AuditCard pour afficher les 11 nouvelles questions avec "chiens errants" au lieu de "présence policière"
 
-**Prochaine Étape:** Tester le comportement complet : audit offline → connexion WiFi → synchronisation automatique → vérification icône verte immédiate
+**Prochaine Étape:** Tester l'affichage des 11 questions dans l'historique et vérifier que les moyennes sont correctement calculées sur les 11 critères
