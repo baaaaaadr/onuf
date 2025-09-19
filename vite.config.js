@@ -36,7 +36,7 @@ export default defineConfig({
         name: 'ONUF - Audit Sécurité Urbaine',
         short_name: 'ONUF',
         description: 'Application PWA d\'audit de sécurité urbaine pour Agadir - Mode offline disponible',
-        theme_color: '#F3C348', // Couleur ONUF selon charte graphique
+        theme_color: '#125EB8', // ✅ NOUVEAU: Couleur primaire ONUF - Bleu
         background_color: '#ffffff',
         display: 'standalone',
         scope: '/',

@@ -58,9 +58,17 @@ Application PWA Vue.js 3 avec Vuetify pour l'audit de sécurité urbaine, utilis
 - **useCityDashboard.js** : Logique du tableau de bord ville
 - **useI18nFallback.js** : Gestion des fallbacks i18n
 
+### `/src/theme/` - Système de Couleurs Centralisé
+- **colors.js** : ⭐ **NOUVEAU** Source unique de vérité pour toutes les couleurs
+  - Couleurs de marque (Bleu #125EB8 + Accent Or #CBA052)
+  - Couleurs UI et sémantiques
+  - Thème Vuetify complet
+  - Propriétés CSS globales
+  - Fonctions utilitaires
+
 ### `/src/plugins/` - Plugins Vue
 - **i18n.js** : ⚠️ **CRITIQUE** - Configuration i18n avec injection manuelle (bug workaround)
-- **vuetify.js** : Configuration Vuetify avec thème personnalisé
+- **vuetify.js** : ✅ **MIS À JOUR** Configuration Vuetify avec nouveau thème bleu
 
 ### `/src/i18n/` - Internationalisation
 - **embedded.js** : Traductions intégrées (FR/EN/AR)

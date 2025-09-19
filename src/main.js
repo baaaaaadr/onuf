@@ -10,8 +10,15 @@ import { initAuth } from './composables/useSupabase' // Import de la fonction in
 import vuetify from './plugins/vuetify' // Configuration centralisée
 import './assets/styles/rtl-support.css' // Styles RTL
 
+// ✅ NOUVEAU: Import et application des propriétés CSS globales pour les couleurs
+import { applyGlobalCSSProperties } from '@/theme/colors.js'
+
 // Initialiser l'authentification au démarrage
 initAuth()
+
+// ✅ NOUVEAU: Appliquer les propriétés CSS globales pour les couleurs
+// Cela rend les couleurs disponibles partout via var(--onuf-primary), etc.
+applyGlobalCSSProperties()
 
 const app = createApp(App);
 app.use(router);

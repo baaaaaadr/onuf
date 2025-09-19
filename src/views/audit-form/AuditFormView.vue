@@ -420,10 +420,19 @@ export default {
 }
 
 /* ==== Variables Globales de la Charte Graphique ==== */
+/* ✅ MISE À JOUR: Utilisation des nouvelles couleurs bleues */
 :root {
-  --primary-gold: #F3C348;
-  --primary-gold-light: #F9D876;
-  --primary-gold-dark: #E5A716;
+  /* Nouvelles couleurs primaires - Bleu */
+  --primary-gold: var(--onuf-primary); /* #125EB8 */
+  --primary-gold-light: var(--onuf-primary-light); /* #1976D2 */
+  --primary-gold-dark: var(--onuf-primary-dark); /* #0D47A1 */
+  
+  /* Couleur accent - Or/Jaune */
+  --accent-gold: var(--onuf-accent); /* #CBA052 */
+  --accent-gold-light: var(--onuf-accent-light);
+  --accent-gold-dark: var(--onuf-accent-dark);
+  
+  /* Couleurs UI inchangées */
   --background-main: #FFFFFF;
   --surface-light: #F5F3F0;
   --surface-lighter: #F8F7F5;
@@ -461,12 +470,13 @@ export default {
 
 /* ==== Header ==== */
 .audit-header {
-  /* Utilise une couleur plus claire pour différencier du header principal de l'app */
-  background: var(--primary-gold-light); /* #F9D876 - plus clair que le header principal */
+  /* ✅ MISE À JOUR: Utilise un bleu clair au lieu du jaune */
+  background: #E3F2FD; /* Bleu très clair pour différencier du header principal */
+  /* Alternative gris clair: background: #F5F5F5; */
   padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xl);
   margin-bottom: var(--spacing-lg);
-  /* Ajouter une bordure subtile pour plus de définition */
-  border-bottom: 1px solid rgba(243, 195, 72, 0.3);
+  /* Bordure bleue subtile pour plus de définition */
+  border-bottom: 1px solid rgba(18, 94, 184, 0.1);
 }
 
 .header-content {
@@ -595,7 +605,8 @@ export default {
   font-weight: 700;
   font-size: 18px;
   min-height: 56px;
-  box-shadow: 0 4px 16px rgba(243, 195, 72, 0.3);
+  /* ✅ MISE À JOUR: Ombre bleue au lieu de jaune */
+  box-shadow: 0 4px 16px rgba(18, 94, 184, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -619,7 +630,8 @@ export default {
 .submit-btn:active:not(:disabled) {
   transform: scale(0.98);
   background: var(--primary-gold-dark);
-  box-shadow: 0 2px 8px rgba(243, 195, 72, 0.4);
+  /* ✅ MISE À JOUR: Ombre bleue au lieu de jaune */
+  box-shadow: 0 2px 8px rgba(18, 94, 184, 0.4);
 }
 
 .submit-btn:active:not(:disabled)::before {
@@ -637,7 +649,8 @@ export default {
 .submit-btn--loading {
   background: var(--primary-gold-light);
   cursor: wait;
-  box-shadow: 0 2px 8px rgba(243, 195, 72, 0.2);
+  /* ✅ MISE À JOUR: Ombre bleue au lieu de jaune */
+  box-shadow: 0 2px 8px rgba(18, 94, 184, 0.2);
 }
 
 .btn-content {

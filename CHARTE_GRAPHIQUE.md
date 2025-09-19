@@ -35,24 +35,29 @@ Une application **claire**, **intuitive** et **accessible** pour tous les agents
 ### 2.1 Couleurs Principales
 
 ```scss
-// Couleur Primaire - Action & Accent
-$primary-gold: #F3C348;     // Jaune doré - CTAs principaux
-$primary-gold-light: #F9D876; // Hover/Focus
-$primary-gold-dark: #E5A716;  // Active/Pressed
+// ✅ MISE À JOUR: Nouvelle couleur primaire - Bleu ONUF
+$primary-blue: #125EB8;        // Bleu primaire - CTAs principaux
+$primary-blue-light: #1976D2;  // Hover/Focus
+$primary-blue-dark: #0D47A1;   // Active/Pressed
+
+// Couleur Accent - Or/Jaune (ex-primaire)
+$accent-gold: #CBA052;         // Jaune doré - Accents et highlights
+$accent-gold-light: #FFD54F;   // Variant clair
+$accent-gold-dark: #F57C00;    // Variant foncé
 
 // Couleurs de Base
-$background-main: #FFFFFF;   // Fond principal
-$surface-light: #F5F3F0;     // Cartes et conteneurs
-$surface-lighter: #F8F7F5;   // Fond alternatif
+$background-main: #FFFFFF;     // Fond principal
+$surface-light: #F5F3F0;       // Cartes et conteneurs
+$surface-lighter: #F8F7F5;     // Fond alternatif
 
 // Textes
-$text-primary: #181611;      // Texte principal (quasi-noir)
-$text-secondary: #837B67;    // Texte secondaire/labels
-$text-disabled: #C4BFB3;     // Texte désactivé
+$text-primary: #181611;        // Texte principal (quasi-noir)
+$text-secondary: #837B67;      // Texte secondaire/labels
+$text-disabled: #C4BFB3;       // Texte désactivé
 
 // Bordures et Séparateurs
-$border-light: #E6E3DB;      // Bordures subtiles
-$border-selected: #F3C348;   // Bordure sélection (3px)
+$border-light: #E6E3DB;        // Bordures subtiles
+$border-selected: #125EB8;     // Bordure sélection bleue (3px)
 ```
 
 ### 2.2 Couleurs Sémantiques
@@ -164,9 +169,9 @@ $spacing-2xl: 48px; // 12 units
 #### Bouton Primaire (CTA)
 ```scss
 .btn-primary {
-  background: $primary-gold;
+  background: $primary-blue;         // ✅ Bleu primaire
   color: $text-primary;
-  border-radius: 9999px; // Pilule
+  border-radius: 9999px;             // Pilule
   padding: 16px 32px;
   font-weight: 600;
   font-size: 16px;
@@ -200,7 +205,7 @@ $spacing-2xl: 48px; // 12 units
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: $primary-gold;
+  background: $primary-blue;         // ✅ Bleu primaire
   box-shadow: $shadow-fab;
   
   // Forme ovale pour mobile
@@ -223,9 +228,9 @@ $spacing-2xl: 48px; // 12 units
   transition: all 0.2s ease;
   
   &.selected {
-    border: 3px solid $primary-gold;
-    padding: 10px 14px; // Compenser la bordure
-    background: rgba($primary-gold, 0.05);
+    border: 3px solid $primary-blue;     // ✅ Bordure bleue
+    padding: 10px 14px;                  // Compenser la bordure
+    background: rgba($primary-blue, 0.05); // ✅ Fond bleu très léger
   }
   
   &:active {
@@ -478,7 +483,8 @@ export default createVuetify({
         colors: {
           background: '#FFFFFF',
           surface: '#F5F3F0',
-          primary: '#F3C348',
+          primary: '#125EB8',        // ✅ Bleu primaire
+          accent: '#CBA052',         // ✅ Or/Jaune accent
           secondary: '#837B67',
           success: '#4CAF50',
           warning: '#FF9800',
@@ -486,7 +492,7 @@ export default createVuetify({
           info: '#2196F3',
           'on-background': '#181611',
           'on-surface': '#181611',
-          'on-primary': '#181611',
+          'on-primary': '#FFFFFF',   // ✅ Texte blanc sur bleu
         }
       }
     }

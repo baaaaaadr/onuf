@@ -271,13 +271,12 @@
           <v-card-actions class="intro-actions" :class="{ 'intro-actions--mobile': $vuetify.display.mobile }">
             <div class="w-100">
               <v-btn
-                color="primary"
-                size="large"
-                rounded="pill"
-                block
-                @click="startFirstAudit"
-                class="cta-button mb-3"
-                style="background-color: #F3C348 !important; color: #181611 !important;"
+              color="primary"
+              size="large"
+              rounded="pill"
+              block
+              @click="startFirstAudit"
+              class="cta-button mb-3"
               >
                 <v-icon start size="20">mdi-play-circle</v-icon>
                 Faire un audit
@@ -687,9 +686,10 @@ watch(isAuthenticated, (authenticated) => {
 .onuf-app {
   font-family: var(--font-family-primary) !important;
   
-  /* Variables CSS pour éviter les incohérences entre dev et prod */
-  --onuf-primary: #F3C348;
-  --onuf-secondary: #F9D876;
+  /* ✅ MISE À JOUR: Variables CSS avec nouvelles couleurs bleues */
+  --onuf-primary: #125EB8;      /* Bleu primaire */
+  --onuf-secondary: #1976D2;    /* Bleu secondaire */
+  --onuf-accent: #CBA052;       /* Accent or/jaune */
   --onuf-surface-variant: #E6E3DB;
   --onuf-background: #FFFFFF;
   --onuf-surface-light: #F5F3F0;
@@ -707,7 +707,8 @@ watch(isAuthenticated, (authenticated) => {
 /* === LOGIN === */
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #F3C348 0%, #F9D876 100%) !important;
+  /* ✅ MISE À JOUR: Gradient bleu au lieu de jaune */
+  background: linear-gradient(135deg, #125EB8 0%, #1976D2 100%) !important;
   padding: 24px;
 }
 
@@ -727,7 +728,8 @@ watch(isAuthenticated, (authenticated) => {
 }
 
 .login-card .text-primary {
-  color: #F3C348 !important;
+  /* ✅ MISE À JOUR: Utilise la couleur primaire bleue */
+  color: var(--onuf-primary) !important;
 }
 
 .login-card .text-secondary {
@@ -753,8 +755,9 @@ watch(isAuthenticated, (authenticated) => {
   height: 56px !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
-  background-color: #F3C348 !important;
-  color: #181611 !important;
+  /* ✅ MISE À JOUR: Utilise les nouvelles couleurs bleues */
+  background-color: var(--onuf-primary) !important;
+  color: #FFFFFF !important; /* Texte blanc sur fond bleu */
 }
 
 /* === HEADER === */
@@ -959,16 +962,18 @@ watch(isAuthenticated, (authenticated) => {
 }
 
 .feature-item {
-  background: rgba(243, 195, 72, 0.08);
+  /* ✅ MISE À JOUR: Utilise les couleurs bleues au lieu du jaune */
+  background: rgba(18, 94, 184, 0.08);
   border-radius: 12px;
   padding: 16px;
-  border-left: 4px solid #F3C348;
+  border-left: 4px solid var(--onuf-primary);
 }
 
 .feature-icon {
   width: 40px;
   height: 40px;
-  background: rgba(243, 195, 72, 0.15);
+  /* ✅ MISE À JOUR: Utilise les couleurs bleues au lieu du jaune */
+  background: rgba(18, 94, 184, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -984,12 +989,14 @@ watch(isAuthenticated, (authenticated) => {
   height: 56px !important;
   font-weight: 600 !important;
   font-size: 16px !important;
-  box-shadow: 0 4px 12px rgba(243, 195, 72, 0.3) !important;
+  /* ✅ MISE À JOUR: Ombres bleues au lieu de jaunes */
+  box-shadow: 0 4px 12px rgba(18, 94, 184, 0.3) !important;
 }
 
 .cta-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(243, 195, 72, 0.4) !important;
+  /* ✅ MISE À JOUR: Ombres bleues au lieu de jaunes */
+  box-shadow: 0 6px 16px rgba(18, 94, 184, 0.4) !important;
 }
 
 .skip-button {

@@ -1,12 +1,16 @@
-// Configuration Vuetify pour ONUF PWA - Thème Redesign v2.0
-// Mise à jour : Phase 1 du redesign - CORRECTION ERREURS AFFICHAGE
+// Configuration Vuetify pour ONUF PWA - Thème Blue Redesign v3.0
+// Mise à jour : Changement de couleur primaire Yellow → Blue (#125EB8)
+// Source unique de vérité pour les couleurs: src/theme/colors.js
 
 import 'vuetify/styles' // Import des styles Vuetify
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { fr } from 'vuetify/locale' // ✅ NOUVEAU: Support français
+import { fr } from 'vuetify/locale' // ✅ Support français
 import '@mdi/font/css/materialdesignicons.css'
+
+// ✅ NOUVEAU: Import du système de couleurs centralisé
+import { VUETIFY_THEME_COLORS } from '@/theme/colors.js'
 
 // ✅ CORRECTION: Traductions françaises personnalisées pour éviter les erreurs
 const frenchTranslations = {
@@ -18,73 +22,11 @@ const frenchTranslations = {
   }
 }
 
-// Définition du thème ONUF
+// ✅ NOUVEAU: Thème ONUF utilisant le système de couleurs centralisé
+// Primary: Blue (#125EB8) | Accent: Gold (#CBA052)
 const onufLightTheme = {
   dark: false,
-  colors: {
-    // Couleurs principales
-    background: '#FFFFFF',
-    surface: '#F5F3F0',
-    'surface-light': '#F8F7F5',
-    'surface-variant': '#E6E3DB',
-    
-    // Primary - Jaune doré (charte graphique ONUF)
-    primary: '#F3C348',
-    'primary-darken-1': '#E5A716',
-    'primary-lighten-1': '#F9D876',
-    
-    // Secondary - Beige foncé
-    secondary: '#837B67',
-    'secondary-darken-1': '#6A6356',
-    'secondary-lighten-1': '#9C9484',
-    
-    // États sémantiques
-    success: '#4CAF50',
-    'success-lighten-1': '#66BB6A',
-    'success-lighten-3': '#A5D6A7',
-    'success-lighten-5': '#E8F5E9',
-    'success-darken-1': '#43A047',
-    
-    warning: '#FF9800',
-    'warning-lighten-1': '#FFA726',
-    'warning-lighten-3': '#FFCC80',
-    'warning-lighten-5': '#FFF3E0',
-    'warning-darken-1': '#FB8C00',
-    
-    error: '#F44336',
-    'error-lighten-1': '#EF5350',
-    'error-lighten-3': '#E57373',
-    'error-lighten-5': '#FFEBEE',
-    'error-darken-1': '#E53935',
-    
-    info: '#2196F3',
-    'info-lighten-1': '#42A5F5',
-    'info-lighten-3': '#90CAF9',
-    'info-lighten-5': '#E3F2FD',
-    'info-darken-1': '#1E88E5',
-    
-    // Textes
-    'on-background': '#181611',
-    'on-surface': '#181611',
-    'on-primary': '#181611',
-    'on-secondary': '#FFFFFF',
-    'on-success': '#FFFFFF',
-    'on-warning': '#181611',
-    'on-error': '#FFFFFF',
-    'on-info': '#FFFFFF',
-    
-    // Gris
-    'grey-lighten-5': '#FAFAFA',
-    'grey-lighten-4': '#F5F5F5',
-    'grey-lighten-3': '#EEEEEE',
-    'grey-lighten-2': '#E0E0E0',
-    'grey-lighten-1': '#BDBDBD',
-    'grey': '#9E9E9E',
-    'grey-darken-1': '#837B67',
-    'grey-darken-2': '#616161',
-    'grey-darken-3': '#424242',
-    'grey-darken-4': '#212121',
-  }
+  colors: VUETIFY_THEME_COLORS // Utilise la source unique de vérité
 }
 
 // Configuration des defaults pour tous les composants
@@ -220,7 +162,8 @@ const defaults = {
 
 // ✅ NOUVEAU: Créer thème RTL pour l'arabe
 const onufLightRTL = {
-  ...onufLightTheme,
+  dark: false,
+  colors: VUETIFY_THEME_COLORS, // Utilise la même source unique de vérité
   rtl: true // Activer le mode RTL
 }
 

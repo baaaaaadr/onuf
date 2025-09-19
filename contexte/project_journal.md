@@ -138,3 +138,35 @@ __debugONUF.getSyncQueue()       // Queue synchronisation
 URL: ?debug=true
 Console: localStorage.setItem('onuf-debug-enabled', 'true')
 ```
+
+## 2025-09-19 - Changement de Branding : Passage du Jaune au Bleu 🎨
+
+### ✅ Changement de couleur primaire
+- **Ancienne couleur** : Jaune/Or #F3C348
+- **Nouvelle couleur** : Bleu #125EB8
+- **Accent** : Or/Jaune #CBA052 (ex-primaire devient accent)
+
+### ✅ Architecture de couleurs centralisée
+- Création de `src/theme/colors.js` comme source unique de vérité
+- Système de couleurs organisé en catégories (BRAND, UI, SEMANTIC, GRAY, SCORE)
+- Propriétés CSS globales pour accès universel (--onuf-primary, etc.)
+- Fonction `applyGlobalCSSProperties()` appliquée dans main.js
+
+### ✅ Composants mis à jour
+- **App.vue** : Variables CSS globales, gradient de login, styles de boutons
+- **Vuetify Theme** : Utilise désormais `VUETIFY_THEME_COLORS` de colors.js
+- **PWA Manifest** : theme_color passé à #125EB8
+- **AuditFormView** : Header bleu clair, boutons et ombres bleues
+- **BottomNav** : États d'interaction avec couleurs bleues
+- **Charte Graphique** : Mise à jour avec nouveaux exemples de code
+
+### ✅ Résolution des couleurs hardcodées
+- Remplacement des valeurs rgba(243, 195, 72, x) par rgba(18, 94, 184, x)
+- Variables CSS --primary-gold maintenant des alias vers --onuf-primary
+- Toutes les couleurs désormais centralisées et configurables
+
+### ✅ Avantages de la nouvelle architecture
+- **Source unique** : Changement global possible depuis un seul fichier
+- **Maintenabilité** : Fini les couleurs hardcodées éparses
+- **Cohérence** : Thème uniforme à travers toute l'application
+- **Flexibilité** : Fonction getColor() pour usage programmatique

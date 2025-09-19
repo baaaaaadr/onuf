@@ -341,7 +341,8 @@ const handleTabChange = (newValue) => {
 
 /* États d'interaction */
 .nav-btn:hover:not(.nav-btn--active) {
-  background: rgba(243, 195, 72, 0.04) !important;
+  /* ✅ MISE À JOUR: Utilise le bleu au lieu du jaune */
+  background: rgba(18, 94, 184, 0.04) !important;
 }
 
 .nav-btn:hover:not(.nav-btn--active) .v-icon {
@@ -355,7 +356,8 @@ const handleTabChange = (newValue) => {
 }
 
 .nav-btn:active {
-  background: rgba(243, 195, 72, 0.08) !important;
+  /* ✅ MISE À JOUR: Utilise le bleu au lieu du jaune */
+  background: rgba(18, 94, 184, 0.08) !important;
   transform: scale(0.98);
 }
 
@@ -368,7 +370,8 @@ const handleTabChange = (newValue) => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(243, 195, 72, 0.2);
+  /* ✅ MISE À JOUR: Utilise le bleu au lieu du jaune */
+  background: rgba(18, 94, 184, 0.2);
   transform: translate(-50%, -50%);
   transition: all 0.3s ease;
   pointer-events: none;
