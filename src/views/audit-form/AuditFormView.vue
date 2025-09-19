@@ -4,7 +4,6 @@
     <div class="audit-header">
       <div class="header-content">
         <h1 class="header-title">
-          <v-icon size="28" class="mr-2">mdi-security</v-icon>
           {{ t('audit.title') }}
         </h1>
         <p class="header-subtitle">{{ t('audit.subtitle') }}</p>
