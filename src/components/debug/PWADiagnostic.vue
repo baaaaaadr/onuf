@@ -237,7 +237,7 @@ export default {
           icon: 'mdi-monitor',
           color: 'primary',
           title: 'Chrome/Edge Desktop',
-          description: 'Icône + dans la barre d\'adresse OU Menu → "Installer ONUF"'
+          description: 'Icône + dans la barre d\'adresse OU Menu → "Installer MANARA"'
         })
       }
       

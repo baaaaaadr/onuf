@@ -32,7 +32,7 @@ if (typeof window !== 'undefined') {
     messages: i18n.global.messages,
     version: '1.0.1-patch4', env: import.meta.env.MODE,
     diagnose: () => {
-      console.log('🏥 Diagnostic ONUF (v4):');
+      console.log('🏥 Diagnostic MANARA (v4):');
       console.log('- Stratégie: Plugin Isolé');
       console.log('- Environnement:', import.meta.env.MODE);
       console.log('- Locale actuelle:', i18n.global.locale.value);
@@ -72,4 +72,4 @@ app.mount('#app');
 // ✅ PWA Service Worker Registration - Géré automatiquement par Vite PWA
 // Le Service Worker est géré par vite-plugin-pwa, pas besoin d'enregistrement manuel
 
-console.log('✅ ONUF PWA démarré avec plugin i18n isolé.');
+console.log('✅ MANARA PWA démarré avec plugin i18n isolé.');

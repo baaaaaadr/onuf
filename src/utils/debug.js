@@ -1,4 +1,4 @@
-// ✅ FONCTIONS DE DEBUG POUR ONUF PWA
+// ✅ FONCTIONS DE DEBUG POUR MANARA PWA
 // Fichier utilitaire pour diagnostiquer les problèmes de synchronisation
 // ⚠️ Sécurité: Certaines fonctions sont désactivées en production
 
@@ -256,7 +256,7 @@ window.__debugONUF = {
   }
 }
 
-console.log('🔧 Debug ONUF disponible: window.__debugONUF')
+console.log('🔧 Debug MANARA disponible: window.__debugONUF')
 console.log('📝 Commandes disponibles:')
 console.log('  === AUDITS ===')
 console.log('  • __debugONUF.getLocalAudits() - Voir audits locaux')

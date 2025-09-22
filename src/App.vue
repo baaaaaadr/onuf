@@ -325,7 +325,7 @@
       >
         <div class="d-flex align-center">
           <v-icon class="mr-2">mdi-download</v-icon>
-          <span>Installer ONUF sur votre appareil ?</span>
+          <span>Installer MANARA sur votre appareil ?</span>
         </div>
         <template v-slot:actions>
           <v-btn variant="text" @click="installPWA">Installer</v-btn>

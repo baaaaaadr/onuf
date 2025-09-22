@@ -33,8 +33,8 @@ export default defineConfig({
         'maskable-icon-512x512.png'
       ],
       manifest: {
-        name: 'ONUF - Audit Sécurité Urbaine',
-        short_name: 'ONUF',
+        name: 'MANARA - Audit Sécurité Urbaine',
+        short_name: 'MANARA',
         description: 'Application PWA d\'audit de sécurité urbaine pour Agadir - Mode offline disponible',
         theme_color: '#125EB8', // ✅ NOUVEAU: Couleur primaire ONUF - Bleu
         background_color: '#ffffff',
@@ -126,7 +126,7 @@ export default defineConfig({
         // ✅ PROTOCOL HANDLERS (optionnel mais améliore l'installabilité)
         protocol_handlers: [
           {
-            protocol: 'web+onuf',
+            protocol: 'web+manara',
             url: '/?audit=%s'
           }
         ]

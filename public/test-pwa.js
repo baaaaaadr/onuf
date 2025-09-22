@@ -1,7 +1,7 @@
-// Test rapide PWA ONUF
+// Test rapide PWA MANARA
 // Copier-coller ce code dans la console du navigateur
 
-console.log('🔍 Test PWA ONUF - Début du diagnostic...\n');
+console.log('🔍 Test PWA MANARA - Début du diagnostic...\n');
 
 // 1. Vérifier les critères de base
 const checkBasicCriteria = () => {
@@ -85,7 +85,7 @@ const checkInstallability = () => {
       console.log('  iOS: Partager 􀈂 → "Sur l\'écran d\'accueil"');
     } else {
       console.log('  Desktop: Icône + dans la barre d\'adresse');
-      console.log('          OU Menu → "Installer ONUF"');
+      console.log('          OU Menu → "Installer MANARA"');
     }
   }
 };

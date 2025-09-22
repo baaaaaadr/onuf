@@ -90,7 +90,7 @@ router.beforeEach((to, from, next) => {
   
   // Mettre à jour le titre de la page
   if (to.meta.title) {
-    document.title = `${to.meta.title} | ONUF`
+    document.title = `${to.meta.title} | MANARA`
   }
   
   next()

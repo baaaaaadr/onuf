@@ -319,7 +319,7 @@ export default {
         case 'mac':
         case 'desktop':
         default:
-          message = `Chrome/Edge Desktop:\n1. Cliquez sur l'icône + dans la barre d'adresse\n2. OU Menu → "Installer ONUF"\n3. OU F12 → Application → Manifest → Install`
+          message = `Chrome/Edge Desktop:\n1. Cliquez sur l'icône + dans la barre d'adresse\n2. OU Menu → "Installer MANARA"\n3. OU F12 → Application → Manifest → Install`
           icon = 'mdi-plus'
           break
       }
